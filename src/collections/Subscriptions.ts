@@ -1,10 +1,25 @@
 import { CollectionConfig } from 'payload/types';
+import { isAdminOrEditor } from '../access/isAdminOrEditor';
+import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
+import { checkRole } from './Users/checkRole';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Subscriptions: CollectionConfig = {
     slug: 'subscriptions',
     admin: {
         useAsTitle: 'id'
+    },
+    access: {
+        create: ({ req: { user } }) => {
+            if (checkRole(['admin', 'editor', 'teacher'], user)) {
+                return true
+            }
+            // TODO: let a user type student enroll in a course
+            return false
+        },
+        read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
+        update: isAdminOrEditor,
+        delete: isAdminOrEditor
     },
     fields: [
         {
