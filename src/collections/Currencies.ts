@@ -1,22 +1,18 @@
 import { CollectionConfig } from 'payload/types';
+import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isRole } from '../access/isRole';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
-const Currencys: CollectionConfig = {
-    slug: 'currencys',
+const Currencies: CollectionConfig = {
+    slug: 'currencies',
     admin: {
         useAsTitle: 'name'
     },
     access: {
-        create: ({req: {user}}) => {
-            return isRole({ user, role: 'admin' })
-        },
-        update: ({req: {user}}) => {
-            return isRole({ user, role: 'admin' })
-        },
-        delete: ({req: {user}}) => {
-            return isRole({ user, role: 'admin' })
-        }
+        create: isAdminOrEditor,
+        read : () => true,
+        update: isAdminOrEditor,
+        delete: isAdminOrEditor
     },
     fields: [
         {
@@ -45,4 +41,4 @@ const Currencys: CollectionConfig = {
     ],
 }
 
-export default Currencys;
+export default Currencies;
