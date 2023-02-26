@@ -1,7 +1,7 @@
 import { CollectionConfig } from 'payload/types';
 
-import { isAdmin, isAdminFieldLevel } from '../access/isAdmin';
-import { isAdminOrSelf } from '../access/isAdminOrSelf';
+import { isAdmin, isAdminFieldLevel } from '../../access/isAdmin';
+import { isAdminOrSelf } from '../../access/isAdminOrSelf';
 const Users: CollectionConfig = {
 	slug: 'users',
 	auth: true,
@@ -19,6 +19,12 @@ const Users: CollectionConfig = {
 		update: isAdminOrSelf,
 		// Only admins can delete
 		delete: isAdmin,
+		admin:  ({ req: { user } }) => { 
+			if (user.roles.includes('user')) {
+				return false
+			}
+			return true
+		}
 	},
 	fields: [
 		// Email added by default
@@ -80,6 +86,10 @@ const Users: CollectionConfig = {
 				{
 					label: 'Editor',
 					value: 'editor'
+				},
+				{
+					label: 'Usuario',
+					value: 'user'
 				}
 			]
 		},

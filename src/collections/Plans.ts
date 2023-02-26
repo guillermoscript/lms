@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload/types';
+import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isRole } from '../access/isRole';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -8,18 +9,10 @@ const Plans: CollectionConfig = {
         useAsTitle: 'name'
     },
     access: {
-        create : ({req: {user}}) => {
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' })
-        },
-        read :({req: {user}}) => {
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' })
-        },
-        update :({req: {user}}) => {
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' })
-        },
-        delete :({req: {user}}) => {
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' })
-        },
+        create : isAdminOrEditor,
+        read : () => true,
+        update : isAdminOrEditor,
+        delete : isAdminOrEditor,
     },
     fields: [
         {

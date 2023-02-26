@@ -16,7 +16,8 @@ export interface Course {
   description: string;
   teacher?: string | User;
   enrollments?: string[] | Enrollment[];
-  productPrices?: string[] | ProductPrice[];
+  createdBy?: string | User;
+  isPublic?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,7 +32,7 @@ export interface User {
   phone?: string;
   address?: string;
   birthDate?: string;
-  roles?: ('admin' | 'teacher' | 'editor')[];
+  roles?: ('admin' | 'teacher' | 'editor' | 'user')[];
   email?: string;
   resetPasswordToken?: string;
   resetPasswordExpiration?: string;
@@ -55,34 +56,6 @@ export interface Enrollment {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-prices".
- */
-export interface ProductPrice {
-  id: string;
-  price: number;
-  currency?: string[] | Currency[];
-  product?: {
-    value: string | Course;
-    relationTo: 'courses';
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "currencys".
- */
-export interface Currency {
-  id: string;
-  name: string;
-  symbol: string;
-  exchangeRate: number;
-  productPrices?: string | ProductPrice;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "customers".
  */
 export interface Customer {
@@ -96,6 +69,34 @@ export interface Customer {
   resetPasswordExpiration?: string;
   loginAttempts?: number;
   lockUntil?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "currencies".
+ */
+export interface Currency {
+  id: string;
+  name: string;
+  symbol: string;
+  exchangeRate: number;
+  productPrices?: string | ProductPrice;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-prices".
+ */
+export interface ProductPrice {
+  id: string;
+  price: number;
+  currency?: string[] | Currency[];
+  product?: {
+    value: string | Course;
+    relationTo: 'courses';
+  };
   createdAt: string;
   updatedAt: string;
 }

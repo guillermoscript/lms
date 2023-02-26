@@ -18,6 +18,13 @@ const Customers: CollectionConfig = {
 		update: isAdminOrSelf,
 		// Only admins can delete
 		delete: isAdmin,
+		// admin:  ({ req: { user } }) => { 
+		// 	if (user.roles.includes('admin')) {
+		// 		return true
+		// 	}
+		// 	return false
+		// },
+
 	},
 	fields: [
 		// Email added by default

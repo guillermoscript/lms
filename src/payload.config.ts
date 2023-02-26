@@ -1,13 +1,13 @@
 import { buildConfig } from 'payload/config';
 import path from 'path';
 // import Examples from './collections/Examples';
-import Users from './collections/Users';
+import Users from './collections/Users/Users';
 import PagoMovils from './collections/PagoMovils';
 import Transactions from './collections/Transactions';
 import PaymentMethods from './collections/PaymentMethods';
 import Zelles from './collections/Zelles';
 import Courses from './collections/Courses';
-import Currencys from './collections/Currencys';
+import Currencies from './collections/Currencies';
 import Enrollments from './collections/Enrollments';
 import Subscriptions from './collections/Subscriptions';
 import ProductPrices from './collections/ProductPrices';
@@ -27,7 +27,7 @@ export default buildConfig({
   collections: [
     Courses,
     Customers,
-    Currencys,
+    Currencies,
     Enrollments,
     Evaluations,
     Exams,
