@@ -1,6 +1,9 @@
 import { CollectionConfig } from 'payload/types';
-import {isRole} from '../access/isRole'
-import {isSelfStudent} from '../access/isSelfStudent'
+import { isAdminOrEditor } from '../access/isAdminOrEditor';
+import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
+import { isRole } from '../access/isRole'
+import { isSelfStudent } from '../access/isSelfStudent'
+import { checkRole } from './Users/checkRole';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Enrollments: CollectionConfig = {
@@ -9,22 +12,16 @@ const Enrollments: CollectionConfig = {
         useAsTitle: 'id'
     },
     access: {
-        create : (data) => {
-            const {req: {user}} = data
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' }) || isRole({ user, role: 'teacher' }) || isSelfStudent(data)
+        create: ({ req: { user } }) => {
+            if (checkRole(['admin', 'editor', 'teacher'], user)) {
+                return true
+            }
+            // TODO: let a user type student enroll in a course
+            return false
         },
-        read: (data) => {
-            const {req: {user}} = data
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' }) || isRole({ user, role: 'teacher' }) || isSelfStudent(data)
-        },
-        update: (data) => {
-            const {req: {user}} = data
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' }) || isRole({ user, role: 'teacher' }) || isSelfStudent(data)
-        },
-        delete: (data) => {
-            const {req: {user}} = data
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' }) || isRole({ user, role: 'teacher' }) || isSelfStudent(data)
-        },
+        read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
+        update: isAdminOrEditor,
+        delete: isAdminOrEditor
     },
     fields: [
         {
