@@ -18,6 +18,7 @@ import Homeworks from './collections/Homeworks';
 import Lessons from './collections/Lessons';
 import Plans from './collections/Plans';
 import Customers from './collections/Customers';
+import Media from './collections/Customers';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
@@ -32,6 +33,7 @@ export default buildConfig({
     Evaluations,
     Exams,
     Homeworks,
+    Media,
     Lessons,
     PagoMovils,
     PaymentMethods,
@@ -49,4 +51,8 @@ export default buildConfig({
   graphQL: {
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
   },
+  upload: {
+    limits: {
+      fileSize: 5000000, // 5MB, written in bytes
+    },
 });
