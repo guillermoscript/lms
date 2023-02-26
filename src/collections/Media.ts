@@ -30,6 +30,25 @@ const Media: CollectionConfig = {
       },
     ],
     adminThumbnail: 'thumbnail',
-    mimeTypes: ['image/*'],
+    mimeTypes: ['image/*', 'application/pdf'],
   },
+  fields: [
+    // {
+    //   name: 'url',
+    //   type: 'text',
+    //   required: true,
+    // },
+    {
+      name: 'filename',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'altText',
+      type: 'text',
+      required: true,
+    }
+  ]
 };
+
+export default Media;
