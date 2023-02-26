@@ -1,5 +1,8 @@
-export default function VenezuelanBanks() {
-    return {
+import deepMerge from '../utilities/deepMerge'
+import type { Field } from 'payload/types'
+
+export default function VenezuelanBanks(overrides = {}) {
+    return deepMerge<Field, Partial<Field>>({
         name: 'bank',
         type: 'radio',
         options: [
@@ -72,5 +75,5 @@ export default function VenezuelanBanks() {
                 value: 'banesco',
             }
         ]
-    }
+    }, overrides)
 }
