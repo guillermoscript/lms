@@ -18,7 +18,7 @@ import Homeworks from './collections/Homeworks';
 import Lessons from './collections/Lessons';
 import Plans from './collections/Plans';
 import Customers from './collections/Customers';
-import Media from './collections/Customers';
+import Media from './collections/Media';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
