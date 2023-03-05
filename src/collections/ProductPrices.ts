@@ -34,8 +34,8 @@ const ProductPrices: CollectionConfig = {
             name: 'product',
             type: 'relationship',
             relationTo: [
-                'courses'
-                // 'subscriptions',
+                'courses',
+                'subscriptions',
             ],
             hasMany: false,
             label: 'Producto',

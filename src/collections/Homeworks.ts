@@ -6,7 +6,6 @@ import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 
-// Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Homeworks: CollectionConfig = {
     slug: 'homework',
     admin: {

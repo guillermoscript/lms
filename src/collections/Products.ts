@@ -41,6 +41,7 @@ const Products: CollectionConfig = {
             relationTo: [
                 'courses',
                 'subscriptions',
+
             ],
             hasMany: true,
         },
