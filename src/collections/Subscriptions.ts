@@ -2,6 +2,7 @@ import { CollectionConfig } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import periodicity from '../fields/periodicity';
+import transactionRelation from '../fields/transactionRelation';
 import { checkRole } from './Users/checkRole';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -55,13 +56,8 @@ const Subscriptions: CollectionConfig = {
             relationTo: 'enrollments',
             hasMany: false,
         },
-        // {
-        //     name: 'transaction',
-        //     type: 'relationship',
-        //     relationTo: 'transactions',
-        //     hasMany: false,
-        // },
-        periodicity()
+        periodicity(),
+        transactionRelation()
     ],
 }
 
