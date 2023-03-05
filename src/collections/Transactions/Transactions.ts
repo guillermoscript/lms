@@ -72,6 +72,11 @@ const Transactions: CollectionConfig = {
             name: 'details',
             type: 'richText',
             label: 'Detalles',
+        },
+        {
+            name: 'referenceNumber',
+            type: 'text',
+            label: 'Número de referencia',
         }
     ],
     hooks: {
