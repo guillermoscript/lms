@@ -63,6 +63,13 @@ const Enrollments: CollectionConfig = {
         //     relationTo: 'subscriptions',
         //     hasMany: true,
         // }
+        {
+            name: "transaction",
+            type: "relationship",
+            relationTo: "transactions",
+            hasMany: false,
+            label: "Transacción",
+        }
     ],
 }
 
