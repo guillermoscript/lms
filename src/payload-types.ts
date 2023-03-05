@@ -70,29 +70,15 @@ export interface Transaction {
         relationTo: 'courses';
       }
     | {
-        value: string | Subscription;
-        relationTo: 'subscriptions';
+        value: string | Enrollment;
+        relationTo: 'enrollments';
       };
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
   isSubscription?: boolean;
   details?: {
     [k: string]: unknown;
   }[];
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "subscriptions".
- */
-export interface Subscription {
-  id: string;
-  status?: 'active' | 'inactive';
-  startDate: string;
-  endDate: string;
-  enrollment?: string | Enrollment;
-  transaction?: string | Transaction;
-  periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
+  referenceNumber?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -135,10 +121,32 @@ export interface ProductPrice {
   id: string;
   price: number;
   currency?: string[] | Currency[];
-  product?: {
-    value: string | Course;
-    relationTo: 'courses';
-  };
+  product?:
+    | {
+        value: string | Course;
+        relationTo: 'courses';
+      }
+    | {
+        value: string | Subscription;
+        relationTo: 'subscriptions';
+      };
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: string;
+  status?: 'active' | 'inactive';
+  startDate: string;
+  endDate: string;
+  enrollment?: string | Enrollment;
+  periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
+  transaction?: string | Transaction;
   createdAt: string;
   updatedAt: string;
 }
@@ -153,6 +161,8 @@ export interface Evaluation {
   course?: string | Course;
   endDate: string;
   maxScore: number;
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -176,6 +186,8 @@ export interface Exam {
     }[];
     id?: string;
   }[];
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -189,6 +201,8 @@ export interface Homework {
     [k: string]: unknown;
   }[];
   evaluation?: string | Evaluation;
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -199,6 +213,7 @@ export interface Homework {
 export interface Media {
   id: string;
   altText: string;
+  createdBy?: string | User;
   url?: string;
   filename: string;
   mimeType?: string;
@@ -245,6 +260,8 @@ export interface Lesson {
   content: {
     [k: string]: unknown;
   }[];
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -317,6 +334,8 @@ export interface Plan {
   description: string;
   status?: 'active' | 'inactive';
   courses?: string[] | Course[];
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -350,6 +369,8 @@ export interface Product {
             relationTo: 'subscriptions';
           }
       )[];
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
