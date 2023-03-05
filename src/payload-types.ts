@@ -51,6 +51,48 @@ export interface Enrollment {
   course?: string | Course;
   status?: 'active' | 'inactive';
   isSubscription?: boolean;
+  transaction?: string | Transaction;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: string;
+  amount: number;
+  status?: 'active' | 'inactive';
+  customer?: string | User;
+  transactionAble?:
+    | {
+        value: string | Course;
+        relationTo: 'courses';
+      }
+    | {
+        value: string | Subscription;
+        relationTo: 'subscriptions';
+      };
+  periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
+  isSubscription?: boolean;
+  details?: {
+    [k: string]: unknown;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: string;
+  status?: 'active' | 'inactive';
+  startDate: string;
+  endDate: string;
+  enrollment?: string | Enrollment;
+  transaction?: string | Transaction;
+  periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
   createdAt: string;
   updatedAt: string;
 }
@@ -157,7 +199,7 @@ export interface Homework {
 export interface Media {
   id: string;
   altText: string;
-  url: string;
+  url?: string;
   filename: string;
   mimeType?: string;
   filesize?: number;
@@ -308,40 +350,6 @@ export interface Product {
             relationTo: 'subscriptions';
           }
       )[];
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "subscriptions".
- */
-export interface Subscription {
-  id: string;
-  status?: 'active' | 'inactive';
-  startDate: string;
-  endDate: string;
-  enrollment?: string | Enrollment;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transactions".
- */
-export interface Transaction {
-  id: string;
-  amount: number;
-  status?: 'active' | 'inactive';
-  customer?: string | User;
-  transactionAble?:
-    | {
-        value: string | Course;
-        relationTo: 'courses';
-      }
-    | {
-        value: string | Subscription;
-        relationTo: 'subscriptions';
-      };
   createdAt: string;
   updatedAt: string;
 }
