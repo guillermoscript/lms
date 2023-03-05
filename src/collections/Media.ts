@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload/types';
+import { createdByField } from '../fields/createdBy';
 
 const Media: CollectionConfig = {
   slug: 'media',
@@ -47,7 +48,8 @@ const Media: CollectionConfig = {
       name: 'altText',
       type: 'text',
       required: true,
-    }
+    },
+    createdByField()
   ]
 };
 
