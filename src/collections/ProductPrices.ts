@@ -1,6 +1,8 @@
 import { CollectionConfig } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isRole } from '../access/isRole';
+import { createdByField } from '../fields/createdBy';
+import { lastModifiedBy } from '../fields/lastModifiedBy ';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const ProductPrices: CollectionConfig = {
@@ -37,7 +39,9 @@ const ProductPrices: CollectionConfig = {
             ],
             hasMany: false,
             label: 'Producto',
-        }
+        },
+        lastModifiedBy(),
+        createdByField()
     ],
 }
 
