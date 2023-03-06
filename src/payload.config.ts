@@ -3,7 +3,7 @@ import path from 'path';
 // import Examples from './collections/Examples';
 import Users from './collections/Users/Users';
 import PagoMovils from './collections/PagoMovils';
-import Transactions from './collections/Transactions';
+import Transactions from './collections/Transactions/Transactions';
 import PaymentMethods from './collections/PaymentMethods';
 import Zelles from './collections/Zelles';
 import Courses from './collections/Courses';

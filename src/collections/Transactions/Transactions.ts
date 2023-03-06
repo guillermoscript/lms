@@ -1,7 +1,11 @@
 import { CollectionConfig } from 'payload/types';
-import { isAdmin } from '../access/isAdmin';
-import { isRole } from '../access/isRole';
-import { isSelfStudent } from '../access/isSelfStudent';
+import { anyone } from '../../access/anyone';
+import { isAdmin } from '../../access/isAdmin';
+import { isRole } from '../../access/isRole';
+import { isSelfStudent } from '../../access/isSelfStudent';
+import periodicity from '../../fields/periodicity';
+import { checkRole } from '../Users/checkRole';
+import createTransactionAbleAfterChange from './hooks/createTransactionAbleAfterChange';
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Transactions: CollectionConfig = {
     slug: 'transactions',
@@ -9,9 +13,10 @@ const Transactions: CollectionConfig = {
         useAsTitle: 'id'
     },
     access: {
+        create: anyone,
         read:  (data) => {
             const {req: {user}} = data
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' }) || isSelfStudent(data)
+            return checkRole(['admin', 'editor', 'teacher'], user) || isSelfStudent(data)
         },
         update: ({req: {user}}) => {
             return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' })
@@ -27,6 +32,7 @@ const Transactions: CollectionConfig = {
         {
             name: 'status',
             type: 'radio',
+            defaultValue: 'inactive',
             options: [ // required
                 {
                     label: 'Activo',
@@ -37,6 +43,11 @@ const Transactions: CollectionConfig = {
                     value: 'inactive',
                 },
             ],
+            hooks: {
+                afterChange: [
+                    createTransactionAbleAfterChange
+                ]
+            }
         },
         {
             name: 'customer',
@@ -52,10 +63,28 @@ const Transactions: CollectionConfig = {
                 // 'lessons', 
                 // 'tests', 
                 // 'plans', 
-                'subscriptions', 
+                'enrollments' 
                 // 'certificates'
             ],
             hasMany: false,
+        },
+        periodicity(),
+        {
+            name: 'isSubscription',
+            type: 'checkbox',
+            defaultValue: true,
+            label: '¿Es una suscripción?',
+
+        },
+        {
+            name: 'details',
+            type: 'richText',
+            label: 'Detalles',
+        },
+        {
+            name: 'referenceNumber',
+            type: 'text',
+            label: 'Número de referencia',
         }
     ],
 }

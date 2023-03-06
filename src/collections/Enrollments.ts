@@ -3,6 +3,7 @@ import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { isRole } from '../access/isRole'
 import { isSelfStudent } from '../access/isSelfStudent'
+import transactionRelation from '../fields/transactionRelation';
 import { checkRole } from './Users/checkRole';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -57,12 +58,7 @@ const Enrollments: CollectionConfig = {
             defaultValue: true,
             label: 'Es suscripción',
         },
-        // {
-        //     name: 'subscription',
-        //     type: 'relationship',
-        //     relationTo: 'subscriptions',
-        //     hasMany: true,
-        // }
+        transactionRelation()
     ],
 }
 

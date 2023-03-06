@@ -6,15 +6,21 @@ import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
+import { checkRole } from './Users/checkRole';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
-const Evaluations: CollectionConfig = {
-    slug: 'evaluations',
+const StudentHasExams: CollectionConfig = {
+    slug: 'student-has-exams',
     admin: {
         useAsTitle: 'name'
     },
     access: {
-        create: isAdminOrTeacher,
+        create: ({ req: { user } }) => {
+            if (checkRole(['admin', 'teacher'], user)) {
+                return true
+            }
+            return false
+        },
         read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'],user),
         update: isAdminOrCreatedBy,
         delete: isAdmin
@@ -55,4 +61,4 @@ const Evaluations: CollectionConfig = {
     ],
 }
 
-export default Evaluations;
+export default StudentHasExams;

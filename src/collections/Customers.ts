@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload/types';
+import { anyone } from '../access/anyone';
 
 import { isAdmin, isAdminFieldLevel } from '../access/isAdmin';
 import { isAdminOrSelf } from '../access/isAdminOrSelf';
@@ -11,9 +12,9 @@ const Customers: CollectionConfig = {
 	},
 	access: {
 		// everyone can create a user
-		create: () => true,
+		create: anyone,
 		// Admins can read all, but any other logged in user can only read themselves
-		read: isAdminOrSelf,
+		read: anyone,
 		// Admins can update all, but any other logged in user can only update themselves
 		update: isAdminOrSelf,
 		// Only admins can delete
@@ -62,6 +63,7 @@ const Customers: CollectionConfig = {
 				create: isAdminFieldLevel,
 				update: isAdminFieldLevel,
 			},
+			defaultValue: ['student'],
 			options: [
 				{
 					label: 'Estudiante',

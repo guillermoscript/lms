@@ -3,6 +3,8 @@ import { isAdmin } from '../access/isAdmin';
 import { isAdminOrCreatedBy } from '../access/isAdminOrCreatedBy';
 import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
+import { createdByField } from '../fields/createdBy';
+import { lastModifiedBy } from '../fields/lastModifiedBy ';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Lessons: CollectionConfig = {
@@ -34,7 +36,9 @@ const Lessons: CollectionConfig = {
             type: 'richText',
             required: true,
             label: 'Contenido',
-        }
+        },
+        lastModifiedBy(),
+        createdByField()
     ],
 }
 
