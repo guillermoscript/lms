@@ -8,8 +8,10 @@ const PaymentMethods: CollectionConfig = {
         useAsTitle: 'id'
     },
     access: {
+
+        //TODO: this is admin or self is working weirdly, it's not working as expected
         create : isAdminOrSelf,
-        read : isAdminOrSelf,
+        // read : isAdminOrSelf,
         update : isAdminOrSelf,
         delete : isAdminOrSelf
     },
