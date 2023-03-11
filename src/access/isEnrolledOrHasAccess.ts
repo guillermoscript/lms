@@ -7,12 +7,18 @@ export const isEnrolledOrHasAccess = (roles: User['roles'] = [], user?: User) =>
     // This code checks to see if the user has the role of admin or teacher, and if they do it returns true. 
     // If they don't have those roles, it checks to see if the user is enrolled in a course, and if they are it returns true. 
     // If they aren't enrolled in a course it returns false. 
+
+    if (!user) {
+        return false
+    }
+
     if (checkRole(roles, user)) {
         return true
     }
-    payload.findByID({
+    payload.find({
         collection: 'enrollments',
-        id: user.id,
+        // id: user.id,
+        user: user.id,
     }).then((enrollment) => {
         if (enrollment) {
 
