@@ -19,6 +19,7 @@ const Homeworks: CollectionConfig = {
         update: isAdminOrCreatedBy,
         delete:  isAdmin
     },
+
     fields: [
         {
             name: 'content',
@@ -31,6 +32,13 @@ const Homeworks: CollectionConfig = {
             type: 'relationship',
             relationTo: 'evaluations',
             hasMany: false,
+            // filterOptions: ({ relationTo, siblingData, user }) => {
+            //     return {
+            //         createdBy: {
+            //             equals: user.id
+            //         }
+            //     }
+            // }
         },
         lastModifiedBy(),
         createdByField()
