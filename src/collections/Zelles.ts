@@ -1,6 +1,8 @@
 import { CollectionConfig } from 'payload/types';
 import { isAdmin } from '../access/isAdmin';
 import { isAdminOrSelf } from '../access/isAdminOrSelf';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Zelles: CollectionConfig = {
@@ -37,6 +39,12 @@ const Zelles: CollectionConfig = {
         //     label: 'Número de referencia',
         // }
     ],
+    hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 }
 
 export default Zelles;

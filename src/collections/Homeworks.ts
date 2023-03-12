@@ -5,6 +5,8 @@ import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 const Homeworks: CollectionConfig = {
     slug: 'homework',
@@ -17,6 +19,7 @@ const Homeworks: CollectionConfig = {
         update: isAdminOrCreatedBy,
         delete:  isAdmin
     },
+
     fields: [
         {
             name: 'content',
@@ -29,10 +32,23 @@ const Homeworks: CollectionConfig = {
             type: 'relationship',
             relationTo: 'evaluations',
             hasMany: false,
+            // filterOptions: ({ relationTo, siblingData, user }) => {
+            //     return {
+            //         createdBy: {
+            //             equals: user.id
+            //         }
+            //     }
+            // }
         },
         lastModifiedBy(),
         createdByField()
     ],
+    hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 }
 
 export default Homeworks;

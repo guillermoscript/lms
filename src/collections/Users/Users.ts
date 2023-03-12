@@ -3,6 +3,8 @@ import { anyone } from '../../access/anyone';
 
 import { isAdmin, isAdminFieldLevel } from '../../access/isAdmin';
 import { isAdminOrSelf } from '../../access/isAdminOrSelf';
+import { populateCreatedBy } from '../../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../../hooks/populateLastModifiedBy';
 const Users: CollectionConfig = {
 	slug: 'users',
 	auth: true,
@@ -95,8 +97,13 @@ const Users: CollectionConfig = {
 				}
 			]
 		},
-
 	],
+	hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 };
 
 export default Users;

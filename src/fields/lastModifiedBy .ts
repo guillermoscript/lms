@@ -13,7 +13,7 @@ export function lastModifiedBy(overrides: Partial<Field> = {}): Field {
             admin: {
                 readOnly: true,
                 position: 'sidebar',
-                condition: data => Boolean(data?.createdBy)
+                condition: data => Boolean(data?.lastModifiedBy)
             },
         }, overrides)
 }

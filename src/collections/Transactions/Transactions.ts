@@ -3,11 +3,13 @@ import { anyone } from '../../access/anyone';
 import { isAdmin } from '../../access/isAdmin';
 import { isRole } from '../../access/isRole';
 import { isSelfStudent } from '../../access/isSelfStudent';
-import periodicity from '../../fields/periodicity';
+import { populateCreatedBy } from '../../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../../hooks/populateLastModifiedBy';
 import { checkRole } from '../Users/checkRole';
 import createTransactionAbleAfterChange from './hooks/createTransactionAbleAfterChange';
 import { creationEmailNotification } from './hooks/creationEmailNotification';
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
+
 const Transactions: CollectionConfig = {
     slug: 'transactions',
     admin: {
@@ -69,14 +71,51 @@ const Transactions: CollectionConfig = {
             ],
             hasMany: false,
         },
-        periodicity(),
         {
             name: 'isSubscription',
             type: 'checkbox',
             defaultValue: true,
             label: '¿Es una suscripción?',
-
         },
+        {
+            name: 'periodicity',
+            type: 'radio',
+            options: [ // required
+                {
+                    label: 'Mensual',
+                    value: 'monthly',
+                },
+                {
+                    label: 'Bimestral',
+                    value: 'bimonthly',
+                },
+                {
+                    label: 'Trimestral',
+                    value: 'quarterly',
+                },
+                {
+                    label: 'Semestral',
+                    value: 'biannual',
+                },
+                {
+                    label: 'Anual',
+                    value: 'annual',
+                },
+                {
+                    label: 'Personalizado',
+                    value: 'custom',
+                }
+            ],
+            admin: {
+                condition: (data, siblingData) => {
+                    if (data.isSubscription) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+    },
         {
             name: 'details',
             type: 'richText',
@@ -91,6 +130,10 @@ const Transactions: CollectionConfig = {
     hooks: {
         afterChange: [
             creationEmailNotification
+        ],
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
         ]
     }
 }

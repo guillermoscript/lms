@@ -8,6 +8,5 @@ export function isPublicField(overrides: Partial<Field> = {}): Field {
         name: 'isPublic',
         type: 'checkbox',
         label: 'Es Publico',
-    //   }
     }, overrides)
 }

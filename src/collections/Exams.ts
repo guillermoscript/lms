@@ -1,3 +1,6 @@
+import payload from 'payload';
+import { FilterOptions } from 'payload/dist/fields/config/types';
+import { PaginatedDocs } from 'payload/dist/mongoose/types';
 import { CollectionConfig } from 'payload/types';
 import { isAdmin } from '../access/isAdmin';
 import { isAdminOrCreatedBy } from '../access/isAdminOrCreatedBy';
@@ -5,6 +8,10 @@ import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
+import { Evaluation } from '../payload-types';
+import tryCatch from '../utilities/tryCatch';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Exams: CollectionConfig = {
@@ -30,6 +37,13 @@ const Exams: CollectionConfig = {
             type: 'relationship',
             relationTo: 'evaluations',
             hasMany: false,
+            filterOptions: ({ relationTo, siblingData, user }) => {
+                return {
+                    createdBy: {
+                        equals: user.id
+                    }
+                }
+            }
         },
         {
             name: 'questions',
@@ -88,6 +102,12 @@ const Exams: CollectionConfig = {
         lastModifiedBy(),
         createdByField()
     ],
+    hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 }
 
 export default Exams;

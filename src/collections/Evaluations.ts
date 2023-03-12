@@ -6,6 +6,8 @@ import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Evaluations: CollectionConfig = {
@@ -24,19 +26,26 @@ const Evaluations: CollectionConfig = {
             name: 'name',
             type: 'text',
             required: true,
-            label: 'Nombre del curso',
+            label: 'Nombre de la evaluación',
         },
         {
             name: 'description',
             type: 'text',
             required: true,
-            label: 'Descripción del curso',
+            label: 'Descripción de la evaluación',
         },
         {
             name: 'course',
             type: 'relationship',
             relationTo: 'courses',
             hasMany: false,
+            filterOptions: ({ relationTo, siblingData, user }) => {
+                return {
+                    createdBy: {
+                        equals: user.id
+                    }
+                }
+            }
         },
         {
             name: 'endDate',
@@ -53,6 +62,12 @@ const Evaluations: CollectionConfig = {
         lastModifiedBy(),
         createdByField()
     ],
+    hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 }
 
 export default Evaluations;

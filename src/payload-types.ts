@@ -121,32 +121,8 @@ export interface ProductPrice {
   id: string;
   price: number;
   currency?: string[] | Currency[];
-  product?:
-    | {
-        value: string | Course;
-        relationTo: 'courses';
-      }
-    | {
-        value: string | Subscription;
-        relationTo: 'subscriptions';
-      };
   lastModifiedBy?: string | User;
   createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "subscriptions".
- */
-export interface Subscription {
-  id: string;
-  status?: 'active' | 'inactive';
-  startDate: string;
-  endDate: string;
-  enrollment?: string | Enrollment;
-  periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
-  transaction?: string | Transaction;
   createdAt: string;
   updatedAt: string;
 }
@@ -310,6 +286,7 @@ export interface PaymentMethod {
         value: string | PagoMovil;
         relationTo: 'pago-movil';
       };
+  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -371,6 +348,21 @@ export interface Product {
       )[];
   lastModifiedBy?: string | User;
   createdBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: string;
+  status?: 'active' | 'inactive';
+  startDate: string;
+  endDate: string;
+  enrollment?: string | Enrollment;
+  periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
+  transaction?: string | Transaction;
   createdAt: string;
   updatedAt: string;
 }
