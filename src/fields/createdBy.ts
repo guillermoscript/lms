@@ -15,6 +15,5 @@ export function createdByField(overrides: Partial<Field> = {}): Field {
           position: 'sidebar',
           condition: data => Boolean(data?.createdBy)
         },
-    //   }
     }, overrides)
 }
