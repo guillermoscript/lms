@@ -4,6 +4,8 @@ import { isAdmin } from '../../access/isAdmin';
 import { isRole } from '../../access/isRole';
 import { isSelfStudent } from '../../access/isSelfStudent';
 import periodicity from '../../fields/periodicity';
+import { populateCreatedBy } from '../../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../../hooks/populateLastModifiedBy';
 import { checkRole } from '../Users/checkRole';
 import createTransactionAbleAfterChange from './hooks/createTransactionAbleAfterChange';
 import { creationEmailNotification } from './hooks/creationEmailNotification';
@@ -91,6 +93,10 @@ const Transactions: CollectionConfig = {
     hooks: {
         afterChange: [
             creationEmailNotification
+        ],
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
         ]
     }
 }

@@ -5,6 +5,8 @@ import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 const Homeworks: CollectionConfig = {
     slug: 'homework',
@@ -33,6 +35,12 @@ const Homeworks: CollectionConfig = {
         lastModifiedBy(),
         createdByField()
     ],
+    hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 }
 
 export default Homeworks;

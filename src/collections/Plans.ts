@@ -2,6 +2,8 @@ import { CollectionConfig } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Plans: CollectionConfig = {
@@ -51,6 +53,12 @@ const Plans: CollectionConfig = {
         lastModifiedBy(),
         createdByField()
     ],
+    hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 }
 
 export default Plans;

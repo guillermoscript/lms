@@ -1,5 +1,7 @@
 import { CollectionConfig } from 'payload/types';
 import { createdByField } from '../fields/createdBy';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 const Media: CollectionConfig = {
   slug: 'media',
@@ -50,7 +52,14 @@ const Media: CollectionConfig = {
       required: true,
     },
     createdByField()
-  ]
+  ],
+  
+  hooks: {
+    beforeChange: [
+        populateCreatedBy,
+        populateLastModifiedBy
+    ]
+}
 };
 
 export default Media;

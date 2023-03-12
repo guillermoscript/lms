@@ -1,6 +1,8 @@
 import { CollectionConfig } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isRole } from '../access/isRole';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Currencies: CollectionConfig = {
@@ -39,6 +41,12 @@ const Currencies: CollectionConfig = {
             hasMany: false,
         }
     ],
+    hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 }
 
 export default Currencies;

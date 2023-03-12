@@ -1,5 +1,8 @@
 import { CollectionConfig } from 'payload/types';
 import { isAdminOrSelf } from '../access/isAdminOrSelf';
+import { createdByField } from '../fields/createdBy';
+import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const PaymentMethods: CollectionConfig = {
@@ -35,7 +38,14 @@ const PaymentMethods: CollectionConfig = {
                 // 'bank-transfer'
             ],
         },
+        createdByField()
     ],
+    hooks: {
+        beforeChange: [
+            populateCreatedBy,
+            populateLastModifiedBy
+        ]
+    }
 }
 
 export default PaymentMethods;
