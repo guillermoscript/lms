@@ -6,6 +6,7 @@ import { isSelfStudent } from '../../access/isSelfStudent';
 import periodicity from '../../fields/periodicity';
 import { checkRole } from '../Users/checkRole';
 import createTransactionAbleAfterChange from './hooks/createTransactionAbleAfterChange';
+import { creationEmailNotification } from './hooks/creationEmailNotification';
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Transactions: CollectionConfig = {
     slug: 'transactions',
@@ -87,6 +88,11 @@ const Transactions: CollectionConfig = {
             label: 'Número de referencia',
         }
     ],
+    hooks: {
+        afterChange: [
+            creationEmailNotification
+        ]
+    }
 }
 
 export default Transactions;
