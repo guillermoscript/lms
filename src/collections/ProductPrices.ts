@@ -32,16 +32,16 @@ const ProductPrices: CollectionConfig = {
             hasMany: true,
             label: 'Moneda',
         },
-        {
-            name: 'product',
-            type: 'relationship',
-            relationTo: [
-                'courses',
-                'subscriptions',
-            ],
-            hasMany: false,
-            label: 'Producto',
-        },
+        // {
+        //     name: 'product',
+        //     type: 'relationship',
+        //     relationTo: [
+        //         'courses',
+        //         'subscriptions',
+        //     ],
+        //     hasMany: false,
+        //     label: 'Producto',
+        // },
         lastModifiedBy(),
         createdByField()
     ],
