@@ -39,6 +39,13 @@ const Evaluations: CollectionConfig = {
             type: 'relationship',
             relationTo: 'courses',
             hasMany: false,
+            filterOptions: ({ relationTo, siblingData, user }) => {
+                return {
+                    createdBy: {
+                        equals: user.id
+                    }
+                }
+            }
         },
         {
             name: 'endDate',
