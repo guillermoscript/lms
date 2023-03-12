@@ -38,18 +38,6 @@ const Exams: CollectionConfig = {
             relationTo: 'evaluations',
             hasMany: false,
             filterOptions: ({ relationTo, siblingData, user }) => {
-                fetch(
-                    `http://localhost:3000/api/evaluations?where[createdBy][equals]=${user.id}`
-                ).then((evaluations) => {
-                    return evaluations.json();
-                }).then((evaluations) => {
-                    console.log(evaluations);
-                }).catch((error) => {
-                    console.log(error);
-                });
-
-                console.log(user);
-
                 return {
                     createdBy: {
                         equals: user.id
