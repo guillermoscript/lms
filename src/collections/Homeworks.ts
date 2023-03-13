@@ -9,7 +9,7 @@ import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 const Homeworks: CollectionConfig = {
-    slug: 'homework',
+    slug: 'homeworks',
     admin: {
         useAsTitle: 'name'
     },

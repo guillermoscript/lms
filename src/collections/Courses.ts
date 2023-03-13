@@ -5,7 +5,9 @@ import { isAdminOrCreatedBy } from '../access/isAdminOrCreatedBy';
 import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
 import { createdByField } from '../fields/createdBy';
 import { isPublicField } from '../fields/isPublic';
+import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
+import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 const populateTeacher: BeforeChangeHook<{
     teacher: string;
@@ -31,7 +33,7 @@ const Courses: CollectionConfig = {
     },
     access: {
         create: isAdminOrTeacher,
-        read : () => true,
+        read: () => true,
         update: isAdminOrCreatedBy,
         delete: isAdmin
     },
@@ -55,7 +57,7 @@ const Courses: CollectionConfig = {
             hasMany: false,
             label: "Profesor",
             access: {
-                read: ({req }) => {
+                read: ({ req }) => {
                     if (!req.user) {
                         return false
                     }
@@ -65,6 +67,13 @@ const Courses: CollectionConfig = {
                     return true
                 }
             },
+            filterOptions: ({ relationTo, siblingData, user }) => {
+                return {
+                    roles: {
+                        contains: 'teacher' || 'admin'
+                    }
+                }
+            }
         },
         {
             name: 'enrollments',
@@ -72,19 +81,15 @@ const Courses: CollectionConfig = {
             relationTo: 'enrollments',
             hasMany: true,
         },
-        // {
-        //     name: 'productPrices',
-        //     type: 'relationship',
-        //     relationTo: 'product-prices',
-        //     hasMany: true,
-        // },
         createdByField(),
+        lastModifiedBy(),
         isPublicField()
     ],
     hooks: {
         beforeChange: [
             populateTeacher,
-            populateCreatedBy
+            populateCreatedBy,
+            populateLastModifiedBy
         ]
     }
 }

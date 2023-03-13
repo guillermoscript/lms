@@ -42,10 +42,9 @@ const Products: CollectionConfig = {
             type: 'relationship',
             relationTo: [
                 'courses',
-                'subscriptions',
-
+                'plans',
             ],
-            hasMany: true,
+            hasMany: false,
         },
         lastModifiedBy(),
         createdByField()

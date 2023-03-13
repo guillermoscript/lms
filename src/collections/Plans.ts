@@ -2,6 +2,7 @@ import { CollectionConfig } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
+import periodicity from '../fields/periodicity';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
@@ -50,6 +51,7 @@ const Plans: CollectionConfig = {
             relationTo: 'courses',
             hasMany: true,
         },
+        periodicity(),
         lastModifiedBy(),
         createdByField()
     ],

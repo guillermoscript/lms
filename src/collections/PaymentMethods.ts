@@ -31,9 +31,9 @@ const PaymentMethods: CollectionConfig = {
             type: 'relationship',
             label: 'Tipo de pago',
             relationTo: [
-                'zelle', 
+                'zelles', 
                 // 'paypal', 
-                'pago-movil', 
+                'pago-movils', 
                 // 'cash', 
                 // 'bank-transfer'
             ],

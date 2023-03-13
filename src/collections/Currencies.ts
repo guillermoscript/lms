@@ -34,12 +34,12 @@ const Currencies: CollectionConfig = {
             required: true,
             label: 'Tipo de cambio',
         },
-        {
-            name: 'productPrices',
-            type: 'relationship',
-            relationTo: 'product-prices',
-            hasMany: false,
-        }
+        // {
+        //     name: 'productPrices',
+        //     type: 'relationship',
+        //     relationTo: 'product-prices',
+        //     hasMany: false,
+        // }
     ],
     hooks: {
         beforeChange: [

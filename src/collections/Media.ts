@@ -4,7 +4,7 @@ import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 const Media: CollectionConfig = {
-  slug: 'media',
+  slug: 'medias',
   upload: {
     staticURL: '/media',
     staticDir: 'media',

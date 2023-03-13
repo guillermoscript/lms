@@ -1,12 +1,12 @@
 import deepMerge from '../utilities/deepMerge'
 import type { Field } from 'payload/types'
 
-export default function transactionRelation(overrides = {}) {
+export default function orderRelation(overrides = {}) {
     return deepMerge<Field, Partial<Field>>({
-        name: "transaction",
+        name: "order",
         type: "relationship",
-        relationTo: "transactions",
+        relationTo: "orders",
         hasMany: false,
-        label: "Transacción",
+        label: "Orden",
     }, overrides)
 }
