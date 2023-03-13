@@ -1,7 +1,7 @@
 import payload from 'payload';
 import { Message } from 'payload/dist/email/types';
 import { CollectionAfterChangeHook } from 'payload/types';
-import { Transaction, User } from '../../../payload-types';
+import { Order, User } from '../../../payload-types';
 
 export const creationEmailNotification: CollectionAfterChangeHook = async ({
   doc, // full document data
@@ -9,18 +9,18 @@ export const creationEmailNotification: CollectionAfterChangeHook = async ({
   previousDoc, // document data before updating the collection
   operation, // name of the operation ie. 'create', 'update'
 }: {
-    doc: Transaction
+    doc: Order
     req: any
-    previousDoc: Transaction
+    previousDoc: Order
     operation: "create" | "update" | "delete"
 }) => {
 
     if (operation === 'create') {
         // send email
-        const userId = doc.customer as User;
+        const userId = typeof doc.customer === 'string' ? { id: doc.customer } : doc.customer;
         const [user, userError] = await findUserById(userId.id);
         if (userError) {
-            console.log(userError);
+            console.log("error on user", userError);
             return
         }
         const mailOptions: Message = {
