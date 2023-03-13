@@ -3,7 +3,7 @@ import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { isRole } from '../access/isRole'
 import { isSelfStudent } from '../access/isSelfStudent'
-import transactionRelation from '../fields/transactionRelation';
+import orderRelation from '../fields/orderRelation';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { checkRole } from './Users/checkRole';
@@ -54,13 +54,7 @@ const Enrollments: CollectionConfig = {
                 },
             ],
         },
-        {
-            name: 'isSubscription',
-            type: 'checkbox',
-            defaultValue: true,
-            label: 'Es suscripción',
-        },
-        transactionRelation()
+        orderRelation()
     ],
     hooks: {
         beforeChange: [
