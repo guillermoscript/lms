@@ -1,5 +1,6 @@
 import express from 'express';
 import payload from 'payload';
+import { runInactivateSubscriptionAndCreateRenewalOrder } from './lib/cron';
 
 require('dotenv').config();
 const app = express();
@@ -26,8 +27,8 @@ payload.init({
       tls: {
         // do not fail on invalid certs
         rejectUnauthorized: false
-        }
-      },
+      }
+    },
     fromName: 'LMS Payload Admin',
     fromAddress: 'noreply@pincelx.com'
   },
@@ -37,5 +38,14 @@ payload.init({
 })
 
 // Add your own express routes here
+
+app.get('/cron', async (req, res) => {
+
+  runInactivateSubscriptionAndCreateRenewalOrder().then((result) => {
+    console.log(result, '<----------- result');
+  }).catch((error) => {
+    console.log(error, '<----------- error');
+  })
+})
 
 app.listen(3000);
