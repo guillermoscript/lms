@@ -29,11 +29,11 @@ const Orders: CollectionConfig = {
         delete: isAdmin
     },
     fields: [
-        {
-            name: 'amount',
-            type: 'number',
-            required: true,
-        },
+        // {
+        //     name: 'amount',
+        //     type: 'number',
+        //     required: true,
+        // },
         {
             name: 'status',
             type: 'radio',
@@ -47,6 +47,10 @@ const Orders: CollectionConfig = {
                     label: 'Inactivo',
                     value: 'inactive',
                 },
+                {
+                    label: 'Cancelado',
+                    value: 'canceled',
+                }
             ],
             hooks: {
                 afterChange: [
@@ -67,14 +71,14 @@ const Orders: CollectionConfig = {
             hasMany: true,
         },
         {
-            name: 'details',
-            type: 'richText',
-            label: 'Detalles',
-        },
-        {
             name: 'referenceNumber',
             type: 'text',
             label: 'Número de referencia',
+        },
+        {
+            name: 'details',
+            type: 'richText',
+            label: 'Detalles',
         },
         createdByField(),
         lastModifiedBy(),
