@@ -1,8 +1,8 @@
-import { Transaction, Subscription, Enrollment } from "../../../payload-types"
+import { Course, Subscription, Enrollment } from "../../../payload-types"
 
 export type SubscriptionCreateDto = Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>
 
-export default function createSubscriptionDto(doc: Transaction, enrollmentId?: string): SubscriptionCreateDto {
+export default function createSubscriptionDto(doc: Enrollment, enrollmentId?: string, periodicity: SubscriptionCreateDto['periodicity'] = 'monthly'): SubscriptionCreateDto {
 
     const periodicityStates: Record<SubscriptionCreateDto['periodicity'], number> = {
         'monthly': 1,
@@ -21,17 +21,20 @@ export default function createSubscriptionDto(doc: Transaction, enrollmentId?: s
         return [startDate, endDate]
     }
 
-    const [startDate, endDate] = setDates(doc.periodicity)
+    // TODO: Handle custom periodicity
+    if (periodicity === 'custom') {
+        return
+    }
 
-    const enrollment = enrollmentId ? enrollmentId : doc.transactionAble.value as Enrollment
+    const [startDate, endDate] = setDates(periodicity)
 
     const subscriptionData: SubscriptionCreateDto = {
         status: 'active',
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
-        transaction: doc.id,
-        periodicity: doc.periodicity,
-        enrollment: enrollment,
+        order: doc.id,
+        periodicity: periodicity,
+        enrollment: enrollmentId,
     }
     return subscriptionData
 }

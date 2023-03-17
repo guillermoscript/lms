@@ -17,6 +17,7 @@ export interface Course {
   teacher?: string | User;
   enrollments?: string[] | Enrollment[];
   createdBy?: string | User;
+  lastModifiedBy?: string | User;
   isPublic?: boolean;
   createdAt: string;
   updatedAt: string;
@@ -50,35 +51,90 @@ export interface Enrollment {
   student?: string | User;
   course?: string | Course;
   status?: 'active' | 'inactive';
-  isSubscription?: boolean;
-  transaction?: string | Transaction;
+  order?: string | Order;
   createdAt: string;
   updatedAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transactions".
+ * via the `definition` "orders".
  */
-export interface Transaction {
+export interface Order {
   id: string;
   amount: number;
   status?: 'active' | 'inactive';
   customer?: string | User;
-  transactionAble?:
+  products?: string[] | Product[];
+  details?: {
+    [k: string]: unknown;
+  }[];
+  referenceNumber?: string;
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  productPrices?: string[] | ProductPrice[];
+  productType?:
     | {
         value: string | Course;
         relationTo: 'courses';
       }
     | {
-        value: string | Enrollment;
-        relationTo: 'enrollments';
+        value: string | Plan;
+        relationTo: 'plans';
       };
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-prices".
+ */
+export interface ProductPrice {
+  id: string;
+  price: number;
+  currency?: string[] | Currency[];
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "currencies".
+ */
+export interface Currency {
+  id: string;
+  name: string;
+  symbol: string;
+  exchangeRate: number;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plans".
+ */
+export interface Plan {
+  id: string;
+  name: string;
+  description: string;
+  status?: 'active' | 'inactive';
+  courses?: string[] | Course[];
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
-  isSubscription?: boolean;
-  details?: {
-    [k: string]: unknown;
-  }[];
-  referenceNumber?: string;
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -97,32 +153,6 @@ export interface Customer {
   resetPasswordExpiration?: string;
   loginAttempts?: number;
   lockUntil?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "currencies".
- */
-export interface Currency {
-  id: string;
-  name: string;
-  symbol: string;
-  exchangeRate: number;
-  productPrices?: string | ProductPrice;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-prices".
- */
-export interface ProductPrice {
-  id: string;
-  price: number;
-  currency?: string[] | Currency[];
-  lastModifiedBy?: string | User;
-  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -169,7 +199,7 @@ export interface Exam {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "homework".
+ * via the `definition` "homeworks".
  */
 export interface Homework {
   id: string;
@@ -184,7 +214,7 @@ export interface Homework {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
+ * via the `definition` "medias".
  */
 export interface Media {
   id: string;
@@ -243,7 +273,7 @@ export interface Lesson {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pago-movil".
+ * via the `definition` "pago-movils".
  */
 export interface PagoMovil {
   id: string;
@@ -280,11 +310,11 @@ export interface PaymentMethod {
   paymentMethodType?:
     | {
         value: string | Zelle;
-        relationTo: 'zelle';
+        relationTo: 'zelles';
       }
     | {
         value: string | PagoMovil;
-        relationTo: 'pago-movil';
+        relationTo: 'pago-movils';
       };
   createdBy?: string | User;
   createdAt: string;
@@ -292,62 +322,12 @@ export interface PaymentMethod {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "zelle".
+ * via the `definition` "zelles".
  */
 export interface Zelle {
   id: string;
   email: string;
   FullName: string;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "plans".
- */
-export interface Plan {
-  id: string;
-  name: string;
-  description: string;
-  status?: 'active' | 'inactive';
-  courses?: string[] | Course[];
-  lastModifiedBy?: string | User;
-  createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products".
- */
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  productPrices?: string[] | ProductPrice[];
-  productType?:
-    | (
-        | {
-            value: string;
-            relationTo: 'courses';
-          }
-        | {
-            value: string;
-            relationTo: 'subscriptions';
-          }
-      )[]
-    | (
-        | {
-            value: Course;
-            relationTo: 'courses';
-          }
-        | {
-            value: Subscription;
-            relationTo: 'subscriptions';
-          }
-      )[];
-  lastModifiedBy?: string | User;
-  createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -362,7 +342,7 @@ export interface Subscription {
   endDate: string;
   enrollment?: string | Enrollment;
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
-  transaction?: string | Transaction;
+  order?: string | Order;
   createdAt: string;
   updatedAt: string;
 }

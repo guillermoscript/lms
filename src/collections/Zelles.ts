@@ -6,7 +6,7 @@ import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Zelles: CollectionConfig = {
-    slug: 'zelle',
+    slug: 'zelles',
     admin: {
         useAsTitle: 'email'
     },

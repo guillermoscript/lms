@@ -3,15 +3,17 @@ import { anyone } from '../../access/anyone';
 import { isAdmin } from '../../access/isAdmin';
 import { isRole } from '../../access/isRole';
 import { isSelfStudent } from '../../access/isSelfStudent';
+import { createdByField } from '../../fields/createdBy';
+import { lastModifiedBy } from '../../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../../hooks/populateLastModifiedBy';
 import { checkRole } from '../Users/checkRole';
-import createTransactionAbleAfterChange from './hooks/createTransactionAbleAfterChange';
+import createOrderAbleAfterChange from './hooks/createOrderAbleAfterChange';
 import { creationEmailNotification } from './hooks/creationEmailNotification';
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 
-const Transactions: CollectionConfig = {
-    slug: 'transactions',
+const Orders: CollectionConfig = {
+    slug: 'orders',
     admin: {
         useAsTitle: 'id'
     },
@@ -27,11 +29,11 @@ const Transactions: CollectionConfig = {
         delete: isAdmin
     },
     fields: [
-        {
-            name: 'amount',
-            type: 'number',
-            required: true,
-        },
+        // {
+        //     name: 'amount',
+        //     type: 'number',
+        //     required: true,
+        // },
         {
             name: 'status',
             type: 'radio',
@@ -45,10 +47,14 @@ const Transactions: CollectionConfig = {
                     label: 'Inactivo',
                     value: 'inactive',
                 },
+                {
+                    label: 'Cancelado',
+                    value: 'canceled',
+                }
             ],
             hooks: {
                 afterChange: [
-                    createTransactionAbleAfterChange
+                    createOrderAbleAfterChange
                 ]
             }
         },
@@ -59,73 +65,23 @@ const Transactions: CollectionConfig = {
             hasMany: false,
         },
         {
-            name: 'transactionAble',
+            name: 'products',
             type: 'relationship',
-            relationTo: [
-                'courses', 
-                // 'lessons', 
-                // 'tests', 
-                // 'plans', 
-                'enrollments' 
-                // 'certificates'
-            ],
-            hasMany: false,
-        },
-        {
-            name: 'isSubscription',
-            type: 'checkbox',
-            defaultValue: true,
-            label: '¿Es una suscripción?',
-        },
-        {
-            name: 'periodicity',
-            type: 'radio',
-            options: [ // required
-                {
-                    label: 'Mensual',
-                    value: 'monthly',
-                },
-                {
-                    label: 'Bimestral',
-                    value: 'bimonthly',
-                },
-                {
-                    label: 'Trimestral',
-                    value: 'quarterly',
-                },
-                {
-                    label: 'Semestral',
-                    value: 'biannual',
-                },
-                {
-                    label: 'Anual',
-                    value: 'annual',
-                },
-                {
-                    label: 'Personalizado',
-                    value: 'custom',
-                }
-            ],
-            admin: {
-                condition: (data, siblingData) => {
-                    if (data.isSubscription) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-    },
-        {
-            name: 'details',
-            type: 'richText',
-            label: 'Detalles',
+            relationTo: 'products',
+            hasMany: true,
         },
         {
             name: 'referenceNumber',
             type: 'text',
             label: 'Número de referencia',
-        }
+        },
+        {
+            name: 'details',
+            type: 'richText',
+            label: 'Detalles',
+        },
+        createdByField(),
+        lastModifiedBy(),
     ],
     hooks: {
         afterChange: [
@@ -138,4 +94,4 @@ const Transactions: CollectionConfig = {
     }
 }
 
-export default Transactions;
+export default Orders;
