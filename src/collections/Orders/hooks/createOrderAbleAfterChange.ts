@@ -48,72 +48,13 @@ const createOrderAbleAfterChange: FieldHook = async ({
 
     console.log(plansIds, '<----------- plansIds');
 
-    const createSubscriptonOrEnrollment = async (plansIds: string[]) => {
-        const [plans, plansError] = await tryCatch<PaginatedDocs<Plan>>(req.payload.find({
-            collection: 'plans',
-            where: {
-                id: {
-                    in: plansIds,
-                }
-            }
-        }))
-
-        console.log(plans, '<----------- plans');
-
-        if (plansError) {
-            console.log(plansError)
-            return
-        }
-
-        // we need to create an enrollment for each course in each plan, so we iterate over the plans and then over the courses in each plan, creating a dto for each course
-        const coursesToEnroll = plans.docs.map(plan => {
-            const coursesToEnroll = plan.courses.map(course => {
-                if (typeof course === 'string') {
-                    return createEnrollmentDto(docType, course)
-                } else {
-                    return createEnrollmentDto(docType, course.id)
-                }
-            })
-            return coursesToEnroll
-        })
-
-        // we need to flatten the array of arrays of enrollment dtos into a single array of enrollment dtos, because the createEnrollment function expects an array of enrollment dtos
-        const enrollmentData = coursesToEnroll.flat()
-
-        console.log(enrollmentData, '<----------- enrollmentData');
-
-        const [enrollments, enrollmentError] = await createEnrollment(enrollmentData, req.payload)
-
-        if (enrollmentError) {
-            console.log(enrollmentError)
-            return
-        }
-
-        console.log(enrollments, '<----------- enrollments');
-
-        // const subscriptionData = createSubscriptionDto(docType, enrollment.id)
-        const subscriptionData = enrollments.map(enrollment => {
-            const subscriptionData = createSubscriptionDto(docType, enrollment.id)
-            return subscriptionData
-        })
-        const [subscription, subscriptionError] = await createSubscription(subscriptionData, req.payload)
-
-        if (subscriptionError) {
-            console.log(subscriptionError)
-            return
-        }
-
-        console.log(subscription, '<----------- subscription');
-        return subscription
-    }
-
     if (productThatArePlans.length === 0) {
         console.log('no plans');
         await sendUserEmail(docType.customer, req.payload)
         return
     }
 
-    const subscription = await createSubscriptonOrEnrollment(plansIds.map(plan => plan.id as string))
+    const subscription = await createSubscriptonAndEnrollment(plansIds.map(plan => plan.id as string), req.payload, docType)
 
     await sendUserEmail(docType.customer, req.payload)
 }
@@ -151,6 +92,65 @@ async function createEnrollment(enrollments: EnrollmentCreateDto[], payload: Pay
     }
 
     return [createdEnrollments, null]
+}
+
+async function createSubscriptonAndEnrollment(plansIds: string[], payload: Payload, docType: Order): Promise<[Subscription[], Error]> {
+    const [plans, plansError] = await tryCatch<PaginatedDocs<Plan>>(payload.find({
+        collection: 'plans',
+        where: {
+            id: {
+                in: plansIds,
+            }
+        }
+    }))
+
+    console.log(plans, '<----------- plans');
+
+    if (plansError) {
+        console.log(plansError)
+        return [null, plansError]
+    }
+
+    // we need to create an enrollment for each course in each plan, so we iterate over the plans and then over the courses in each plan, creating a dto for each course
+    const coursesToEnroll = plans.docs.map(plan => {
+        const coursesToEnroll = plan.courses.map(course => {
+            if (typeof course === 'string') {
+                return createEnrollmentDto(docType, course)
+            } else {
+                return createEnrollmentDto(docType, course.id)
+            }
+        })
+        return coursesToEnroll
+    })
+
+    // we need to flatten the array of arrays of enrollment dtos into a single array of enrollment dtos, because the createEnrollment function expects an array of enrollment dtos
+    const enrollmentData = coursesToEnroll.flat()
+
+    console.log(enrollmentData, '<----------- enrollmentData');
+
+    const [enrollments, enrollmentError] = await createEnrollment(enrollmentData, payload)
+
+    if (enrollmentError) {
+        console.log(enrollmentError)
+        return [null, enrollmentError]
+    }
+
+    console.log(enrollments, '<----------- enrollments');
+
+    // const subscriptionData = createSubscriptionDto(docType, enrollment.id)
+    const subscriptionData = enrollments.map(enrollment => {
+        const subscriptionData = createSubscriptionDto(docType, enrollment.id)
+        return subscriptionData
+    })
+    const [subscriptions, subscriptionError] = await createSubscription(subscriptionData, payload)
+
+    if (subscriptionError) {
+        console.log(subscriptionError)
+        return
+    }
+
+    console.log(subscriptions, '<----------- subscriptions');
+    return [subscriptions, null]
 }
 
 async function createSubscription(subscriptionData: SubscriptionCreateDto[], payload: Payload): Promise<[Subscription[], Error]> {
