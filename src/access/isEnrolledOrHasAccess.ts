@@ -17,21 +17,36 @@ export const isEnrolledOrHasAccess = (roles: User['roles'] = [], user?: User) =>
     }
     payload.find({
         collection: 'enrollments',
-        // id: user.id,
-        user: user.id,
-    }).then((enrollment) => {
-        if (enrollment) {
-
-            // TODO: This is where I need to check to see if the user is enrolled in a course.
-            // return  {
-            //     student: {
-            //         equals: user.id,
-            //     },
-            // };
-
-            return true
+        where: {
+            and: [
+                {
+                    student: {
+                        equals: user.id,
+                    },
+                },
+                {
+                    status: {
+                        equals: 'active',
+                    },
+                },
+            ],
         }
-        return false
+    }).then((enrollment) => {
+        // return enrollment ? true : false
+       return {
+            and: [
+                {
+                    student: {
+                        equals: user.id,
+                    },
+                },
+                {
+                    status: {
+                        equals: 'active',
+                    },
+                },
+            ],
+        }
     }).catch((err) => {
         console.log(err)
         return false

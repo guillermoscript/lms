@@ -30,14 +30,6 @@ const PagoMovils: CollectionConfig = {
             required: true,
             label: 'Cédula de identidad',
         },
-        // {
-        //     relationTo: 'payment-methods',
-        //     name: 'paymentMethod',
-        //     type: 'relationship',
-        //     hasMany: false,
-        //     label: 'Método de pago',
-
-        // }
     ],
     hooks: {
         beforeChange: [
