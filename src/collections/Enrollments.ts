@@ -1,8 +1,6 @@
 import { CollectionConfig } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
-import { isRole } from '../access/isRole'
-import { isSelfStudent } from '../access/isSelfStudent'
 import orderRelation from '../fields/orderRelation';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';

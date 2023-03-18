@@ -10,8 +10,7 @@ import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
-import { Evaluation } from '../payload-types';
-import tryCatch from '../utilities/tryCatch';
+
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Exams: CollectionConfig = {
