@@ -21,6 +21,7 @@ export default function createSubscriptionDto(doc: Enrollment, enrollmentId?: st
         return [startDate, endDate]
     }
 
+    // ** not sure if custom periodicity is needed
     // TODO: Handle custom periodicity
     if (periodicity === 'custom') {
         return
