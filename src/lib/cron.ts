@@ -1,7 +1,7 @@
 import cron from "node-cron";
 import payload from 'payload';
 import { PaginatedDocs } from "payload/dist/mongoose/types";
-import { Order, Subscription } from "../payload-types";
+import { Enrollment, Order, Subscription } from "../payload-types";
 import tryCatch from "../utilities/tryCatch";
 const todayDate = new Date().toISOString().substring(0, 10);
 
@@ -57,7 +57,7 @@ async function setAsInactiveSubscription(subscriptions: Subscription[]) {
     return [updatedSubs, null]
 }
 
-async function setAsInactiveEnrollment(subscriptions: Subscription[]) {
+async function setAsInactiveEnrollment(subscriptions: Subscription[]): Promise<[Enrollment[] | null, Error | null]> {
     let updatedEnrollments = []
     const enrollmentIds = subscriptions.map((subscription) => {
         return typeof subscription.enrollment === 'string' ? subscription.enrollment : subscription.enrollment.id
@@ -79,11 +79,12 @@ async function setAsInactiveEnrollment(subscriptions: Subscription[]) {
         // console.log(updatedEnrollment, '<----------- updatedEnrollment');
         updatedEnrollments.push(updatedEnrollment)
     }
+    console.log(updatedEnrollments, '<----------- updatedEnrollment');
 
     return [updatedEnrollments, null]
 }
 
-async function createRenewalOrder(subscriptions: Subscription[]) {
+async function createRenewalOrder(subscriptions: Subscription[], enrollments: Enrollment[]): Promise<[Order[] | null, Error | null]> {
 
     const subscriptionOrderIds = subscriptions.map((subscription) => {
         return typeof subscription.order === 'string' ? subscription.order : subscription.order.id
@@ -104,30 +105,46 @@ async function createRenewalOrder(subscriptions: Subscription[]) {
         return [null, ordersError]
     }
 
+    console.log(enrollments, '<----------- enrollments');
+
     // only get unique order
     const uniqueOrderIds = [...new Set(orders.docs)]
 
     console.log(uniqueOrderIds, '<----------- uniqueOrderIds');
 
-    let newOrders = []
-    for (const order of uniqueOrderIds) {
-
-        const products = order.products.map((product) => {
+    const productsInOrder = uniqueOrderIds.map((order) => {
+        return order.products.map((product) => {
             return product.id
         })
+    })
 
-        const [newOrder, newOrderError] = await tryCatch(payload.create({
+    const userProductEnrollemnt = enrollments.filter((enrollment) => {
+        const enrollmentProductId = typeof enrollment.products === 'string' ? enrollment.products : enrollment.products.id
+        console.log(enrollmentProductId, '<----------- enrollmentProductId');
+        return productsInOrder.includes(enrollmentProductId)
+    })
+
+    // unique products in user enrollment
+    const uniqueProducts = [...new Set(userProductEnrollemnt.map((enrollment) => { 
+        return typeof enrollment.products === 'string' ? enrollment.products : enrollment.products.id
+    }))]
+
+    console.log(uniqueProducts, '<----------- uniqueProducts');
+
+    let newOrders: Order[] = []
+    for (const order of uniqueOrderIds) {
+
+        const [newOrder, newOrderError] = await tryCatch<Order>(payload.create({
             collection: 'orders',
             data: {
-                customer: order.customer.id,
-                products: products,
-                status: 'inactive',
-                // orderType: 'renewal'
+                products: uniqueProducts,
+                user: order.user,
+                status: 'pending',
+                type: 'renewal'
             }
         }))
-
         if (newOrderError) {
-            console.log(newOrderError, '<----------- updatedOrderError');
+            console.log(newOrderError, '<----------- newOrderError');
             return [null, newOrderError]
         }
 
@@ -157,7 +174,7 @@ export async function runInactivateSubscriptionAndCreateRenewalOrder() {
     }
 
 
-    const [newOrders, newOrdersError] = await createRenewalOrder(subscriptions.docs)
+    const [newOrders, newOrdersError] = await createRenewalOrder(subscriptions.docs, updatedEnrollments)
 
     if (newOrdersError) {
         return [null, newOrdersError]

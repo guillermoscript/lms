@@ -1,8 +1,8 @@
-import { Course, Subscription, Enrollment } from "../../../payload-types"
+import { Subscription, Order } from "../../../payload-types"
 
 export type SubscriptionCreateDto = Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>
 
-export default function createSubscriptionDto(doc: Enrollment, enrollmentId?: string, periodicity: SubscriptionCreateDto['periodicity'] = 'monthly'): SubscriptionCreateDto {
+export default function createSubscriptionDto(doc: Order, enrollmentId?: string, periodicity: SubscriptionCreateDto['periodicity'] = 'monthly'): SubscriptionCreateDto {
 
     const periodicityStates: Record<SubscriptionCreateDto['periodicity'], number> = {
         'monthly': 1,
@@ -37,5 +37,6 @@ export default function createSubscriptionDto(doc: Enrollment, enrollmentId?: st
         periodicity: periodicity,
         enrollment: enrollmentId,
     }
+
     return subscriptionData
 }

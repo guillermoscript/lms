@@ -49,28 +49,10 @@ export interface User {
 export interface Enrollment {
   id: string;
   student?: string | User;
+  products?: string | Product;
   course?: string | Course;
   status?: 'active' | 'inactive';
   order?: string | Order;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
- */
-export interface Order {
-  id: string;
-  amount: number;
-  status?: 'active' | 'inactive';
-  customer?: string | User;
-  products?: string[] | Product[];
-  details?: {
-    [k: string]: unknown;
-  }[];
-  referenceNumber?: string;
-  createdBy?: string | User;
-  lastModifiedBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -135,6 +117,25 @@ export interface Plan {
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
   lastModifiedBy?: string | User;
   createdBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  status?: 'active' | 'inactive' | 'canceled' | 'pending';
+  type?: 'order' | 'renewal' | 'enrollment';
+  customer?: string | User;
+  products?: string[] | Product[];
+  referenceNumber?: string;
+  details?: {
+    [k: string]: unknown;
+  }[];
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
