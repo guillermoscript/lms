@@ -51,9 +51,21 @@ const Subscriptions: CollectionConfig = {
             label: 'Fecha de finalización',
         },
         {
-            name: 'enrollment',
+            name: 'user',
             type: 'relationship',
-            relationTo: 'enrollments',
+            relationTo: 'users',
+            hasMany: false,
+        },
+        {
+            name: 'product',
+            type: 'relationship',
+            relationTo: 'products',
+            hasMany: false,
+        },
+        {
+            name: 'plan',
+            type: 'relationship',
+            relationTo: 'plans',
             hasMany: false,
         },
         periodicity(),
