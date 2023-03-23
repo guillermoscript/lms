@@ -76,10 +76,29 @@ const Courses: CollectionConfig = {
             }
         },
         {
-            name: 'enrollments',
-            type: 'relationship',
-            relationTo: 'enrollments',
-            hasMany: true,
+            name: 'lessons',
+            type: 'array',
+            label: 'Lecciones',
+            fields: [
+                {
+                    name: 'name',
+                    type: 'text',
+                    required: true,
+                    label: 'Nombre de la lección',
+                },
+                {
+                    name: 'description',
+                    type: 'text',
+                    required: true,
+                    label: 'Descripción de la lección',
+                },
+                {
+                    name: 'content',
+                    type: 'richText',
+                    required: true,
+                    label: 'Contenido',
+                },
+            ],
         },
         createdByField(),
         lastModifiedBy(),
