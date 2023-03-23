@@ -49,7 +49,18 @@ const createOrderAbleAfterChange: FieldHook = async ({
         return product.productType.value as Plan
     })
 
-    // console.log(plansIds, '<----------- plansIds');
+    const [plans, plansError] = await tryCatch<PaginatedDocs<Plan>>(req.payload.find({
+        collection: 'plans',
+        where: {
+            id: {
+                in: plansIds.map(plan => plan.id as string),
+            }
+        }
+    }))
+
+    if (plansError) {
+        return
+    }
 
     if (productThatArePlans.length === 0) {
         console.log('no plans');
@@ -57,8 +68,12 @@ const createOrderAbleAfterChange: FieldHook = async ({
         return
     }
 
-    const subscription = await createSubscriptonAndEnrollment(plansIds.map(plan => plan.id as string), req.payload, docType, productThatArePlans)
+    const [subscription, errorSub] = await newCreateSubscription(plans.docs, req.payload, docType, productThatArePlans)
 
+    if (errorSub) {
+        return
+    }
+    
     await sendUserEmail(docType.customer, req.payload)
 }
 
@@ -79,96 +94,18 @@ async function sendUserEmail(userId: Order['customer'], payload: Payload) {
     };
     payload.sendEmail(mailOptions)
 }
-async function createEnrollment(enrollments: EnrollmentCreateDto[], payload: Payload): Promise<[Enrollment[], Error]> {
 
-    const createdEnrollments: Enrollment[] = []
-    for (const enrollment of enrollments) {
-        const [enrollmentDoc, enrollmentError] = await tryCatch<Enrollment>(payload.create({
-            collection: 'enrollments',
-            data: enrollment,
-        }))
-
-        if (enrollmentError) {
-            console.error(enrollmentError)
-            return [null, enrollmentError]
-        }
-        createdEnrollments.push(enrollmentDoc)
-    }
-
-    return [createdEnrollments, null]
-}
-
-async function createSubscriptonAndEnrollment(plansIds: string[], payload: Payload, docType: Order, productThatArePlans: Product[]): Promise<[Subscription[], Error]> {
-    const [plans, plansError] = await tryCatch<PaginatedDocs<Plan>>(payload.find({
-        collection: 'plans',
-        where: {
-            id: {
-                in: plansIds,
-            }
-        }
-    }))
-
-    if (plansError) {
-        console.error(plansError)
-        return [null, plansError]
-    }
-    const userId = typeof docType.customer === 'string' ? docType.customer : docType.customer.id
-
-    const periodicityForEachCourse = []
-    // we need to create an enrollment for each course in each plan, so we iterate over the plans and then over the courses in each plan, creating a dto for each course
-    const coursesToEnroll = plans.docs.map(plan => {
-
-        // console.log(plan, '<----------- plan');
-        const productThatBelongsToPlan = productThatArePlans.find(product => {
-            const productId = typeof product.productType.value === 'string' ? product.productType.value : product.productType.value.id
-            return productId === plan.id
-        }).id as string
-        
-        const coursesToEnroll = plan.courses.map(course => {
-            periodicityForEachCourse.push(plan.periodicity)
-            const courseId = typeof course === 'string' ? course : course.id
-            return createEnrollmentDto({
-                course: courseId,
-                studentId: userId,
-                orderId: docType.id as string,
-                productId: productThatBelongsToPlan,
-            })
-        })
-        return coursesToEnroll
+async function newCreateSubscription(plans: Plan[], payload: Payload, docType: Order, productThatArePlans: Product[]): Promise<[Subscription[], Error]> {
+    
+    const subscriptionData = productThatArePlans.map((product,index) => {
+        const planId = plans[index].id as string
+        const planPeriodicity = plans[index].periodicity
+        return createSubscriptionDto(docType, product, planId, planPeriodicity)
     })
+    
+    let subscriptions: Subscription[] = []
+    let error: Error = null
 
-    // we need to flatten the array of arrays of enrollment dtos into a single array of enrollment dtos, because the createEnrollment function expects an array of enrollment dtos
-    const enrollmentData = coursesToEnroll.flat()
-    const [enrollments, enrollmentError] = await createEnrollment(enrollmentData, payload)
-
-    if (enrollmentError) {
-        console.error(enrollmentError)
-        return [null, enrollmentError]
-    }
-
-    console.log(enrollments, '<----------- enrollments');
-
-    const subscriptionData = enrollments.map((enrollment, index) => {
-        const enrollmentId = typeof enrollment === 'string' ? enrollment : enrollment.id as string
-        const subscriptionData = createSubscriptionDto(docType, enrollmentId, periodicityForEachCourse[index])
-        return subscriptionData
-    })
-
-    console.log(subscriptionData);
-    const [subscriptions, subscriptionError] = await createSubscription(subscriptionData, payload)
-
-    if (subscriptionError) {
-        console.error(subscriptionError)
-        return
-    }
-
-    console.log(subscriptions, '<----------- subscriptions');
-    return [subscriptions, null]
-}
-
-async function createSubscription(subscriptionData: SubscriptionCreateDto[], payload: Payload): Promise<[Subscription[], Error]> {
-
-    const createdSubscriptions: Subscription[] = []
     for (const subscription of subscriptionData) {
         const [subscriptionDoc, subscriptionError] = await tryCatch<Subscription>(payload.create({
             collection: 'subscriptions',
@@ -177,12 +114,14 @@ async function createSubscription(subscriptionData: SubscriptionCreateDto[], pay
 
         if (subscriptionError) {
             console.error(subscriptionError)
-            return [null, subscriptionError]
+            error = subscriptionError
+            break
         }
-        createdSubscriptions.push(subscriptionDoc)
+
+        subscriptions.push(subscriptionDoc)
     }
 
-    return [createdSubscriptions, null]
+    return [subscriptions, null]
 }
 
 export default createOrderAbleAfterChange
