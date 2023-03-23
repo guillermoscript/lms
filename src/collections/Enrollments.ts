@@ -33,6 +33,13 @@ const Enrollments: CollectionConfig = {
             label: 'Estudiante',
         },
         {
+            name: 'products',
+            type: 'relationship',
+            relationTo: 'products',
+            hasMany: false,
+            label: 'Producto',
+        },
+        {
             name: 'course',
             type: 'relationship',
             relationTo: 'courses',

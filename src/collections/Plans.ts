@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
+import { categoryField } from '../fields/category';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import periodicity from '../fields/periodicity';
@@ -45,10 +46,23 @@ const Plans: CollectionConfig = {
                 },
             ],
         },
+        categoryField(),
         {
             name: 'courses',
             type: 'relationship',
             relationTo: 'courses',
+            hasMany: true,
+        },
+        {
+            name: 'subscriptions',
+            type: 'relationship',
+            relationTo: 'subscriptions',
+            hasMany: true,
+        },
+        {
+            name: 'reviews',
+            type: 'relationship',
+            relationTo: 'reviews',
             hasMany: true,
         },
         periodicity(),

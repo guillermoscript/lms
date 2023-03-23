@@ -1,24 +1,20 @@
 import { buildConfig } from 'payload/config';
 import path from 'path';
-// import Examples from './collections/Examples';
 import Users from './collections/Users/Users';
-import PagoMovils from './collections/PagoMovils';
 import Orders from './collections/Orders/Orders';
 import PaymentMethods from './collections/PaymentMethods';
-import Zelles from './collections/Zelles';
 import Courses from './collections/Courses';
 import Currencies from './collections/Currencies';
 import Enrollments from './collections/Enrollments';
 import Subscriptions from './collections/Subscriptions';
-import ProductPrices from './collections/ProductPrices';
 import Products from './collections/Products';
 import Evaluations from './collections/Evaluations';
-import Exams from './collections/Exams';
-import Homeworks from './collections/Homeworks';
-import Lessons from './collections/Lessons';
 import Plans from './collections/Plans';
-import Customers from './collections/Customers';
 import Media from './collections/Media';
+import Categories from './collections/Categories';
+import Comments from './collections/Comments';
+import Lessons from './collections/Lessons';
+import Reviews from './collections/Reviews';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
@@ -27,23 +23,20 @@ export default buildConfig({
   },
   collections: [
     Courses,
-    Customers,
     Currencies,
+    Categories,
+    Comments,
     Enrollments,
     Evaluations,
-    Exams,
-    Homeworks,
     Media,
     Lessons,
-    PagoMovils,
     PaymentMethods,
     Plans,
-    ProductPrices,
     Products,
+    Reviews,
     Subscriptions,
     Orders,
     Users,
-    Zelles,
   ],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),

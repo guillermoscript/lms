@@ -1,15 +1,28 @@
-import { Order, Enrollment, Course } from "../../../payload-types"
+import { Order, Enrollment, Course, Product, User } from "../../../payload-types"
 
 export type EnrollmentCreateDto = Omit<Enrollment, 'id' | 'createdAt' | 'updatedAt'>
 
-export default function createEnrollmentDto(doc: Order, course: Course['id']): EnrollmentCreateDto {
-    
+type CreateEnrollemntType = {
+    course: Course['id']
+    productId: Product['id']
+    orderId: Order['id']
+    studentId: User['id']
+}
+
+export default function createEnrollmentDto({
+    course,
+    productId,
+    orderId,
+    studentId
+}: CreateEnrollemntType): EnrollmentCreateDto {
+
     const enrollmentData: EnrollmentCreateDto = {
-        student: doc.customer,
+        student: studentId,
         course: course,
         status: 'active',
-        order: doc.id,
+        order: orderId,
+        products: productId
     }
-    
+
     return enrollmentData
 }   

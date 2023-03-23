@@ -50,6 +50,10 @@ const Orders: CollectionConfig = {
                 {
                     label: 'Cancelado',
                     value: 'canceled',
+                },
+                {
+                    label: 'Pendiente',
+                    value: 'pending',
                 }
             ],
             hooks: {
@@ -57,6 +61,29 @@ const Orders: CollectionConfig = {
                     createOrderAbleAfterChange
                 ]
             }
+        },
+        {
+            name: 'type',
+            type: 'radio',
+            defaultValue: 'order',
+            options: [ // required
+                {
+                    label: 'Orden',
+                    value: 'order',
+                },
+                {
+                    label: 'Renovación',
+                    value: 'renewal',
+                },
+                {
+                    label: 'Matrícula',
+                    value: 'enrollment',
+                },
+                // {
+                //     label: 'Inscripción',
+                //     value: 'subscription',
+                // }
+            ],
         },
         {
             name: 'customer',
@@ -74,6 +101,12 @@ const Orders: CollectionConfig = {
             name: 'referenceNumber',
             type: 'text',
             label: 'Número de referencia',
+        },
+        {
+            name: 'paymentMethod',
+            type: 'relationship',
+            relationTo: 'payment-methods',
+            hasMany: false,
         },
         {
             name: 'details',

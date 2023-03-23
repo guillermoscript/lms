@@ -32,12 +32,6 @@ const Products: CollectionConfig = {
             label: 'Descripción del producto',
         },
         {
-            name: 'productPrices',
-            type: 'relationship',
-            relationTo: 'product-prices',
-            hasMany: true,
-        },
-        {
             name: 'productType',
             type: 'relationship',
             relationTo: [
@@ -45,6 +39,60 @@ const Products: CollectionConfig = {
                 'plans',
             ],
             hasMany: false,
+        },
+        {
+            name: 'productStatus',
+            type: 'radio',
+            required: true,
+            defaultValue: 'active',
+            options: [
+                {
+                    label: 'Activo',
+                    value: 'active',
+                },
+                {
+                    label: 'Inactivo',
+                    value: 'inactive',
+                },
+            ],
+        },
+        {
+            name: 'productPrice',
+            type: 'array',
+            required: true,
+            fields: [
+                {
+                    name: 'price',
+                    type: 'number',
+                    required: true,
+                    label: 'Precio',
+                },
+                {
+                    name: 'currency',
+                    type: 'relationship',
+                    relationTo: 'currencies',
+                    hasMany: true,
+                    label: 'Moneda',
+                },
+            ],
+        },
+        {
+            name: 'productImage',
+            type: 'upload', 
+            required: true,
+            relationTo: 'medias',
+        },
+        {
+            name: 'relatedProducts',
+            type: 'relationship',
+            relationTo: 'products',
+            hasMany: true,
+        },
+        {
+            name: 'reviews',
+            type: 'relationship',
+            relationTo: 'reviews',
+            hasMany: true,
         },
         lastModifiedBy(),
         createdByField()
