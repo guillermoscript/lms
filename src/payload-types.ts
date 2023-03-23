@@ -15,7 +15,14 @@ export interface Course {
   name: string;
   description: string;
   teacher?: string | User;
-  enrollments?: string[] | Enrollment[];
+  lessons: {
+    name: string;
+    description: string;
+    content: {
+      [k: string]: unknown;
+    }[];
+    id?: string;
+  }[];
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   isPublic?: boolean;
@@ -44,14 +51,33 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "currencies".
+ */
+export interface Currency {
+  id: string;
+  name: string;
+  symbol: string;
+  exchangeRate: number;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "enrollments".
  */
 export interface Enrollment {
   id: string;
   student?: string | User;
   products?: string | Product;
+  subscriptions2?: string | Subscription;
   course?: string | Course;
   status?: 'active' | 'inactive';
+  subscriptions: {
+    startDate: string;
+    endDate: string;
+    periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
+    id?: string;
+  }[];
   order?: string | Order;
   createdAt: string;
   updatedAt: string;
@@ -64,7 +90,6 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  productPrices?: string[] | ProductPrice[];
   productType?:
     | {
         value: string | Course;
@@ -74,33 +99,15 @@ export interface Product {
         value: string | Plan;
         relationTo: 'plans';
       };
+  productStatus: 'active' | 'inactive';
+  productPrice: {
+    price: number;
+    currency?: string[] | Currency[];
+    id?: string;
+  }[];
+  productImage: string | Media;
   lastModifiedBy?: string | User;
   createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-prices".
- */
-export interface ProductPrice {
-  id: string;
-  price: number;
-  currency?: string[] | Currency[];
-  lastModifiedBy?: string | User;
-  createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "currencies".
- */
-export interface Currency {
-  id: string;
-  name: string;
-  symbol: string;
-  exchangeRate: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -114,9 +121,27 @@ export interface Plan {
   description: string;
   status?: 'active' | 'inactive';
   courses?: string[] | Course[];
+  subscriptions?: string[] | Subscription[];
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
   lastModifiedBy?: string | User;
   createdBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: string;
+  status?: 'active' | 'inactive';
+  startDate: string;
+  endDate: string;
+  user?: string | User;
+  product?: string | Product;
+  plan?: string | Plan;
+  periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
+  order?: string | Order;
   createdAt: string;
   updatedAt: string;
 }
@@ -131,6 +156,7 @@ export interface Order {
   customer?: string | User;
   products?: string[] | Product[];
   referenceNumber?: string;
+  paymentMethod?: string | PaymentMethod;
   details?: {
     [k: string]: unknown;
   }[];
@@ -141,74 +167,68 @@ export interface Order {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "customers".
+ * via the `definition` "payment-methods".
  */
-export interface Customer {
+export interface PaymentMethod {
   id: string;
-  firstName: string;
-  lastName: string;
-  phone?: string;
-  roles?: 'student'[];
-  email?: string;
-  resetPasswordToken?: string;
-  resetPasswordExpiration?: string;
-  loginAttempts?: number;
-  lockUntil?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "evaluations".
- */
-export interface Evaluation {
-  id: string;
-  name: string;
-  description: string;
-  course?: string | Course;
-  endDate: string;
-  maxScore: number;
-  lastModifiedBy?: string | User;
-  createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Exams".
- */
-export interface Exam {
-  id: string;
-  content: {
-    [k: string]: unknown;
-  }[];
-  evaluation?: string | Evaluation;
-  questions: {
-    multipleOptions?: 'verdadero' | 'falso';
-    question?: string;
-    options: {
-      option?: string;
-      correct?: 'verdadero' | 'falso';
-      id?: string;
-    }[];
-    id?: string;
-  }[];
-  lastModifiedBy?: string | User;
-  createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "homeworks".
- */
-export interface Homework {
-  id: string;
-  content: {
-    [k: string]: unknown;
-  }[];
-  evaluation?: string | Evaluation;
-  lastModifiedBy?: string | User;
+  paymentsOfUser?: string[] | User[];
+  title: string;
+  paymentMethodType: 'zelle' | 'paypal' | 'pago-movil' | 'cash' | 'bank-transfer';
+  zelle: {
+    zelleEmail?: string;
+    fullName?: string;
+  };
+  paypal: {
+    paypalEmail?: string;
+  };
+  pagoMovil: {
+    phoneNumber: string;
+    bank?:
+      | 'banco-de-venezuela'
+      | 'banco-mercantil'
+      | 'banco-provincial'
+      | 'banco-bicentenario'
+      | 'banco-exterior'
+      | 'banco-occidental-de-descuento'
+      | 'banco-sofitasa'
+      | 'banco-plaza'
+      | 'banco-caroni'
+      | 'banco-activo'
+      | 'banco-del-tesoro'
+      | 'banco-agricola-de-venezuela'
+      | 'banco-de-la-fuerza-armada-nacional-bolivariana'
+      | 'banco-del-pueblo-soberano'
+      | 'banco-nacional-de-credito'
+      | 'banco-venezolano-de-credito'
+      | 'banesco';
+    idn: number;
+  };
+  cash: {
+    cash?: string;
+  };
+  bankTransfer: {
+    accountNumber?: string;
+    bankName?: string;
+    accountType?: 'savings' | 'current';
+    bank?:
+      | 'banco-de-venezuela'
+      | 'banco-mercantil'
+      | 'banco-provincial'
+      | 'banco-bicentenario'
+      | 'banco-exterior'
+      | 'banco-occidental-de-descuento'
+      | 'banco-sofitasa'
+      | 'banco-plaza'
+      | 'banco-caroni'
+      | 'banco-activo'
+      | 'banco-del-tesoro'
+      | 'banco-agricola-de-venezuela'
+      | 'banco-de-la-fuerza-armada-nacional-bolivariana'
+      | 'banco-del-pueblo-soberano'
+      | 'banco-nacional-de-credito'
+      | 'banco-venezolano-de-credito'
+      | 'banesco';
+  };
   createdBy?: string | User;
   createdAt: string;
   updatedAt: string;
@@ -258,92 +278,36 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lessons".
+ * via the `definition` "evaluations".
  */
-export interface Lesson {
+export interface Evaluation {
   id: string;
   name: string;
   description: string;
-  content: {
-    [k: string]: unknown;
+  course?: string | Course;
+  endDate: string;
+  maxScore: number;
+  evaluationType: 'exam' | 'homework';
+  homework: {
+    content: {
+      [k: string]: unknown;
+    }[];
+    id?: string;
+  }[];
+  exam: {
+    content: {
+      [k: string]: unknown;
+    }[];
+    questions: {
+      question: {
+        [k: string]: unknown;
+      }[];
+      id?: string;
+    }[];
+    id?: string;
   }[];
   lastModifiedBy?: string | User;
   createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pago-movils".
- */
-export interface PagoMovil {
-  id: string;
-  phoneNumber: string;
-  bank?:
-    | 'banco-de-venezuela'
-    | 'banco-mercantil'
-    | 'banco-provincial'
-    | 'banco-bicentenario'
-    | 'banco-exterior'
-    | 'banco-occidental-de-descuento'
-    | 'banco-sofitasa'
-    | 'banco-plaza'
-    | 'banco-caroni'
-    | 'banco-activo'
-    | 'banco-del-tesoro'
-    | 'banco-agricola-de-venezuela'
-    | 'banco-de-la-fuerza-armada-nacional-bolivariana'
-    | 'banco-del-pueblo-soberano'
-    | 'banco-nacional-de-credito'
-    | 'banco-venezolano-de-credito'
-    | 'banesco';
-  idn: number;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "payment-methods".
- */
-export interface PaymentMethod {
-  id: string;
-  paymentsOfUser?: string[] | User[];
-  paymentMethodType?:
-    | {
-        value: string | Zelle;
-        relationTo: 'zelles';
-      }
-    | {
-        value: string | PagoMovil;
-        relationTo: 'pago-movils';
-      };
-  createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "zelles".
- */
-export interface Zelle {
-  id: string;
-  email: string;
-  FullName: string;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "subscriptions".
- */
-export interface Subscription {
-  id: string;
-  status?: 'active' | 'inactive';
-  startDate: string;
-  endDate: string;
-  enrollment?: string | Enrollment;
-  periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
-  order?: string | Order;
   createdAt: string;
   updatedAt: string;
 }
