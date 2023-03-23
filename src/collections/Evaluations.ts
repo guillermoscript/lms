@@ -17,7 +17,7 @@ const Evaluations: CollectionConfig = {
     },
     access: {
         create: isAdminOrTeacher,
-        read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'],user),
+        read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
         update: isAdminOrCreatedBy,
         delete: isAdmin
     },
@@ -58,6 +58,67 @@ const Evaluations: CollectionConfig = {
             type: 'number',
             required: true,
             label: 'Puntaje máximo',
+        },
+        {
+            name: 'evaluationType',
+            type: 'radio',
+            required: true,
+            label: 'Tipo de evaluación',
+            options: [
+                {
+                    label: 'Examen',
+                    value: 'exam'
+                },
+                {
+                    label: 'Tarea',
+                    value: 'homework'
+                }
+            ]
+        },
+        {
+            name: 'homework',
+            type: 'array',
+            label: 'Tareas',
+            fields: [
+                {
+                    name: 'content',
+                    type: 'richText',
+                    required: true,
+                    label: 'Contenido',
+                }
+            ],
+            admin: {
+                condition: (data) => data.evaluationType === 'homework'
+            }
+        },
+        {
+            name: 'exam',
+            type: 'array',
+            label: 'Exámenes',
+            fields: [
+                {
+                    name: 'content',
+                    type: 'richText',
+                    required: true,
+                    label: 'Contenido',
+                },
+                {
+                    name: 'questions',
+                    type: 'array',
+                    label: 'Preguntas',
+                    fields: [
+                        {
+                            name: 'question',
+                            type: 'richText',
+                            required: true,
+                            label: 'Pregunta',
+                        }
+                    ]
+                }
+            ],
+            admin: {
+                condition: (data) => data.evaluationType === 'exam'
+            }
         },
         lastModifiedBy(),
         createdByField()
