@@ -103,6 +103,12 @@ const Orders: CollectionConfig = {
             label: 'Número de referencia',
         },
         {
+            name: 'paymentMethod',
+            type: 'relationship',
+            relationTo: 'payment-methods',
+            hasMany: false,
+        },
+        {
             name: 'details',
             type: 'richText',
             label: 'Detalles',
