@@ -82,6 +82,18 @@ const Products: CollectionConfig = {
             required: true,
             relationTo: 'medias',
         },
+        {
+            name: 'relatedProducts',
+            type: 'relationship',
+            relationTo: 'products',
+            hasMany: true,
+        },
+        {
+            name: 'reviews',
+            type: 'relationship',
+            relationTo: 'reviews',
+            hasMany: true,
+        },
         lastModifiedBy(),
         createdByField()
     ],
