@@ -59,6 +59,12 @@ const Plans: CollectionConfig = {
             relationTo: 'subscriptions',
             hasMany: true,
         },
+        {
+            name: 'reviews',
+            type: 'relationship',
+            relationTo: 'reviews',
+            hasMany: true,
+        },
         periodicity(),
         lastModifiedBy(),
         createdByField()
