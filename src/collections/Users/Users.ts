@@ -52,6 +52,11 @@ const Users: CollectionConfig = {
 					type: 'text',
 					required: false,
 				},
+			],
+		},
+		{
+			type: 'row',
+			fields: [
 				{
 					name: 'address',
 					label: 'Dirección',
@@ -63,9 +68,35 @@ const Users: CollectionConfig = {
 					label: 'Fecha de nacimiento',
 					type: 'date',
 					required: false,
+				},
+				{
+					name: 'gender',
+					label: 'Género',
+					type: 'select',
+					required: false,
+					options: [
+						{
+							label: 'Masculino',
+							value: 'male',
+						},
+						{
+							label: 'Femenino',
+							value: 'female',
+						},
+						{
+							label: 'Otro',
+							value: 'other',
+						},
+					],
 				}
-			],
+			]
 		},
+		{
+            name: 'profilePicture',
+            type: 'upload', 
+            required: true,
+            relationTo: 'medias',
+        },
 		{
 			name: 'roles',
 			// Save this field to JWT so we can use from `req.user`
