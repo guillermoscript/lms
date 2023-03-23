@@ -1,8 +1,8 @@
-import { Subscription, Order } from "../../../payload-types"
+import { Subscription, Order, Product, Plan } from "../../../payload-types"
 
 export type SubscriptionCreateDto = Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>
 
-export default function createSubscriptionDto(doc: Order, enrollmentId?: string, periodicity: SubscriptionCreateDto['periodicity'] = 'monthly'): SubscriptionCreateDto {
+export default function createSubscriptionDto(doc: Order, product: Product, plan: Plan['id'], periodicity: SubscriptionCreateDto['periodicity'] = 'monthly'): SubscriptionCreateDto {
 
     const periodicityStates: Record<SubscriptionCreateDto['periodicity'], number> = {
         'monthly': 1,
@@ -27,15 +27,19 @@ export default function createSubscriptionDto(doc: Order, enrollmentId?: string,
         return
     }
 
+    const userId = typeof doc.customer === 'string' ? doc.customer : doc.customer.id
+
     const [startDate, endDate] = setDates(periodicity)
 
     const subscriptionData: SubscriptionCreateDto = {
         status: 'active',
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
+        user: userId,
         order: doc.id,
         periodicity: periodicity,
-        enrollment: enrollmentId,
+        plan: plan,
+        product: product.id,
     }
 
     return subscriptionData
