@@ -14,6 +14,7 @@ import Media from './collections/Media';
 import Categories from './collections/Categories';
 import Comments from './collections/Comments';
 import Lessons from './collections/Lessons';
+import Reviews from './collections/Reviews';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
@@ -32,6 +33,7 @@ export default buildConfig({
     PaymentMethods,
     Plans,
     Products,
+    Reviews,
     Subscriptions,
     Orders,
     Users,
