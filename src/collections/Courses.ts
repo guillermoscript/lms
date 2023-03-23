@@ -68,6 +68,19 @@ const Courses: CollectionConfig = {
             relationTo: 'lessons',
             hasMany: true,
         },
+        {
+            name: 'reviews',
+            type: 'relationship',
+            relationTo: 'reviews',
+            hasMany: true,
+        },
+        {
+            name: 'relatedCourses',
+            type: 'relationship',
+            relationTo: 'courses',
+            label: 'Cursos relacionados',
+            hasMany: true,
+        },
         createdByField(),
         lastModifiedBy(),
         isPublicField()
