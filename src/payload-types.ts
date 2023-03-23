@@ -17,6 +17,8 @@ export interface Course {
   category?: string[] | Category[];
   teacher?: string | User;
   lessons?: string[] | Lesson[];
+  reviews?: string[] | Review[];
+  relatedCourses?: string[] | Course[];
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   isPublic?: boolean;
@@ -149,6 +151,21 @@ export interface Comment {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: string;
+  review?: string;
+  user?: string | User;
+  likes?: number;
+  dislikes?: number;
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "currencies".
  */
 export interface Currency {
@@ -222,6 +239,8 @@ export interface Product {
     id?: string;
   }[];
   productImage: string | Media;
+  relatedProducts?: string[] | Product[];
+  reviews?: string[] | Review[];
   lastModifiedBy?: string | User;
   createdBy?: string | User;
   createdAt: string;
@@ -239,6 +258,7 @@ export interface Plan {
   category?: string[] | Category[];
   courses?: string[] | Course[];
   subscriptions?: string[] | Subscription[];
+  reviews?: string[] | Review[];
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
   lastModifiedBy?: string | User;
   createdBy?: string | User;
