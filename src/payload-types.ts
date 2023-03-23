@@ -14,18 +14,70 @@ export interface Course {
   id: string;
   name: string;
   description: string;
+  category?: string[] | Category[];
   teacher?: string | User;
-  lessons: {
-    name: string;
-    description: string;
-    content: {
-      [k: string]: unknown;
-    }[];
-    id?: string;
-  }[];
+  lessons?: string[] | Lesson[];
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   isPublic?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  image: string | Media;
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medias".
+ */
+export interface Media {
+  id: string;
+  altText: string;
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
+  url?: string;
+  filename: string;
+  mimeType?: string;
+  filesize?: number;
+  width?: number;
+  height?: number;
+  sizes: {
+    thumbnail: {
+      url?: string;
+      width?: number;
+      height?: number;
+      mimeType?: string;
+      filesize?: number;
+      filename?: string;
+    };
+    card: {
+      url?: string;
+      width?: number;
+      height?: number;
+      mimeType?: string;
+      filesize?: number;
+      filename?: string;
+    };
+    tablet: {
+      url?: string;
+      width?: number;
+      height?: number;
+      mimeType?: string;
+      filesize?: number;
+      filename?: string;
+    };
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -40,12 +92,58 @@ export interface User {
   phone?: string;
   address?: string;
   birthDate?: string;
+  gender?: 'male' | 'female' | 'other';
+  profilePicture: string | Media;
   roles?: ('admin' | 'teacher' | 'editor' | 'user')[];
   email?: string;
   resetPasswordToken?: string;
   resetPasswordExpiration?: string;
   loginAttempts?: number;
   lockUntil?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lessons".
+ */
+export interface Lesson {
+  id: string;
+  name: string;
+  description: string;
+  category?: string[] | Category[];
+  teacher?: string | User;
+  content: {
+    [k: string]: unknown;
+  }[];
+  resources: {
+    name: string;
+    description: {
+      [k: string]: unknown;
+    }[];
+    id?: string;
+  }[];
+  comments?: string[] | Comment[];
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
+  isPublic?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments".
+ */
+export interface Comment {
+  id: string;
+  comment?: string;
+  user?: string | User;
+  likes?: number;
+  dislikes?: number;
+  lesson?: string | Lesson;
+  replyTo?: string[] | Comment[];
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -68,8 +166,6 @@ export interface Currency {
 export interface Enrollment {
   id: string;
   student?: string | User;
-  products?: string | Product;
-  subscriptions2?: string | Subscription;
   course?: string | Course;
   status?: 'active' | 'inactive';
   subscriptions: {
@@ -79,6 +175,26 @@ export interface Enrollment {
     id?: string;
   }[];
   order?: string | Order;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  status?: 'active' | 'inactive' | 'canceled' | 'pending';
+  type?: 'order' | 'renewal' | 'enrollment';
+  customer?: string | User;
+  products?: string[] | Product[];
+  referenceNumber?: string;
+  paymentMethod?: string | PaymentMethod;
+  details?: {
+    [k: string]: unknown;
+  }[];
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -120,6 +236,7 @@ export interface Plan {
   name: string;
   description: string;
   status?: 'active' | 'inactive';
+  category?: string[] | Category[];
   courses?: string[] | Course[];
   subscriptions?: string[] | Subscription[];
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
@@ -142,26 +259,6 @@ export interface Subscription {
   plan?: string | Plan;
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
   order?: string | Order;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
- */
-export interface Order {
-  id: string;
-  status?: 'active' | 'inactive' | 'canceled' | 'pending';
-  type?: 'order' | 'renewal' | 'enrollment';
-  customer?: string | User;
-  products?: string[] | Product[];
-  referenceNumber?: string;
-  paymentMethod?: string | PaymentMethod;
-  details?: {
-    [k: string]: unknown;
-  }[];
-  createdBy?: string | User;
-  lastModifiedBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -230,49 +327,6 @@ export interface PaymentMethod {
       | 'banesco';
   };
   createdBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "medias".
- */
-export interface Media {
-  id: string;
-  altText: string;
-  createdBy?: string | User;
-  url?: string;
-  filename: string;
-  mimeType?: string;
-  filesize?: number;
-  width?: number;
-  height?: number;
-  sizes: {
-    thumbnail: {
-      url?: string;
-      width?: number;
-      height?: number;
-      mimeType?: string;
-      filesize?: number;
-      filename?: string;
-    };
-    card: {
-      url?: string;
-      width?: number;
-      height?: number;
-      mimeType?: string;
-      filesize?: number;
-      filename?: string;
-    };
-    tablet: {
-      url?: string;
-      width?: number;
-      height?: number;
-      mimeType?: string;
-      filesize?: number;
-      filename?: string;
-    };
-  };
   createdAt: string;
   updatedAt: string;
 }
