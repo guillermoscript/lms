@@ -57,98 +57,34 @@ async function setAsInactiveSubscription(subscriptions: Subscription[]) {
     return [updatedSubs, null]
 }
 
-async function setAsInactiveEnrollment(subscriptions: Subscription[]): Promise<[Enrollment[] | null, Error | null]> {
-    let updatedEnrollments = []
-    const enrollmentIds = subscriptions.map((subscription) => {
-        return typeof subscription.enrollment === 'string' ? subscription.enrollment : subscription.enrollment.id
-    })
-
-    for (const enrollmentId of enrollmentIds) {
-        const [updatedEnrollment, updatedEnrollmentError] = await tryCatch(payload.update({
-            collection: 'enrollments',
-            id: enrollmentId,
-            data: {
-                status: 'inactive'
-            }
-        }))
-        if (updatedEnrollmentError) {
-            console.log(updatedEnrollmentError, '<----------- updatedEnrollmentError');
-            return [null, updatedEnrollmentError]
-        }
-
-        // console.log(updatedEnrollment, '<----------- updatedEnrollment');
-        updatedEnrollments.push(updatedEnrollment)
-    }
-    console.log(updatedEnrollments, '<----------- updatedEnrollment');
-
-    return [updatedEnrollments, null]
-}
-
-async function createRenewalOrder(subscriptions: Subscription[], enrollments: Enrollment[]): Promise<[Order[] | null, Error | null]> {
+async function createRenewalOrder(subscriptions: Subscription[]): Promise<[Order[] | null, Error | null]> {
 
     const subscriptionOrderIds = subscriptions.map((subscription) => {
         return typeof subscription.order === 'string' ? subscription.order : subscription.order.id
     })
 
-    console.log(subscriptionOrderIds, '<----------- subscriptionIds');
-    const [orders, ordersError] = await tryCatch(payload.find({
-        collection: 'orders',
-        where: {
-            id: {
-                in: subscriptionOrderIds
-            }
-        }
-    }))
+    let newOrders = []
+    for (const subscription of subscriptions) {
 
-    if (ordersError) {
-        console.log(ordersError, '<----------- ordersError');
-        return [null, ordersError]
-    }
-
-    console.log(enrollments, '<----------- enrollments');
-
-    // only get unique order
-    const uniqueOrderIds = [...new Set(orders.docs)]
-
-    console.log(uniqueOrderIds, '<----------- uniqueOrderIds');
-
-    const productsInOrder = uniqueOrderIds.map((order) => {
-        return order.products.map((product) => {
-            return product.id
-        })
-    })
-
-    const userProductEnrollemnt = enrollments.filter((enrollment) => {
-        const enrollmentProductId = typeof enrollment.products === 'string' ? enrollment.products : enrollment.products.id
-        console.log(enrollmentProductId, '<----------- enrollmentProductId');
-        return productsInOrder.includes(enrollmentProductId)
-    })
-
-    // unique products in user enrollment
-    const uniqueProducts = [...new Set(userProductEnrollemnt.map((enrollment) => { 
-        return typeof enrollment.products === 'string' ? enrollment.products : enrollment.products.id
-    }))]
-
-    console.log(uniqueProducts, '<----------- uniqueProducts');
-
-    let newOrders: Order[] = []
-    for (const order of uniqueOrderIds) {
-
-        const [newOrder, newOrderError] = await tryCatch<Order>(payload.create({
+        const userId = typeof subscription.user === 'string' ? subscription.user : subscription.user.id
+        const productsIds = [typeof subscription.product === 'string' ? subscription.product : subscription.product.id]
+        console.log(productsIds, '<----------- productsIds');
+        const [order, orderError] = await tryCatch(payload.create({
             collection: 'orders',
             data: {
-                products: uniqueProducts,
-                user: order.user,
+                products: productsIds,
                 status: 'pending',
-                type: 'renewal'
+                type: 'renewal',
+                customer: userId,
             }
         }))
-        if (newOrderError) {
-            console.log(newOrderError, '<----------- newOrderError');
-            return [null, newOrderError]
+
+        if (orderError) {
+            console.log(orderError, '<----------- orderError');
+            return [null, orderError]
         }
 
-        newOrders.push(newOrder)
+        newOrders.push(order)
     }
 
     return [newOrders, null]
@@ -167,25 +103,20 @@ export async function runInactivateSubscriptionAndCreateRenewalOrder() {
         return [null, updatedSubError]
     }
 
-    const [updatedEnrollments, updatedEnrollmentsError] = await setAsInactiveEnrollment(subscriptions.docs)
-
-    if (updatedEnrollmentsError) {
-        return [null, updatedEnrollmentsError]
-    }
-
-
-    const [newOrders, newOrdersError] = await createRenewalOrder(subscriptions.docs, updatedEnrollments)
+    const [newOrders, newOrdersError] = await createRenewalOrder(subscriptions.docs)
 
     if (newOrdersError) {
         return [null, newOrdersError]
     }
 
-    payload.sendEmail({
-        to: 'arepayquezo@gmail.com',
-        from: 'noreply@pincelx.com',
-        subject: 'Subscription Renewal',
-        html: 'Your subscription has been renewed'
-    })
+    // payload.sendEmail({
+    //     to: 'arepayquezo@gmail.com',
+    //     from: 'noreply@pincelx.com',
+    //     subject: 'Subscription Renewal',
+    //     html: 'Your subscription has been renewed'
+    // })
+
+    console.log("Finished running inactivate subscription and create renewal order");
 
     return [newOrders, null]
 }
