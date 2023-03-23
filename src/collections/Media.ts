@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload/types';
 import { createdByField } from '../fields/createdBy';
+import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 
@@ -51,7 +52,8 @@ const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
-    createdByField()
+    createdByField(),
+    lastModifiedBy()
   ],
   
   hooks: {
