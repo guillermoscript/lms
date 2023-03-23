@@ -11,6 +11,9 @@ import Products from './collections/Products';
 import Evaluations from './collections/Evaluations';
 import Plans from './collections/Plans';
 import Media from './collections/Media';
+import Categories from './collections/Categories';
+import Comments from './collections/Comments';
+import Lessons from './collections/Lessons';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
@@ -20,9 +23,12 @@ export default buildConfig({
   collections: [
     Courses,
     Currencies,
+    Categories,
+    Comments,
     Enrollments,
     Evaluations,
     Media,
+    Lessons,
     PaymentMethods,
     Plans,
     Products,
