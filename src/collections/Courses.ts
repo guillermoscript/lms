@@ -3,27 +3,13 @@ import { CollectionConfig } from 'payload/types';
 import { isAdmin } from '../access/isAdmin';
 import { isAdminOrCreatedBy } from '../access/isAdminOrCreatedBy';
 import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
+import { categoryField } from '../fields/category';
 import { createdByField } from '../fields/createdBy';
 import { isPublicField } from '../fields/isPublic';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
-
-const populateTeacher: BeforeChangeHook<{
-    teacher: string;
-    id: string;
-}> = ({ data, req, operation }) => {
-    if (operation === 'create') {
-        if (req.body && !req.body.teacher) {
-            if (req.user.roles?.includes('teacher')) {
-                data.teacher = req.user.id;
-                return data;
-            }
-        }
-    }
-
-    return data
-}
+import { populateTeacher } from '../hooks/poupulateTeacherField';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Courses: CollectionConfig = {
@@ -50,6 +36,7 @@ const Courses: CollectionConfig = {
             required: true,
             label: 'Descripción del curso',
         },
+        categoryField(),
         {
             name: "teacher",
             type: "relationship",
@@ -77,28 +64,9 @@ const Courses: CollectionConfig = {
         },
         {
             name: 'lessons',
-            type: 'array',
-            label: 'Lecciones',
-            fields: [
-                {
-                    name: 'name',
-                    type: 'text',
-                    required: true,
-                    label: 'Nombre de la lección',
-                },
-                {
-                    name: 'description',
-                    type: 'text',
-                    required: true,
-                    label: 'Descripción de la lección',
-                },
-                {
-                    name: 'content',
-                    type: 'richText',
-                    required: true,
-                    label: 'Contenido',
-                },
-            ],
+            type: 'relationship',
+            relationTo: 'lessons',
+            hasMany: true,
         },
         createdByField(),
         lastModifiedBy(),
