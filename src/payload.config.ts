@@ -20,6 +20,9 @@ export default buildConfig({
   serverURL: 'http://localhost:3000',
   admin: {
     user: Users.slug,
+    meta: {
+      titleSuffix: 'LMS Admin',
+    },
   },
   collections: [
     Courses,
