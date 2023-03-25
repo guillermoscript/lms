@@ -29,13 +29,13 @@ const Lessons: CollectionConfig = {
             name: 'name',
             type: 'text',
             required: true,
-            label: 'Nombre del curso',
+            label: 'Nombre de la lección',
         },
         {
             name: 'description',
             type: 'text',
             required: true,
-            label: 'Descripción del curso',
+            label: 'Descripción de la lección',
         },
         categoryField(),
         {
