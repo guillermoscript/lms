@@ -10,7 +10,8 @@ import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 const Categories: CollectionConfig = {
   slug: 'categories',
   admin: {
-    useAsTitle: 'name'
+    useAsTitle: 'name',
+    description: 'Categorías para los cursos, planes, productos, etc.',
   },
   access: {
     create: isAdminOrTeacher,
