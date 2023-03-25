@@ -95,7 +95,7 @@ export interface User {
   address?: string;
   birthDate?: string;
   gender?: 'male' | 'female' | 'other';
-  profilePicture: string | Media;
+  profilePicture?: string | Media;
   roles?: ('admin' | 'teacher' | 'editor' | 'user')[];
   email?: string;
   resetPasswordToken?: string;
@@ -183,35 +183,10 @@ export interface Currency {
 export interface Enrollment {
   id: string;
   student?: string | User;
+  products?: string | Product;
   course?: string | Course;
   status?: 'active' | 'inactive';
-  subscriptions: {
-    startDate: string;
-    endDate: string;
-    periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
-    id?: string;
-  }[];
   order?: string | Order;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
- */
-export interface Order {
-  id: string;
-  status?: 'active' | 'inactive' | 'canceled' | 'pending';
-  type?: 'order' | 'renewal' | 'enrollment';
-  customer?: string | User;
-  products?: string[] | Product[];
-  referenceNumber?: string;
-  paymentMethod?: string | PaymentMethod;
-  details?: {
-    [k: string]: unknown;
-  }[];
-  createdBy?: string | User;
-  lastModifiedBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
@@ -235,7 +210,7 @@ export interface Product {
   productStatus: 'active' | 'inactive';
   productPrice: {
     price: number;
-    currency?: string[] | Currency[];
+    aceptedCurrency: 'Bs.' | 'USD';
     id?: string;
   }[];
   productImage: string | Media;
@@ -279,6 +254,27 @@ export interface Subscription {
   plan?: string | Plan;
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
   order?: string | Order;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  status?: 'active' | 'inactive' | 'canceled' | 'pending';
+  type?: 'order' | 'renewal' | 'enrollment';
+  customer?: string | User;
+  products?: string[] | Product[];
+  referenceNumber?: string;
+  paymentMethod?: string | PaymentMethod;
+  details?: {
+    [k: string]: unknown;
+  }[];
+  total?: string;
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
   createdAt: string;
   updatedAt: string;
 }
