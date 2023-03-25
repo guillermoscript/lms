@@ -68,11 +68,20 @@ const Products: CollectionConfig = {
                     label: 'Precio',
                 },
                 {
-                    name: 'currency',
-                    type: 'relationship',
-                    relationTo: 'currencies',
-                    hasMany: true,
-                    label: 'Moneda',
+                    name: 'aceptedCurrency',
+                    type: 'radio',
+                    required: true,
+                    defaultValue: 'USD',
+                    options: [
+                        {
+                            label: 'Bolivares',
+                            value: 'Bs.',
+                        },
+                        {
+                            label: 'Dolares Americanos',
+                            value: 'USD',
+                        },
+                    ],
                 },
             ],
         },
