@@ -1,6 +1,8 @@
+import payload from 'payload';
 import { CollectionConfig } from 'payload/types';
 import { anyone } from '../../access/anyone';
 import { isAdmin } from '../../access/isAdmin';
+import { isAdminOrEditor } from '../../access/isAdminOrEditor';
 import { isRole } from '../../access/isRole';
 import { isSelfStudent } from '../../access/isSelfStudent';
 import { createdByField } from '../../fields/createdBy';
@@ -19,11 +21,11 @@ const Orders: CollectionConfig = {
     },
     access: {
         create: anyone,
-        read:  (data) => {
-            const {req: {user}} = data
+        read: (data) => {
+            const { req: { user } } = data
             return checkRole(['admin', 'editor', 'teacher'], user) || isSelfStudent(data)
         },
-        update: ({req: {user}}) => {
+        update: ({ req: { user } }) => {
             return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' })
         },
         delete: isAdmin
@@ -112,6 +114,48 @@ const Orders: CollectionConfig = {
             name: 'details',
             type: 'richText',
             label: 'Detalles',
+        },
+        {
+            name: 'total',
+            type: 'text',
+            label: 'Total',
+            admin: {
+                // hidden: true, // hides the field from the admin panel
+            },
+            access: {
+                update: () => false, // prevents the field from being updated
+                create: () => false, // prevents the field from being created
+            },
+            hooks: {
+                beforeChange: [
+                    ({ siblingData }) => {
+                        // ensures data is not stored in DB
+                        delete siblingData['total']
+                    }
+                ],
+                afterRead: [
+                    async ({ data }) => {
+                        // search for the total in the products
+                        const { products } = data
+                        let total = 0
+                        let currency = ''
+                    
+                        for (const product of products) {
+
+                            const productsData = await payload.findByID({
+                                collection: 'products',
+                                id: product
+                            })
+
+                            const productPrice = productsData.productPrice[0].price
+                            const productCurrency = productsData.productPrice[0].aceptedCurrency
+                            total += productPrice
+                            currency = productCurrency
+                        }
+                        return `${total} ${currency}`
+                    }
+                ],
+            },
         },
         createdByField(),
         lastModifiedBy(),
