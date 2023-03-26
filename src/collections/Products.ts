@@ -88,7 +88,7 @@ const Products: CollectionConfig = {
         {
             name: 'productImage',
             type: 'upload', 
-            required: true,
+            required: false,
             relationTo: 'medias',
         },
         {
