@@ -47,7 +47,7 @@ const Categories: CollectionConfig = {
         populateCreatedBy,
         populateLastModifiedBy
     ]
-}
+  }
 };
 
 export default Categories;
