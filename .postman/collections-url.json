@@ -1,0 +1,5 @@
+{
+    "enrollment": " https://api.postman.com/collections/9827180-aa3b6eb4-c0d4-44d1-b618-8ece59703581?access_key={POSTMAN_API_ENROLLMENT_COLLECTION_KEY}",
+    "Product Creation Process": "https://api.postman.com/collections/21286568-fa50471f-8c87-4268-b2bd-78b003af4c71?access_key=#{POSTMAN_API_ENROLLMENT_COLLECTION_KEY}",
+    "environment": " https://api.getpostman.com/environments/21286568-0a615492-fdde-495b-a3b1-d2c369e5676b?apikey={POSTMAN_API_KEY}"
+}
