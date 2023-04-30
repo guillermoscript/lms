@@ -94,6 +94,12 @@ const Lessons: CollectionConfig = {
             relationTo: 'comments',
             hasMany: true,
         },
+        {
+            name: 'completedBy',
+            type: 'relationship',
+            relationTo: 'users',
+            label: 'Completado por',
+        },
         createdByField(),
         lastModifiedBy(),
         isPublicField()
