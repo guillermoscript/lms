@@ -17,7 +17,7 @@ import Lessons from './collections/Lessons';
 import Reviews from './collections/Reviews';
 
 export default buildConfig({
-  serverURL: 'http://localhost:3000',
+  serverURL: 'http://localhost:3001',
   admin: {
     user: Users.slug,
     meta: {
