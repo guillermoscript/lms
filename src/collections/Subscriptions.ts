@@ -4,6 +4,8 @@ import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import periodicity from '../fields/periodicity';
 import orderRelation from '../fields/orderRelation';
 import { checkRole } from './Users/checkRole';
+import { slugField } from '../fields/slug';
+
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Subscriptions: CollectionConfig = {
@@ -69,8 +71,16 @@ const Subscriptions: CollectionConfig = {
             hasMany: false,
         },
         periodicity(),
-        orderRelation()
+        orderRelation(),
+        // slugField('user'),
     ],
+    hooks: {
+        beforeChange: [
+            // populateCreatedBy,
+            // populateLastModifiedBy,
+            
+        ],
+    },
 }
 
 export default Subscriptions;

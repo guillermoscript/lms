@@ -5,6 +5,8 @@ import { isAdmin, isAdminFieldLevel } from '../../access/isAdmin';
 import { isAdminOrSelf } from '../../access/isAdminOrSelf';
 import { populateCreatedBy } from '../../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../../hooks/populateLastModifiedBy';
+import { slugField } from '../../fields/slug';
+
 const Users: CollectionConfig = {
 	slug: 'users',
 	auth: true,
@@ -128,11 +130,13 @@ const Users: CollectionConfig = {
 				}
 			]
 		},
+		slugField('email'),
 	],
 	hooks: {
         beforeChange: [
             populateCreatedBy,
-            populateLastModifiedBy
+            populateLastModifiedBy,
+			
         ]
     }
 };

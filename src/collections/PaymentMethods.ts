@@ -4,12 +4,20 @@ import { createdByField } from '../fields/createdBy';
 import VenezuelanBanks from '../fields/VenezuelanBanks';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
+import { slugField } from '../fields/slug';
+import { User } from '../payload-types';
+import { checkRole } from './Users/checkRole';
+
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const PaymentMethods: CollectionConfig = {
     slug: 'payment-methods',
     admin: {
-        useAsTitle: 'id'
+        useAsTitle: 'title',
+        hidden(args) {
+            const {  user  } = args
+            return !checkRole(['admin', 'editor'], user as unknown as User)
+        },
     },
     access: {
         create : isAdminOrSelf,
@@ -168,12 +176,14 @@ const PaymentMethods: CollectionConfig = {
                 VenezuelanBanks(),
             ],
         },
-        createdByField()
+        createdByField(),
+        slugField('title'),
     ],
     hooks: {
         beforeChange: [
             populateCreatedBy,
-            populateLastModifiedBy
+            populateLastModifiedBy,
+            
         ]
     }
 }

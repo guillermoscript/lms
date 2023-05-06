@@ -5,12 +5,17 @@ import orderRelation from '../fields/orderRelation';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { checkRole } from './Users/checkRole';
+import { User } from '../payload-types';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Enrollments: CollectionConfig = {
     slug: 'enrollments',
     admin: {
-        useAsTitle: 'id'
+        useAsTitle: 'id',
+        hidden(args) {
+            const {  user  } = args
+            return !checkRole(['admin', 'editor'], user as unknown as User)
+        },
     },
     access: {
         create: ({ req: { user } }) => {

@@ -6,6 +6,8 @@ import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
+import { slugField } from '../fields/slug';
+
 
 const Categories: CollectionConfig = {
   slug: 'categories',
@@ -40,12 +42,13 @@ const Categories: CollectionConfig = {
   },
     createdByField(),
     lastModifiedBy(),
+    slugField('name'),
   ],
   
   hooks: {
     beforeChange: [
         populateCreatedBy,
-        populateLastModifiedBy
+        populateLastModifiedBy,
     ]
   }
 };

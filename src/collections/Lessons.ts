@@ -9,13 +9,21 @@ import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { populateTeacher } from '../hooks/poupulateTeacherField';
+import { slugField } from '../fields/slug';
+import { User } from '../payload-types';
+import { checkRole } from './Users/checkRole';
+
 
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Lessons: CollectionConfig = {
     slug: 'lessons',
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'name',
+        hidden(args) {
+            const {  user  } = args
+            return !checkRole(['admin', 'teacher'], user as unknown as User)
+        },
     },
     access: {
         create: isAdminOrTeacher,
@@ -102,13 +110,15 @@ const Lessons: CollectionConfig = {
         },
         createdByField(),
         lastModifiedBy(),
-        isPublicField()
+        isPublicField(),
+        slugField('name'),
     ],
     hooks: {
         beforeChange: [
             populateTeacher,
             populateCreatedBy,
-            populateLastModifiedBy
+            populateLastModifiedBy,
+            
         ]
     }
 }
