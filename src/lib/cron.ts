@@ -57,6 +57,29 @@ async function setAsInactiveSubscription(subscriptions: Subscription[]) {
     return [updatedSubs, null]
 }
 
+async function setAsInactiveOrder(orders: string[]) {
+    let updatedOrders = []
+    for (const order of orders) {
+        const [updatedOrder, updatedOrderError] = await tryCatch(payload.update({
+            collection: 'orders',
+            id: order,
+            data: {
+                status: 'inactive'
+            }
+        }))
+
+        if (updatedOrderError) {
+            console.log(updatedOrderError, '<----------- updatedOrderError');
+            return [null, updatedOrderError]
+        }
+
+        // console.log(updatedOrder, '<----------- updatedOrder');
+        updatedOrders.push(updatedOrder)
+    }
+
+    return [updatedOrders, null]
+}
+
 async function createRenewalOrder(subscriptions: Subscription[]): Promise<[Order[] | null, Error | null]> {
 
     const subscriptionOrderIds = subscriptions.map((subscription) => {
@@ -101,6 +124,14 @@ export async function runInactivateSubscriptionAndCreateRenewalOrder() {
 
     if (updatedSubError) {
         return [null, updatedSubError]
+    }
+
+    const [inactivatedOrders, inactivatedOrdersError] = await setAsInactiveOrder(subscriptions.docs.map((subscription) => {
+        return typeof subscription.order === 'string' ? subscription.order : subscription.order.id
+    }))
+
+    if (inactivatedOrdersError) {
+        return [null, inactivatedOrdersError]
     }
 
     const [newOrders, newOrdersError] = await createRenewalOrder(subscriptions.docs)
