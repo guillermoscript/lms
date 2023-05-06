@@ -15,11 +15,15 @@ import Categories from './collections/Categories';
 import Comments from './collections/Comments';
 import Lessons from './collections/Lessons';
 import Reviews from './collections/Reviews';
+import FormBuilder from '@payloadcms/plugin-form-builder';
 
 export default buildConfig({
-  serverURL: 'http://localhost:3000',
+  serverURL: 'http://localhost:3001',
   admin: {
     user: Users.slug,
+    meta: {
+      titleSuffix: 'LMS Admin',
+    },
   },
   collections: [
     Courses,
@@ -48,5 +52,10 @@ export default buildConfig({
     limits: {
       fileSize: 5000000, // 5MB, written in bytes
     },
-  }
+  },
+  plugins: [FormBuilder({
+    fields: {
+      payment: false
+    }
+  })],
 });

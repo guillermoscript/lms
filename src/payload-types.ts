@@ -5,11 +5,28 @@
  * and re-run `payload generate:types` to regenerate this file.
  */
 
-export interface Config {}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "courses".
- */
+export interface Config {
+  collections: {
+    courses: Course;
+    currencies: Currency;
+    categories: Category;
+    comments: Comment;
+    enrollments: Enrollment;
+    evaluations: Evaluation;
+    medias: Media;
+    lessons: Lesson;
+    'payment-methods': PaymentMethod;
+    plans: Plan;
+    products: Product;
+    reviews: Review;
+    subscriptions: Subscription;
+    orders: Order;
+    users: User;
+    forms: Form;
+    'form-submissions': FormSubmission;
+  };
+  globals: {};
+}
 export interface Course {
   id: string;
   name: string;
@@ -22,13 +39,10 @@ export interface Course {
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   isPublic?: boolean;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
 export interface Category {
   id: string;
   name: string;
@@ -36,26 +50,24 @@ export interface Category {
   image: string | Media;
   createdBy?: string | User;
   lastModifiedBy?: string | User;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "medias".
- */
 export interface Media {
   id: string;
   altText: string;
   createdBy?: string | User;
   lastModifiedBy?: string | User;
+  slug?: string;
   url?: string;
   filename: string;
   mimeType?: string;
   filesize?: number;
   width?: number;
   height?: number;
-  sizes: {
-    thumbnail: {
+  sizes?: {
+    thumbnail?: {
       url?: string;
       width?: number;
       height?: number;
@@ -63,7 +75,7 @@ export interface Media {
       filesize?: number;
       filename?: string;
     };
-    card: {
+    card?: {
       url?: string;
       width?: number;
       height?: number;
@@ -71,7 +83,7 @@ export interface Media {
       filesize?: number;
       filename?: string;
     };
-    tablet: {
+    tablet?: {
       url?: string;
       width?: number;
       height?: number;
@@ -83,10 +95,6 @@ export interface Media {
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
 export interface User {
   id: string;
   firstName: string;
@@ -95,8 +103,9 @@ export interface User {
   address?: string;
   birthDate?: string;
   gender?: 'male' | 'female' | 'other';
-  profilePicture: string | Media;
+  profilePicture?: string | Media;
   roles?: ('admin' | 'teacher' | 'editor' | 'user')[];
+  slug?: string;
   email?: string;
   resetPasswordToken?: string;
   resetPasswordExpiration?: string;
@@ -104,11 +113,8 @@ export interface User {
   lockUntil?: string;
   createdAt: string;
   updatedAt: string;
+  password?: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lessons".
- */
 export interface Lesson {
   id: string;
   name: string;
@@ -126,16 +132,14 @@ export interface Lesson {
     id?: string;
   }[];
   comments?: string[] | Comment[];
+  completedBy?: string | User;
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   isPublic?: boolean;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "comments".
- */
 export interface Comment {
   id: string;
   comment?: string;
@@ -146,13 +150,10 @@ export interface Comment {
   replyTo?: string[] | Comment[];
   createdBy?: string | User;
   lastModifiedBy?: string | User;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reviews".
- */
 export interface Review {
   id: string;
   review?: string;
@@ -161,64 +162,29 @@ export interface Review {
   dislikes?: number;
   createdBy?: string | User;
   lastModifiedBy?: string | User;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "currencies".
- */
 export interface Currency {
   id: string;
   name: string;
   symbol: string;
   exchangeRate: number;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "enrollments".
- */
 export interface Enrollment {
   id: string;
   student?: string | User;
+  products?: string | Product;
   course?: string | Course;
   status?: 'active' | 'inactive';
-  subscriptions: {
-    startDate: string;
-    endDate: string;
-    periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
-    id?: string;
-  }[];
   order?: string | Order;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
- */
-export interface Order {
-  id: string;
-  status?: 'active' | 'inactive' | 'canceled' | 'pending';
-  type?: 'order' | 'renewal' | 'enrollment';
-  customer?: string | User;
-  products?: string[] | Product[];
-  referenceNumber?: string;
-  paymentMethod?: string | PaymentMethod;
-  details?: {
-    [k: string]: unknown;
-  }[];
-  createdBy?: string | User;
-  lastModifiedBy?: string | User;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products".
- */
 export interface Product {
   id: string;
   name: string;
@@ -235,21 +201,18 @@ export interface Product {
   productStatus: 'active' | 'inactive';
   productPrice: {
     price: number;
-    currency?: string[] | Currency[];
+    aceptedCurrency: 'Bs.' | 'USD';
     id?: string;
   }[];
-  productImage: string | Media;
+  productImage?: string | Media;
   relatedProducts?: string[] | Product[];
   reviews?: string[] | Review[];
   lastModifiedBy?: string | User;
   createdBy?: string | User;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "plans".
- */
 export interface Plan {
   id: string;
   name: string;
@@ -262,13 +225,10 @@ export interface Plan {
   periodicity?: 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom';
   lastModifiedBy?: string | User;
   createdBy?: string | User;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "subscriptions".
- */
 export interface Subscription {
   id: string;
   status?: 'active' | 'inactive';
@@ -282,23 +242,37 @@ export interface Subscription {
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "payment-methods".
- */
+export interface Order {
+  id: string;
+  status?: 'active' | 'inactive' | 'canceled' | 'pending';
+  type?: 'order' | 'renewal' | 'enrollment' | 'subscription';
+  customer?: string | User;
+  products?: string[] | Product[];
+  referenceNumber?: string;
+  paymentMethod?: string | PaymentMethod;
+  details?: {
+    [k: string]: unknown;
+  }[];
+  total?: string;
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
+  slug?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface PaymentMethod {
   id: string;
   paymentsOfUser?: string[] | User[];
   title: string;
   paymentMethodType: 'zelle' | 'paypal' | 'pago-movil' | 'cash' | 'bank-transfer';
-  zelle: {
+  zelle?: {
     zelleEmail?: string;
     fullName?: string;
   };
-  paypal: {
+  paypal?: {
     paypalEmail?: string;
   };
-  pagoMovil: {
+  pagoMovil?: {
     phoneNumber: string;
     bank?:
       | 'banco-de-venezuela'
@@ -320,10 +294,10 @@ export interface PaymentMethod {
       | 'banesco';
     idn: number;
   };
-  cash: {
+  cash?: {
     cash?: string;
   };
-  bankTransfer: {
+  bankTransfer?: {
     accountNumber?: string;
     bankName?: string;
     accountType?: 'savings' | 'current';
@@ -347,13 +321,10 @@ export interface PaymentMethod {
       | 'banesco';
   };
   createdBy?: string | User;
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "evaluations".
- */
 export interface Evaluation {
   id: string;
   name: string;
@@ -362,13 +333,13 @@ export interface Evaluation {
   endDate: string;
   maxScore: number;
   evaluationType: 'exam' | 'homework';
-  homework: {
+  homework?: {
     content: {
       [k: string]: unknown;
     }[];
     id?: string;
   }[];
-  exam: {
+  exam?: {
     content: {
       [k: string]: unknown;
     }[];
@@ -378,10 +349,146 @@ export interface Evaluation {
       }[];
       id?: string;
     }[];
+    formExamn: {
+      form: string | Form;
+      id?: string;
+      blockName?: string;
+      blockType: 'formBlock';
+    }[];
     id?: string;
   }[];
   lastModifiedBy?: string | User;
   createdBy?: string | User;
+  slug?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Form {
+  id: string;
+  title: string;
+  fields?: (
+    | {
+        name: string;
+        label?: string;
+        width?: number;
+        defaultValue?: string;
+        required?: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'text';
+      }
+    | {
+        name: string;
+        label?: string;
+        width?: number;
+        defaultValue?: string;
+        required?: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'textarea';
+      }
+    | {
+        name: string;
+        label?: string;
+        width?: number;
+        defaultValue?: string;
+        options: {
+          label: string;
+          value: string;
+          id?: string;
+        }[];
+        required?: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'select';
+      }
+    | {
+        name: string;
+        label?: string;
+        width?: number;
+        required?: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'email';
+      }
+    | {
+        name: string;
+        label?: string;
+        width?: number;
+        required?: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'state';
+      }
+    | {
+        name: string;
+        label?: string;
+        width?: number;
+        required?: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'country';
+      }
+    | {
+        name: string;
+        label?: string;
+        width?: number;
+        defaultValue?: number;
+        required?: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'number';
+      }
+    | {
+        name: string;
+        label?: string;
+        width?: number;
+        required?: boolean;
+        defaultValue?: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'checkbox';
+      }
+    | {
+        message?: {
+          [k: string]: unknown;
+        }[];
+        id?: string;
+        blockName?: string;
+        blockType: 'message';
+      }
+  )[];
+  submitButtonLabel?: string;
+  confirmationType?: 'message' | 'redirect';
+  confirmationMessage: {
+    [k: string]: unknown;
+  }[];
+  redirect?: {
+    url: string;
+  };
+  emails: {
+    emailTo?: string;
+    cc?: string;
+    bcc?: string;
+    replyTo?: string;
+    emailFrom?: string;
+    subject: string;
+    message?: {
+      [k: string]: unknown;
+    }[];
+    id?: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+export interface FormSubmission {
+  id: string;
+  form: string | Form;
+  submissionData: {
+    field: string;
+    value: string;
+    id?: string;
+  }[];
   createdAt: string;
   updatedAt: string;
 }

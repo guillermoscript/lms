@@ -5,7 +5,7 @@ services:
   payload:
     image: node:18-alpine
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
@@ -14,8 +14,8 @@ services:
     depends_on:
       - mongo
     environment:
-      MONGODB_URI: mongodb://mongo:27017/payload
-      PORT: 3000
+      MONGODB_URI: mongodb+srv://lms:mNfm7qEeET5K56X@cluster0.ogpwy20.mongodb.net/lms?retryWrites=true&w=majority
+      PORT: 3001
       NODE_ENV: development
       PAYLOAD_SECRET: TESTING
 
@@ -29,6 +29,49 @@ services:
       - data:/data/db
     logging:
       driver: none
+
+#   mongo:
+#     container_name: mongo
+#     image: mongo:4.4
+#     volumes:
+#       - data:/data/db
+#       - ./rs-init.sh:/scripts/rs-init.sh
+#     networks:
+#       - mongors-network
+#     ports:
+#       - 27021:27017
+#     links:
+#       - mongo2
+#       - mongo3
+#     restart: always
+#     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--storageEngine", "wiredTiger" ]
+#   mongo2:
+#     container_name: mongo2
+#     image: mongo:4.4
+#     volumes:
+#       - ~/mongors/data2:/data/db
+#     networks:
+#       - mongors-network
+#     ports:
+#       - 27022:27017
+#     restart: always
+#     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+#   mongo3:
+#     container_name: mongo3
+#     image: mongo:4.4
+#     volumes:
+#       - ~/mongors/data3:/data/db
+#     networks:
+#       - mongors-network
+#     ports:
+#       - 27023:27017
+#     restart: always
+#     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+
+# networks:
+#   mongors-network:
+#     driver: bridge
+
 
 volumes:
   data:

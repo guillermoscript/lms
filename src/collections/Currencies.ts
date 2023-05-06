@@ -3,12 +3,20 @@ import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isRole } from '../access/isRole';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
+import { slugField } from '../fields/slug';
+import { User } from '../payload-types';
+import { checkRole } from './Users/checkRole';
+
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Currencies: CollectionConfig = {
     slug: 'currencies',
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'name',
+        hidden(args) {
+            const {  user  } = args
+            return !checkRole(['admin', 'editor'], user as unknown as User)
+        },
     },
     access: {
         create: isAdminOrEditor,
@@ -40,11 +48,13 @@ const Currencies: CollectionConfig = {
         //     relationTo: 'product-prices',
         //     hasMany: false,
         // }
+        slugField('name'),
     ],
     hooks: {
         beforeChange: [
             populateCreatedBy,
-            populateLastModifiedBy
+            populateLastModifiedBy,
+            
         ]
     }
 }

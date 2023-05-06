@@ -4,11 +4,13 @@ import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
+import { slugField } from '../fields/slug';
+
 
 const Comments: CollectionConfig = {
     slug: 'comments',
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'id'
     },
     access: {
         create: isAdminOrCreatedBy,
@@ -53,12 +55,13 @@ const Comments: CollectionConfig = {
         },
         createdByField(),
         lastModifiedBy(),
+        slugField('id')
     ],
 
     hooks: {
         beforeChange: [
             populateCreatedBy,
-            populateLastModifiedBy
+            populateLastModifiedBy,
         ]
     }
 };

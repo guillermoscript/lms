@@ -13,7 +13,7 @@ const formatSlug =
                 return format(value)
             }
 
-            if (operation === 'create') {
+            if (operation === 'create' || operation === 'update') {
                 const fallbackData = data?.[fallback] || originalDoc?.[fallback]
 
                 if (fallbackData && typeof fallbackData === 'string') {

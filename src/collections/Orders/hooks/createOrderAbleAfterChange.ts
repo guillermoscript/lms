@@ -1,4 +1,4 @@
-import { Enrollment, Order, Plan, Product, Subscription, User } from '../../../payload-types';
+import { Course, Enrollment, Order, Plan, Product, Subscription, User } from '../../../payload-types';
 import { Payload } from "payload";
 import createEnrollmentDto, { EnrollmentCreateDto } from '../dto/createEnrollmentDto';
 import createSubscriptionDto, { SubscriptionCreateDto } from '../dto/createSubscriptionDto';
@@ -14,11 +14,12 @@ const createOrderAbleAfterChange: FieldHook = async ({
     const docType: Order = originalDoc
     const status = docType.status
     const type = docType.type
+
     if (status === 'inactive') {
         return
     }
 
-    if (type === "renewal" || type === "order") {
+    if (type === "renewal") {
         return
     }
 
@@ -44,37 +45,82 @@ const createOrderAbleAfterChange: FieldHook = async ({
     }
 
     const products = purchasedProducts.docs
-    const productThatArePlans = products.filter(product => product.productType.relationTo === 'plans')
-    const plansIds = productThatArePlans.map(product => {
-        return product.productType.value as Plan
-    })
 
-    const [plans, plansError] = await tryCatch<PaginatedDocs<Plan>>(req.payload.find({
-        collection: 'plans',
-        where: {
-            id: {
-                in: plansIds.map(plan => plan.id as string),
-            }
-        }
-    }))
-
-    if (plansError) {
-        return
-    }
-
-    if (productThatArePlans.length === 0) {
-        console.log('no plans');
-        await sendUserEmail(docType.customer, req.payload)
-        return
-    }
-
-    const [subscription, errorSub] = await newCreateSubscription(plans.docs, req.payload, docType, productThatArePlans)
-
-    if (errorSub) {
-        return
-    }
+    console.log(products, '<----------- products')
     
-    await sendUserEmail(docType.customer, req.payload)
+    const typeOfOrderFlowToTake = {
+        async enrollment() {
+
+            console.log('enrollment')
+            const productThatAreCoruse = products.filter(product => product.productType.relationTo === 'courses');
+            const coursesIds = productThatAreCoruse.map(product => {
+                return product.productType.value as Course;
+            });
+
+            const [courses, coursesError] = await tryCatch<PaginatedDocs<Course>>(req.payload.find({
+                collection: 'courses',
+                where: {
+                    id: {
+                        in: coursesIds.map(course => course.id as string),
+                    }
+                }
+            }));
+
+            if (coursesError) {
+                return;
+            }
+
+            const [enrollment, errorEnrollment] = await newCreateEnrollment(courses.docs, req.payload, docType, productThatAreCoruse);
+
+            if (errorEnrollment) {
+                return;
+            }
+
+            await sendUserEmail(docType.customer, req.payload);
+            return true;
+        },
+        async subscription() {
+            console.log('subscription')
+            const productThatArePlans = products.filter(product => product.productType.relationTo === 'plans');
+            if (productThatArePlans.length === 0) {
+                console.log('no plans');
+                await sendUserEmail(docType.customer, req.payload);
+                return;
+            }
+
+            const plansIds = productThatArePlans.map(product => {
+                return product.productType.value as Plan;
+            });
+
+            const [plans, plansError] = await tryCatch<PaginatedDocs<Plan>>(req.payload.find({
+                collection: 'plans',
+                where: {
+                    id: {
+                        in: plansIds.map(plan => plan.id as string),
+                    }
+                }
+            }));
+
+            if (plansError) {
+                return;
+            }
+
+            const [subscription, errorSub] = await newCreateSubscription(plans.docs, req.payload, docType, productThatArePlans);
+
+            if (errorSub) {
+                return;
+            }
+
+            await sendUserEmail(docType.customer, req.payload);
+            return true;
+        },
+    }
+
+    if (typeOfOrderFlowToTake[type]) {
+        await typeOfOrderFlowToTake[type]()
+    }
+
+    return
 }
 
 async function sendUserEmail(userId: Order['customer'], payload: Payload) {
@@ -121,7 +167,40 @@ async function newCreateSubscription(plans: Plan[], payload: Payload, docType: O
         subscriptions.push(subscriptionDoc)
     }
 
-    return [subscriptions, null]
+    return error ? [null, error] : [subscriptions, null]
+}
+
+async function newCreateEnrollment(courses: Course[], payload: Payload, docType: Order, productThatAreCourses: Product[]): Promise<[Enrollment[], Error]> {
+
+    const userId = typeof docType.customer === 'string' ? docType.customer : docType.customer.id
+    const enrollmentData = productThatAreCourses.map((product,index) => {
+        const courseId = courses[index].id as string
+        return createEnrollmentDto({
+            orderId: docType.id as string,
+            studentId: userId,
+            course: courseId,
+            productId: product.id as string,
+        })
+    })
+
+    const createdEnrollments: Enrollment[] = []
+    let error: Error = null
+
+    for (const enrollment of enrollmentData) {
+        const [enrollmentDoc, enrollmentError] = await tryCatch<Enrollment>(payload.create({
+            collection: 'enrollments',
+            data: enrollment,
+        }))
+
+        if (enrollmentError) {
+            console.error(enrollmentError)
+            error = enrollmentError
+            break
+        }
+        createdEnrollments.push(enrollmentDoc)
+    }
+
+    return error ? [null, error] : [createdEnrollments, null]
 }
 
 export default createOrderAbleAfterChange

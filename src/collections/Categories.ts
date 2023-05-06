@@ -6,11 +6,14 @@ import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
+import { slugField } from '../fields/slug';
+
 
 const Categories: CollectionConfig = {
   slug: 'categories',
   admin: {
-    useAsTitle: 'name'
+    useAsTitle: 'name',
+    description: 'Categorías para los cursos, planes, productos, etc.',
   },
   access: {
     create: isAdminOrTeacher,
@@ -39,14 +42,15 @@ const Categories: CollectionConfig = {
   },
     createdByField(),
     lastModifiedBy(),
+    slugField('name'),
   ],
   
   hooks: {
     beforeChange: [
         populateCreatedBy,
-        populateLastModifiedBy
+        populateLastModifiedBy,
     ]
-}
+  }
 };
 
 export default Categories;

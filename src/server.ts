@@ -48,4 +48,7 @@ app.get('/cron', async (req, res) => {
   })
 })
 
-app.listen(3000);
+app.listen(process.env.PORT);
+// app.listen(process.env.PORT, () => {
+//   payload.logger.info(`Server running on port ${process.env.PORT}`)
+// });

@@ -6,6 +6,8 @@ import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import periodicity from '../fields/periodicity';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
+import { slugField } from '../fields/slug';
+
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Plans: CollectionConfig = {
@@ -67,12 +69,13 @@ const Plans: CollectionConfig = {
         },
         periodicity(),
         lastModifiedBy(),
-        createdByField()
+        createdByField(),
+        slugField('name'),
     ],
     hooks: {
         beforeChange: [
             populateCreatedBy,
-            populateLastModifiedBy
+            populateLastModifiedBy,
         ]
     }
 }
