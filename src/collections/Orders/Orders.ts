@@ -12,12 +12,19 @@ import { populateLastModifiedBy } from '../../hooks/populateLastModifiedBy';
 import { checkRole } from '../Users/checkRole';
 import createOrderAbleAfterChange from './hooks/createOrderAbleAfterChange';
 import { creationEmailNotification } from './hooks/creationEmailNotification';
+import { slugField } from '../../fields/slug';
+import { User } from '../../payload-types';
+
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 
 const Orders: CollectionConfig = {
     slug: 'orders',
     admin: {
-        useAsTitle: 'id'
+        useAsTitle: 'id',
+        hidden(args) {
+            const {  user  } = args
+            return !checkRole(['admin', 'editor'], user as unknown as User)
+        },
     },
     access: {
         create: anyone,
@@ -81,10 +88,10 @@ const Orders: CollectionConfig = {
                     label: 'Matrícula',
                     value: 'enrollment',
                 },
-                // {
-                //     label: 'Inscripción',
-                //     value: 'subscription',
-                // }
+                {
+                    label: 'Suscripción',
+                    value: 'subscription',
+                }
             ],
         },
         {
@@ -159,6 +166,7 @@ const Orders: CollectionConfig = {
         },
         createdByField(),
         lastModifiedBy(),
+        slugField('id'),
     ],
     hooks: {
         afterChange: [
@@ -166,7 +174,8 @@ const Orders: CollectionConfig = {
         ],
         beforeChange: [
             populateCreatedBy,
-            populateLastModifiedBy
+            populateLastModifiedBy,
+            
         ]
     }
 }
