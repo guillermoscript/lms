@@ -6,7 +6,7 @@ import tryCatch from "../utilities/tryCatch";
 const todayDate = new Date().toISOString().substring(0, 10);
 
 async function findPastDueDateSubscription(): Promise<[PaginatedDocs<Subscription> | null, Error | null]> {
-    const [subscriptions, subError]: [PaginatedDocs<Subscription>, Error] = await tryCatch(payload.find({
+    const [subscriptions, subError] = await tryCatch<PaginatedDocs<Subscription>>(payload.find({
         collection: 'subscriptions',
         where: {
             and: [
@@ -83,14 +83,14 @@ async function setAsInactiveOrder(orders: string[]) {
 async function createRenewalOrder(subscriptions: Subscription[]): Promise<[Order[] | null, Error | null]> {
 
     const subscriptionOrderIds = subscriptions.map((subscription) => {
-        return typeof subscription.order === 'string' ? subscription.order : subscription.order.id
+        return typeof subscription.order === 'string' ? subscription.order : subscription?.order?.id
     })
 
     let newOrders = []
     for (const subscription of subscriptions) {
 
-        const userId = typeof subscription.user === 'string' ? subscription.user : subscription.user.id
-        const productsIds = [typeof subscription.product === 'string' ? subscription.product : subscription.product.id]
+        const userId = typeof subscription.user === 'string' ? subscription.user : subscription?.user?.id
+        const productsIds = [typeof subscription.product === 'string' ? subscription.product : subscription?.product?.id]
         console.log(productsIds, '<----------- productsIds');
         const [order, orderError] = await tryCatch(payload.create({
             collection: 'orders',
@@ -120,21 +120,21 @@ export async function runInactivateSubscriptionAndCreateRenewalOrder() {
         return [null, subError]
     }
 
-    const [updatedSubscriptions, updatedSubError] = await setAsInactiveSubscription(subscriptions.docs)
+    const [updatedSubscriptions, updatedSubError] = await setAsInactiveSubscription(subscriptions?.docs as Subscription[])
 
     if (updatedSubError) {
         return [null, updatedSubError]
     }
 
-    const [inactivatedOrders, inactivatedOrdersError] = await setAsInactiveOrder(subscriptions.docs.map((subscription) => {
-        return typeof subscription.order === 'string' ? subscription.order : subscription.order.id
-    }))
+    const [inactivatedOrders, inactivatedOrdersError] = await setAsInactiveOrder(subscriptions?.docs.map((subscription) => {
+        return typeof subscription.order === 'string' ? subscription.order : subscription?.order?.id
+    }) as string[])
 
     if (inactivatedOrdersError) {
         return [null, inactivatedOrdersError]
     }
 
-    const [newOrders, newOrdersError] = await createRenewalOrder(subscriptions.docs)
+    const [newOrders, newOrdersError] = await createRenewalOrder(subscriptions?.docs as Subscription[])
 
     if (newOrdersError) {
         return [null, newOrdersError]

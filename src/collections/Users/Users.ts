@@ -24,7 +24,7 @@ const Users: CollectionConfig = {
 		update: isAdminOrSelf,
 		// Only admins can delete
 		delete: isAdmin,
-		admin:  ({ req: { user } }) => { 
+		admin: ({ req: { user } }) => {
 			if (user.roles.includes('user')) {
 				return false
 			}
@@ -94,11 +94,11 @@ const Users: CollectionConfig = {
 			]
 		},
 		{
-            name: 'profilePicture',
-            type: 'upload', 
-            required: false,
-            relationTo: 'medias',
-        },
+			name: 'profilePicture',
+			type: 'upload',
+			required: false,
+			relationTo: 'medias',
+		},
 		{
 			name: 'roles',
 			// Save this field to JWT so we can use from `req.user`
@@ -133,12 +133,12 @@ const Users: CollectionConfig = {
 		slugField('email'),
 	],
 	hooks: {
-        beforeChange: [
-            populateCreatedBy,
-            populateLastModifiedBy,
-			
-        ]
-    }
+		beforeChange: [
+			populateCreatedBy,
+			populateLastModifiedBy,
+
+		]
+	},
 };
 
 export default Users;

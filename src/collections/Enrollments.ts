@@ -1,11 +1,65 @@
-import { CollectionConfig } from 'payload/types';
+import { CollectionConfig, PayloadRequest } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import orderRelation from '../fields/orderRelation';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { checkRole } from './Users/checkRole';
-import { User } from '../payload-types';
+import { Subscription, User } from '../payload-types';
+import { Response } from 'express';
+import { PaginatedDocs } from 'payload/dist/mongoose/types';
+import { z } from 'zod';
+import tryCatch from '../utilities/tryCatch';
+
+async function getActiveEnrollments(req: PayloadRequest, res: Response) {
+    const { id } = req.params;
+
+    if (!id) {
+        return [null, { message: 'Missing user id' }]
+    }
+
+    // use zod to validate id
+    const idSchema = z.string()
+    const idValidation = idSchema.safeParse(id);
+
+    if (!idValidation.success) {
+        return [null, { message: 'Invalid user id' }]
+    }
+
+    // find user
+    const [userEnrollemnt, userError] = await tryCatch<PaginatedDocs<Subscription>>(req.payload.find({
+        collection: 'enrollments',
+        where: {
+            and: [
+                {
+                    student: {
+                        equals: id
+                    }
+                },
+                {
+                    status: {
+                        equals: 'active'
+                    }
+                }
+            ]
+        },
+        sort: '-createdAt',
+    }));
+
+    console.log(userEnrollemnt, "userEnrollemnt")
+
+    if (userError || !userEnrollemnt) {
+        return [null, userError]
+    }
+
+    if (userEnrollemnt?.docs.length === 0) {
+        return [null, { message: 'No Enrollment found' }]
+    }
+
+    // send response that user has active subscription
+    return [userEnrollemnt, null]
+}
+
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Enrollments: CollectionConfig = {
@@ -71,7 +125,36 @@ const Enrollments: CollectionConfig = {
             populateCreatedBy,
             populateLastModifiedBy
         ]
-    }
+    },
+    endpoints: [
+		{
+			path: '/:id/check',
+			method: 'get',
+			handler: async (req, res, next) => {
+                const [activeEnrollments, error] = await getActiveEnrollments(req, res);
+                
+                if (error) {
+                    res.status(400).json(error);
+                }
+
+                res.status(200).json({ message: 'User has active enrollment' });
+            }
+			
+		},
+        {
+            path: '/:id/actives',
+            method: 'get',
+            handler: async (req, res, next) => {
+                const [activeEnrollments, error] = await getActiveEnrollments(req, res);
+                
+                if (error) {
+                    res.status(400).json(error);
+                }
+
+                res.status(200).json(activeEnrollments);
+            }
+        }
+	],
 }
 
 export default Enrollments;

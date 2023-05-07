@@ -1,11 +1,62 @@
-import { CollectionConfig } from 'payload/types';
+import { CollectionConfig, PayloadRequest } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
 import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import periodicity from '../fields/periodicity';
 import orderRelation from '../fields/orderRelation';
 import { checkRole } from './Users/checkRole';
 import { slugField } from '../fields/slug';
+import tryCatch from '../utilities/tryCatch';
+import { Subscription } from '../payload-types';
+import { PaginatedDocs } from 'payload/dist/mongoose/types';
+import { z } from 'zod';
+import { Response } from 'express';
 
+async function getActiveSubscriptions(req: PayloadRequest, res: Response) {
+    const { id } = req.params;
+
+    if (!id) {
+        return [null, { message: 'Missing user id' }]
+    }
+
+    // use zod to validate id
+    const idSchema = z.string()
+    const idValidation = idSchema.safeParse(id);
+
+    if (!idValidation.success) {
+        return [null, { message: 'Invalid user id' }]
+    }
+
+    // find user
+    const [userSubscriptions, userError] = await tryCatch<PaginatedDocs<Subscription>>(req.payload.find({
+        collection: 'subscriptions',
+        where: {
+            and: [
+                {
+                    'user': {
+                        equals: id
+                    }
+                },
+                {
+                    'status': {
+                        equals: 'active'
+                    }
+                }
+            ]
+        },
+        sort: '-createdAt',
+    }));
+
+    if (userError || !userSubscriptions) {
+        return [null, userError]
+    }
+
+    if (userSubscriptions?.docs.length === 0) {
+        return [null, { message: 'No Subscription found' }]
+    }
+
+    // send response that user has active subscription
+    return [userSubscriptions, null]
+}
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Subscriptions: CollectionConfig = {
@@ -81,6 +132,30 @@ const Subscriptions: CollectionConfig = {
             
         ],
     },
+    endpoints: [
+		{
+			path: '/:id/check',
+			method: 'get',
+			handler: async (req, res, next) => {
+                const [activeSubscriptions, error] = await getActiveSubscriptions(req, res);
+                
+                if (error) {
+                    return res.status(400).json(error);
+                }
+
+                res.status(200).json({ message: 'User has active subscription'});
+            }
+			
+		},
+        {
+            path: '/:id/actives',
+            method: 'get',
+            handler: async (req, res, next) => {
+                const activeSubscriptions = await getActiveSubscriptions(req, res);
+                res.status(200).json(activeSubscriptions);
+            }
+        }
+	],
 }
 
 export default Subscriptions;

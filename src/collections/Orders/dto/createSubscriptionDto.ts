@@ -2,9 +2,11 @@ import { Subscription, Order, Product, Plan } from "../../../payload-types"
 
 export type SubscriptionCreateDto = Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>
 
-export default function createSubscriptionDto(doc: Order, product: Product, plan: Plan['id'], periodicity: SubscriptionCreateDto['periodicity'] = 'monthly'): SubscriptionCreateDto {
+type periodicity = 'monthly' | 'bimonthly' | 'quarterly' | 'biannual' | 'annual' | 'custom'
 
-    const periodicityStates: Record<SubscriptionCreateDto['periodicity'], number> = {
+export default function createSubscriptionDto(doc: Order, product: Product, plan: Plan['id'], periodicity: SubscriptionCreateDto['periodicity'] = 'monthly') {
+
+    const periodicityStates: Record<periodicity, number> = {
         'monthly': 1,
         'bimonthly': 2,
         'quarterly': 3,
@@ -13,7 +15,7 @@ export default function createSubscriptionDto(doc: Order, product: Product, plan
         'custom': 0,
     }
 
-    const setDates = (periodicity: SubscriptionCreateDto['periodicity']) => {
+    const setDates = (periodicity: periodicity): [Date, Date] => {
         const startDate = new Date()
         const endDate = new Date()
         endDate.setMonth(endDate.getMonth() + periodicityStates[periodicity])
@@ -27,7 +29,7 @@ export default function createSubscriptionDto(doc: Order, product: Product, plan
         return
     }
 
-    const userId = typeof doc.customer === 'string' ? doc.customer : doc.customer.id
+    const userId = typeof doc.customer === 'string' ? doc.customer : doc?.customer?.id
 
     const [startDate, endDate] = setDates(periodicity)
 

@@ -143,7 +143,7 @@ const Orders: CollectionConfig = {
                 afterRead: [
                     async ({ data }) => {
                         // search for the total in the products
-                        const { products } = data
+                        const { products } = data as { products: string[] }
                         let total = 0
                         let currency = ''
                     
