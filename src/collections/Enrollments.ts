@@ -5,25 +5,19 @@ import orderRelation from '../fields/orderRelation';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { checkRole } from './Users/checkRole';
-import { Subscription, User } from '../payload-types';
+import { Enrollment, Subscription, User } from '../payload-types';
 import { Response } from 'express';
 import { PaginatedDocs } from 'payload/dist/mongoose/types';
 import { z } from 'zod';
 import tryCatch from '../utilities/tryCatch';
+import { isLoggedIn } from '../access/isLoggedIn';
+import { StatusCodes } from 'http-status-codes';
 
 async function getActiveEnrollments(req: PayloadRequest, res: Response) {
-    const { id } = req.params;
-
-    if (!id) {
+    
+    const user = req.user as User;
+    if (!user) {
         return [null, { message: 'Missing user id' }]
-    }
-
-    // use zod to validate id
-    const idSchema = z.string()
-    const idValidation = idSchema.safeParse(id);
-
-    if (!idValidation.success) {
-        return [null, { message: 'Invalid user id' }]
     }
 
     // find user
@@ -33,7 +27,7 @@ async function getActiveEnrollments(req: PayloadRequest, res: Response) {
             and: [
                 {
                     student: {
-                        equals: id
+                        equals: user?.id
                     }
                 },
                 {
@@ -79,7 +73,8 @@ const Enrollments: CollectionConfig = {
             // TODO: let a user type student enroll in a course
             return false
         },
-        read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
+        read: isLoggedIn,
+        // read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
         update: isAdminOrEditor,
         delete: isAdminOrEditor
     },
@@ -128,30 +123,68 @@ const Enrollments: CollectionConfig = {
     },
     endpoints: [
 		{
-			path: '/:id/check',
+			path: '/check',
 			method: 'get',
 			handler: async (req, res, next) => {
                 const [activeEnrollments, error] = await getActiveEnrollments(req, res);
                 
-                if (error) {
-                    res.status(400).json(error);
-                }
-
                 res.status(200).json({ message: 'User has active enrollment' });
             }
 			
 		},
         {
-            path: '/:id/actives',
+            path: '/actives/:courseId',
             method: 'get',
             handler: async (req, res, next) => {
-                const [activeEnrollments, error] = await getActiveEnrollments(req, res);
                 
-                if (error) {
-                    res.status(400).json(error);
+                const user = req.user as User;
+                const courseId = req.params.courseId;
+                if (!user) {
+                    return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Missing user id' })
                 }
 
-                res.status(200).json(activeEnrollments);
+                if (!courseId) {
+                    return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Missing course id' })
+                }                
+
+                // find user
+                const [userEnrollemnt, userError] = await tryCatch<PaginatedDocs<Enrollment>>(req.payload.find({
+                    collection: 'enrollments',
+                    where: {
+                        and: [
+                            {
+                                student: {
+                                    equals: user?.id
+                                }
+                            },
+                            {
+                                status: {
+                                    equals: 'active'
+                                }
+                            },
+                            {
+                                course: {
+                                    equals: courseId
+                                }
+                            }
+                        ]
+                    },
+                    sort: '-createdAt',
+                }));
+
+                if (userError || !userEnrollemnt) {
+                    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error finding user enrollment' })
+                }
+
+                if (userEnrollemnt?.docs.length === 0) {
+                    return res.status(StatusCodes.NOT_FOUND).json({ message: 'No Enrollment found' })
+                }
+
+                // filter by course id
+                // send response that user has active subscription
+                const course = userEnrollemnt?.docs[0].course;
+                
+                res.status(200).json(course);
             }
         }
 	],
