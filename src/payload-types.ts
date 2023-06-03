@@ -244,6 +244,7 @@ export interface Subscription {
 }
 export interface Order {
   id: string;
+  amount: number;
   status?: 'active' | 'inactive' | 'canceled' | 'pending';
   type?: 'order' | 'renewal' | 'enrollment' | 'subscription';
   customer?: string | User;
@@ -267,7 +268,7 @@ export interface PaymentMethod {
   paymentMethodType: 'zelle' | 'paypal' | 'pago-movil' | 'cash' | 'bank-transfer';
   zelle?: {
     zelleEmail?: string;
-    fullName?: string;
+    zelleName?: string;
   };
   paypal?: {
     paypalEmail?: string;
@@ -292,7 +293,7 @@ export interface PaymentMethod {
       | 'banco-nacional-de-credito'
       | 'banco-venezolano-de-credito'
       | 'banesco';
-    idn: number;
+    pagoMovilIdn: string;
   };
   cash?: {
     cash?: string;
