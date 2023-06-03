@@ -23,6 +23,8 @@ const createOrderAbleAfterChange: FieldHook = async ({
         return
     }
 
+    // TODO if an order is type enrrollment, and status changes to inactive, then set enrollment to inactive
+
     const typeOfOrder = docType?.products?.map(product => {
         if (typeof product === 'string') {
             return product
@@ -107,9 +109,48 @@ const createOrderAbleAfterChange: FieldHook = async ({
 
             const [subscription, errorSub] = await newCreateSubscription(plans?.docs as Plan[], req.payload, docType, productThatArePlans as Product[]);
 
+
             if (errorSub) {
                 return;
             }
+
+            // now create an enrollment for each course in the plan
+            const courses = plans?.docs.map(plan => {
+                return plan.courses as Course[];
+            }).flat();
+
+            console.log(courses, '<----------- courses')
+
+            const createdEnrollments: Enrollment[] = []
+            let error: Error | null = null
+            for (const course of (courses as Course[])) {
+
+                const [enrollmentDoc, enrollmentError] = await tryCatch<Enrollment>(req.payload.create({
+                    collection: 'enrollments',
+                    data: {
+                        student: docType.customer,
+                        products: (products as Product[])[0].id,
+                        course: course.id,
+                        status: 'active',
+                        order: docType.id,
+                    }
+                }))
+
+                if (enrollmentError) {
+                    error = enrollmentError
+                    break
+                }
+
+                createdEnrollments.push(enrollmentDoc as Enrollment)
+            }
+
+            if (error) {
+                console.log(error, '<----------- error')
+                return
+            }
+
+            console.log(createdEnrollments, '<----------- createdEnrollments')
+
 
             await sendUserEmail(docType.customer, req.payload);
             return true;
