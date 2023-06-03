@@ -11,6 +11,10 @@ import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { populateTeacher } from '../hooks/poupulateTeacherField';
 import { slugField } from '../fields/slug';
+import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
+import { anyone } from '../access/anyone';
+import { checkRole } from './Users/checkRole';
+import payload from 'payload';
 
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -21,7 +25,8 @@ const Courses: CollectionConfig = {
     },
     access: {
         create: isAdminOrTeacher,
-        read: () => true,
+        // read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin','teacher'], user),
+        read: anyone,
         update: isAdminOrCreatedBy,
         delete: isAdmin
     },
@@ -69,6 +74,61 @@ const Courses: CollectionConfig = {
             type: 'relationship',
             relationTo: 'lessons',
             hasMany: true,
+            access: {
+                read: ({ req }) => {
+                    
+                    const user = req.user
+
+                    if (!user) {
+                        return false
+                    }
+
+                    if (checkRole([ 'admin','teacher'], req.user)) {
+                        return true
+                    }
+
+                    async function findIfUserIsEnrolled() {
+                        try {
+                            const enrollment = await payload.find({
+                                collection: 'enrollments',
+                                where: {
+                                    and: [
+                                        {
+                                            student: {
+                                                equals: user?.id,
+                                            },
+                                        },
+                                        {
+                                            status: {
+                                                equals: 'active',
+                                            },
+                                        },
+                                        {
+                                            course: {
+                                                equals: req.params.id,
+                                            },
+                                        }
+                                    ],
+                                }
+                            })
+
+                            console.log(enrollment, "enrollment")
+
+                            // return enrollment ? true : false
+                            if (!enrollment || enrollment.docs.length === 0) {
+                                return false
+                            }
+
+                            return true
+                        } catch (error) {
+                            console.log(error)
+                            return false
+                        }
+                    }
+
+                    return findIfUserIsEnrolled()
+                },
+            },
         },
         {
             name: 'reviews',
@@ -93,7 +153,7 @@ const Courses: CollectionConfig = {
             populateTeacher,
             populateCreatedBy,
             populateLastModifiedBy,
-            
+
         ]
     }
 }
