@@ -10,7 +10,8 @@ import { slugField } from '../fields/slug';
 const Reviews: CollectionConfig = {
     slug: 'reviews',
     admin: {
-        useAsTitle: 'id'
+        useAsTitle: 'id',
+        group: 'Comentarios',
     },
     access: {
         create: isAdminOrCreatedBy,

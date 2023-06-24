@@ -62,7 +62,8 @@ async function getActiveSubscriptions(req: PayloadRequest, res: Response) {
 const Subscriptions: CollectionConfig = {
     slug: 'subscriptions',
     admin: {
-        useAsTitle: 'id'
+        useAsTitle: 'id',
+        group: 'Información de usuarios',
     },
     access: {
         create: ({ req: { user } }) => {
