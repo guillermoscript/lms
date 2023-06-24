@@ -5,17 +5,19 @@ import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { slugField } from '../fields/slug';
+import { anyone } from '../access/anyone';
 
 
 const Comments: CollectionConfig = {
     slug: 'comments',
     admin: {
-        useAsTitle: 'id'
+        useAsTitle: 'id',
+        group: 'Comentarios',
     },
     access: {
-        create: isAdminOrCreatedBy,
+        create: anyone,
         // TODO: Only active subscriptions can access this
-        read: () => true,
+        read: anyone,
         update: isAdminOrCreatedBy,
         delete: isAdminOrCreatedBy
     },
@@ -23,7 +25,7 @@ const Comments: CollectionConfig = {
         {
             name: 'comment',
             type: 'text',
-            required: false,
+            required: true,
         },
         {
             name: 'user',
@@ -42,22 +44,15 @@ const Comments: CollectionConfig = {
             required: false,
         },
         {
-            name: 'lesson',
+            name: 'commentable',
             type: 'relationship',
-            relationTo: 'lessons',
+            relationTo: ['products', 'lessons', 'courses', 'comments', 'evaluations'],
             hasMany: false,
-        },
-        {
-            name: 'replyTo',
-            type: 'relationship',
-            relationTo: 'comments',
-            hasMany: true,
         },
         createdByField(),
         lastModifiedBy(),
         slugField('id')
     ],
-
     hooks: {
         beforeChange: [
             populateCreatedBy,
