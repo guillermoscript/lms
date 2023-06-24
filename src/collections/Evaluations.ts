@@ -12,6 +12,8 @@ import { FormBlock } from '../blocks/Form';
 import { slugField } from '../fields/slug';
 import { User } from '../payload-types';
 import { checkRole } from './Users/checkRole';
+import { isLoggedIn } from '../access/isLoggedIn';
+import fieldComp from '../blocks/Fields';
 
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -23,11 +25,12 @@ const Evaluations: CollectionConfig = {
             const {  user  } = args
             return !checkRole(['admin', 'teacher'], user as unknown as User)
         },
+        group: 'Cursos',
     },
     access: {
         create: isAdminOrTeacher,
         read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'teacher'], user),
-        update: isAdminOrCreatedBy,
+        update: isLoggedIn,
         delete: isAdmin
     },
     fields: [
@@ -36,18 +39,27 @@ const Evaluations: CollectionConfig = {
             type: 'text',
             required: true,
             label: 'Nombre de la evaluación',
+            // access: {
+            //     update: ({ req: { user } }) => checkRole(['admin', 'teacher'], user as unknown as User)
+            // }
         },
         {
             name: 'description',
             type: 'text',
             required: true,
             label: 'Descripción de la evaluación',
+            // access: {
+            //     update: ({ req: { user } }) => checkRole(['admin', 'teacher'], user as unknown as User)
+            // }
         },
         {
             name: 'course',
             type: 'relationship',
             relationTo: 'courses',
             hasMany: false,
+            // access: {
+            //     update: ({ req: { user } }) => checkRole(['admin', 'teacher'], user as unknown as User)
+            // },
             filterOptions: ({ relationTo, siblingData, user }) => {
                 return {
                     createdBy: {
@@ -61,18 +73,27 @@ const Evaluations: CollectionConfig = {
             type: 'date',
             required: true,
             label: 'Fecha de finalización',
+            // access: {
+            //     update: ({ req: { user } }) => checkRole(['admin', 'teacher'], user as unknown as User)
+            // }
         },
         {
             name: 'maxScore',
             type: 'number',
             required: true,
             label: 'Puntaje máximo',
+            // access: {
+            //     update: ({ req: { user } }) => checkRole(['admin', 'teacher'], user as unknown as User)
+            // }
         },
         {
             name: 'evaluationType',
             type: 'radio',
             required: true,
             label: 'Tipo de evaluación',
+            // access: {
+            //     update: ({ req: { user } }) => checkRole(['admin', 'teacher'], user as unknown as User)
+            // },
             options: [
                 {
                     label: 'Examen',
@@ -112,19 +133,6 @@ const Evaluations: CollectionConfig = {
                     label: 'Contenido',
                 },
                 {
-                    name: 'questions',
-                    type: 'array',
-                    label: 'Preguntas',
-                    fields: [
-                        {
-                            name: 'question',
-                            type: 'richText',
-                            required: true,
-                            label: 'Pregunta',
-                        }
-                    ]
-                },
-                {
                     name: 'formExamn',
                     type: 'blocks',
                     required: true,
@@ -133,10 +141,27 @@ const Evaluations: CollectionConfig = {
                     ],
                     label: 'Formulario de examen'
                 },
+                {
+                    name: 'timeToAnswer',
+                    type: 'number',
+                    required: true,
+                    label: 'Tiempo para responder (minutos)',
+                }
+
             ],
             admin: {
                 condition: (data) => data.evaluationType === 'exam'
-            }
+            },
+            // access: {
+            //     update: ({ req: { user } }) => checkRole(['admin', 'teacher'], user as unknown as User)
+            // }
+        },
+        {
+            name: 'completedBy',
+            type: 'relationship',
+            relationTo: 'users',
+            hasMany: true,
+            label: 'Completado por',
         },
         lastModifiedBy(),
         createdByField(),
