@@ -64,6 +64,7 @@ const Enrollments: CollectionConfig = {
             const {  user  } = args
             return !checkRole(['admin', 'editor'], user as unknown as User)
         },
+        group: 'Información de usuarios',
     },
     access: {
         create: ({ req: { user } }) => {
@@ -73,7 +74,21 @@ const Enrollments: CollectionConfig = {
             // TODO: let a user type student enroll in a course
             return false
         },
-        read: isLoggedIn,
+        read: ({ req: { user } }) => {
+            if (!user) {
+                return false
+            }
+            if (checkRole(['admin', 'editor', 'teacher'], user)) {
+                return true
+            }
+
+            return {
+                student: {
+                    equals: user.id
+                }
+            }
+
+        }, 
         // read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
         update: isAdminOrEditor,
         delete: isAdminOrEditor
@@ -183,9 +198,36 @@ const Enrollments: CollectionConfig = {
                 // filter by course id
                 // send response that user has active subscription
                 const course = userEnrollemnt?.docs[0].course;
+
+                console.log(course, "course")
                 
                 res.status(200).json(course);
             }
+        },
+        {
+            path: '/course/:id/evaluations',
+            method: 'get',
+            handler: async (req, res) => {
+
+                const { id } = req.params
+
+                const evaluations = await req.payload.find({
+                    collection: 'evaluations',
+                    where: {
+                        course: {
+                            equals: id
+                        }
+                    }
+                })
+
+                if (!evaluations || evaluations.docs.length === 0) {
+                    return res.status(404).json({
+                        message: 'No evaluations found'
+                    })
+                }
+
+                return res.status(200).json(evaluations)
+            },
         }
 	],
 }
