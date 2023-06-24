@@ -1,7 +1,7 @@
 import cron from "node-cron";
 import payload from 'payload';
 import { PaginatedDocs } from "payload/dist/mongoose/types";
-import { Enrollment, Order, Subscription } from "../payload-types";
+import { Enrollment, Order, Subscription, User } from "../payload-types";
 import tryCatch from "../utilities/tryCatch";
 const todayDate = new Date().toISOString().substring(0, 10);
 
@@ -33,11 +33,29 @@ async function findPastDueDateSubscription(): Promise<[PaginatedDocs<Subscriptio
     return [subscriptions, null]
 }
 
+async function findEnrollemntsFromOrder(orderIds: string[]): Promise<[PaginatedDocs<Enrollment> | null, Error | null]> {
+    const [enrollments, enrollmentsError] = await tryCatch<PaginatedDocs<Enrollment>>(payload.find({
+        collection: 'enrollments',
+        where: {
+            order: {
+                in: orderIds
+            }
+        }
+    }))
+
+    if (enrollmentsError) {
+        console.log(enrollmentsError, '<----------- enrollmentsError');
+        return [null, enrollmentsError]
+    }
+
+    // console.log(enrollments, '<----------- enrollments');
+    return [enrollments, null]
+}
 
 async function setAsInactiveSubscription(subscriptions: Subscription[]) {
     let updatedSubs = []
     for (const subscription of subscriptions) {
-        const [updatedSubscription, updatedSubscriptionError] = await tryCatch(payload.update({
+        const [updatedSubscription, updatedSubscriptionError] = await tryCatch<Subscription>(payload.update({
             collection: 'subscriptions',
             id: subscription.id,
             data: {
@@ -57,10 +75,32 @@ async function setAsInactiveSubscription(subscriptions: Subscription[]) {
     return [updatedSubs, null]
 }
 
+async function setAsInactiveEnrollment(enrollments: Enrollment[]) {
+    let updatedEnrollments = []
+    for (const enrollment of enrollments) {
+        const [updatedEnrollment, updatedEnrollmentError] = await tryCatch<Enrollment>(payload.update({
+            collection: 'enrollments',
+            id: enrollment.id,
+            data: {
+                status: 'inactive'
+            }
+        }))
+        if (updatedEnrollmentError) {
+            console.log(updatedEnrollmentError, '<----------- updatedEnrollmentError');
+            return [null, updatedEnrollmentError]
+        }
+
+        // console.log(updatedEnrollment, '<----------- updatedEnrollment');
+        updatedEnrollments.push(updatedEnrollment)
+    }
+
+    return [updatedEnrollments, null]
+}
+
 async function setAsInactiveOrder(orders: string[]) {
     let updatedOrders = []
     for (const order of orders) {
-        const [updatedOrder, updatedOrderError] = await tryCatch(payload.update({
+        const [updatedOrder, updatedOrderError] = await tryCatch<Order>(payload.update({
             collection: 'orders',
             id: order,
             data: {
@@ -77,20 +117,20 @@ async function setAsInactiveOrder(orders: string[]) {
         updatedOrders.push(updatedOrder)
     }
 
-    return [updatedOrders, null]
+    return [updatedOrders as Order[], null]
 }
 
-async function createRenewalOrder(subscriptions: Subscription[]): Promise<[Order[] | null, Error | null]> {
+// TODO que pasa si la persona paga antes? no se deberia crear una nueva orden
+async function createRenewalOrder(orders: Order[]): Promise<[Order[] | null, Error | null]> {
 
-    const subscriptionOrderIds = subscriptions.map((subscription) => {
-        return typeof subscription.order === 'string' ? subscription.order : subscription?.order?.id
-    })
 
     let newOrders = []
-    for (const subscription of subscriptions) {
+    for (const myorder of orders) {
 
-        const userId = typeof subscription.user === 'string' ? subscription.user : subscription?.user?.id
-        const productsIds = [typeof subscription.product === 'string' ? subscription.product : subscription?.product?.id]
+        const userId = myorder.customer === 'string' ? myorder.customer : (myorder?.customer as User)?.id
+        const productsIds = (myorder.products as any[]).map((product) => {
+            return typeof product === 'string' ? product : product?.id
+        })
         console.log(productsIds, '<----------- productsIds');
         const [order, orderError] = await tryCatch(payload.create({
             collection: 'orders',
@@ -99,6 +139,7 @@ async function createRenewalOrder(subscriptions: Subscription[]): Promise<[Order
                 status: 'pending',
                 type: 'renewal',
                 customer: userId,
+                amount: myorder.amount,
             }
         }))
 
@@ -126,15 +167,33 @@ export async function runInactivateSubscriptionAndCreateRenewalOrder() {
         return [null, updatedSubError]
     }
 
-    const [inactivatedOrders, inactivatedOrdersError] = await setAsInactiveOrder(subscriptions?.docs.map((subscription) => {
+    const ordersIds = subscriptions?.docs.map((subscription) => {
         return typeof subscription.order === 'string' ? subscription.order : subscription?.order?.id
-    }) as string[])
+    })
+
+    const [inactivatedOrders, inactivatedOrdersError] = await setAsInactiveOrder(ordersIds as string[])
 
     if (inactivatedOrdersError) {
         return [null, inactivatedOrdersError]
     }
 
-    const [newOrders, newOrdersError] = await createRenewalOrder(subscriptions?.docs as Subscription[])
+    const [enrollments, enrollmentsError] = await findEnrollemntsFromOrder(ordersIds as string[])
+
+    if (enrollmentsError) {
+        return [null, enrollmentsError]
+    }
+
+    const [updatedEnrollments, updatedEnrollmentsError] = await setAsInactiveEnrollment(enrollments?.docs as Enrollment[])
+
+    console.log(updatedEnrollments, '<----------- updatedEnrollments')
+
+    if (updatedEnrollmentsError) {
+        return [null, updatedEnrollmentsError]
+    }
+
+    const uniqueInactiveOrder = [...new Set(inactivatedOrders as Order[])]
+
+    const [newOrders, newOrdersError] = await createRenewalOrder(uniqueInactiveOrder)
 
     if (newOrdersError) {
         return [null, newOrdersError]
