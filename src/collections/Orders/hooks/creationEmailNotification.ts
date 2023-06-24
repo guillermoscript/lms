@@ -18,7 +18,7 @@ export const creationEmailNotification: CollectionAfterChangeHook = async ({
     if (operation === 'create') {
         // send email
         const userId = typeof doc.customer === 'string' ? { id: doc.customer } : doc.customer;
-        const [user, userError] = await findUserById(userId.id);
+        const [user, userError] = await findUserById(userId ? userId.id : '');
         if (userError) {
             console.log("error on user", userError);
             return

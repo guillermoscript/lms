@@ -1,6 +1,6 @@
 import { Access } from "payload/config";
 
-export const isAdminOrSelf: Access = ({ req: { user } }) => {
+export const isAdminOrSelf: any = ({ req: { user } }: any) => {
   // Need to be logged in
   if (user) {
     // If user has role of 'admin'
