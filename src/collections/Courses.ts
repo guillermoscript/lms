@@ -21,7 +21,8 @@ import payload from 'payload';
 const Courses: CollectionConfig = {
     slug: 'courses',
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'name',
+        group: 'Cursos',
     },
     access: {
         create: isAdminOrTeacher,
