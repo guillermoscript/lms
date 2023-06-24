@@ -15,7 +15,7 @@ const createOrderAbleAfterChange: FieldHook = async ({
     const status = docType.status
     const type = docType.type
 
-    if (status === 'inactive') {
+    if (status === 'inactive' || status === 'pending' || status === 'canceled') {
         return
     }
 
