@@ -1,12 +1,31 @@
 import { CollectionConfig } from 'payload/types';
-import { isAdminOrSelf } from '../access/isAdminOrSelf';
 import { createdByField } from '../fields/createdBy';
 import VenezuelanBanks from '../fields/VenezuelanBanks';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { slugField } from '../fields/slug';
-import { User } from '../payload-types';
+import { PaymentMethod, User } from '../payload-types';
 import { checkRole } from './Users/checkRole';
+import tryCatch from '../utilities/tryCatch';
+import { StatusCodes } from 'http-status-codes';
+import { PaginatedDocs } from 'payload/dist/mongoose/types';
+
+const isAdminOrSelf: any = ({ req: { user } }: any) => {
+
+    if (!user) {
+        return false
+    }
+
+    if (user.roles?.includes('admin')) {
+        return true
+    }
+
+    return {
+        paymentsOfUser: {
+            equals: user.id
+        }
+    }
+}
 
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -18,10 +37,11 @@ const PaymentMethods: CollectionConfig = {
             const {  user  } = args
             return !checkRole(['admin', 'editor'], user as unknown as User)
         },
+        group: 'Información de usuarios',
     },
     access: {
-        create : isAdminOrSelf,
-        read : isAdminOrSelf,
+        create: isAdminOrSelf,
+        read: isAdminOrSelf,
         update : isAdminOrSelf,
         delete : isAdminOrSelf
     },
@@ -55,7 +75,7 @@ const PaymentMethods: CollectionConfig = {
                 },
                 {
                     label: 'Pago móvil',
-                    value: 'pago-movil',
+                    value: 'pagoMovil',
                 },
                 {
                     label: 'Efectivo',
@@ -63,7 +83,7 @@ const PaymentMethods: CollectionConfig = {
                 },
                 {
                     label: 'Transferencia bancaria',
-                    value: 'bank-transfer',
+                    value: 'bankTransfer',
                 },
             ],
         },
@@ -81,7 +101,7 @@ const PaymentMethods: CollectionConfig = {
                     label: 'Correo electrónico de Zelle',
                 },
                 {
-                    name: 'fullName',
+                    name: 'zelleName',
                     type: 'text',
                     label: 'Nombre completo',
                 },
@@ -107,7 +127,7 @@ const PaymentMethods: CollectionConfig = {
             type: 'group',
             label: 'Pago móvil',
             admin: {
-                condition: (data) => data.paymentMethodType === 'pago-movil'
+                condition: (data) => data.paymentMethodType === 'pagoMovil'
             },
             fields: [
                 {
@@ -118,8 +138,8 @@ const PaymentMethods: CollectionConfig = {
                 },
                 VenezuelanBanks(),
                 {
-                    name: 'idn',
-                    type: 'number',
+                    name: 'pagoMovilIdn',
+                    type: 'text',
                     required: true,
                     label: 'Cédula de identidad',
                 },
@@ -144,7 +164,7 @@ const PaymentMethods: CollectionConfig = {
             name: 'bankTransfer',
             type: 'group',
             admin: {
-                condition: (data) => data.paymentMethodType === 'bank-transfer'
+                condition: (data) => data.paymentMethodType === 'bankTransfer'
             },
             label: 'Transferencia bancaria',
             fields: [
@@ -185,7 +205,42 @@ const PaymentMethods: CollectionConfig = {
             populateLastModifiedBy,
             
         ]
-    }
+    },
+    endpoints: [
+        {
+            method: 'get',
+            path: '/user/:id',
+            handler: async (req, res) => {
+
+                const { id } = req.params;
+                const user = req.user;
+                console.log(user, 'user')
+                
+                if (!user) {
+                    res.status(StatusCodes.UNAUTHORIZED).send('No se ha iniciado sesión');
+                }
+
+                if (!id) {
+                    res.status(StatusCodes.BAD_REQUEST).send('No se ha especificado un id');
+                }
+
+                const [paymentMethods, error] = await tryCatch<PaginatedDocs<PaymentMethod>>(req.payload.find({
+                    collection: 'payment-methods',
+                    where: {
+                        paymentsOfUser: {
+                            equals: id
+                        }
+                    }
+                }))
+
+                if (error || !paymentMethods) {
+                    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({message: "Error al obtener los métodos de pago del usuario", error});
+                }
+
+                res.send(paymentMethods?.docs);
+            }
+        }
+    ]
 }
 
 export default PaymentMethods;
