@@ -14,17 +14,18 @@ const Users: CollectionConfig = {
 		useAsTitle: 'email',
 		// user: 'admin'
 		defaultColumns: ['email', 'firstName', 'lastName', 'phone', 'address', 'roles'],
+		group: 'Información de usuarios',
 	},
 	access: {
 		// everyone can create a user
 		create: anyone,
 		// Admins can read all, but any other logged in user can only read themselves
-		read: isAdminOrSelf,
+		read: anyone,
 		// Admins can update all, but any other logged in user can only update themselves
 		update: isAdminOrSelf,
 		// Only admins can delete
 		delete: isAdmin,
-		admin:  ({ req: { user } }) => { 
+		admin: ({ req: { user } }) => {
 			if (user.roles.includes('user')) {
 				return false
 			}
@@ -94,11 +95,11 @@ const Users: CollectionConfig = {
 			]
 		},
 		{
-            name: 'profilePicture',
-            type: 'upload', 
-            required: false,
-            relationTo: 'medias',
-        },
+			name: 'profilePicture',
+			type: 'upload',
+			required: false,
+			relationTo: 'medias',
+		},
 		{
 			name: 'roles',
 			// Save this field to JWT so we can use from `req.user`
@@ -133,12 +134,12 @@ const Users: CollectionConfig = {
 		slugField('email'),
 	],
 	hooks: {
-        beforeChange: [
-            populateCreatedBy,
-            populateLastModifiedBy,
-			
-        ]
-    }
+		beforeChange: [
+			populateCreatedBy,
+			populateLastModifiedBy,
+
+		]
+	},
 };
 
 export default Users;

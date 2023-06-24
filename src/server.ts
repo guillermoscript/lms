@@ -10,10 +10,21 @@ app.get('/', (_, res) => {
   res.redirect('/admin');
 });
 
+const secret = process.env.PAYLOAD_SECRET
+const mongoURL = process.env.MONGODB_URI
+
+if (!secret) {
+  throw new Error('Missing env var: PAYLOAD_SECRET')
+}
+
+if (!mongoURL) {
+  throw new Error('Missing env var: MONGODB_URI')
+}
+
 // Initialize Payload
 payload.init({
-  secret: process.env.PAYLOAD_SECRET,
-  mongoURL: process.env.MONGODB_URI,
+  secret,
+  mongoURL,
   express: app,
   email: {
     transportOptions: {

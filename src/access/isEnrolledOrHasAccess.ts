@@ -15,41 +15,49 @@ export const isEnrolledOrHasAccess = (roles: User['roles'] = [], user?: User) =>
     if (checkRole(roles, user)) {
         return true
     }
-    payload.find({
-        collection: 'enrollments',
-        where: {
-            and: [
-                {
-                    student: {
-                        equals: user.id,
-                    },
-                },
-                {
-                    status: {
-                        equals: 'active',
-                    },
-                },
-            ],
+
+    console.log(user, "user")
+    async function findIfUserIsEnrolled() {
+        try {
+            const enrollment = await payload.find({
+                collection: 'enrollments',
+                where: {
+                    and: [
+                        {
+                            student: {
+                                equals: user?.id,
+                            },
+                        },
+                        {
+                            status: {
+                                equals: 'active',
+                            },
+                        },
+                    ],
+                }
+            })
+
+            console.log(enrollment, "enrollment")
+
+             // return enrollment ? true : false
+            if (!enrollment || enrollment.docs.length === 0) {
+                return false
+            }
+
+            const userCourses = enrollment.docs.map((enrollment) => enrollment.course)
+
+            console.log(userCourses, "userCourses")
+
+            return {
+                id: {
+                    in: userCourses.map((course) => course.id),
+                }
+            }
+        } catch (error) {
+            console.log(error)
+            return false
         }
-    }).then((enrollment) => {
-        // return enrollment ? true : false
-       return {
-            and: [
-                {
-                    student: {
-                        equals: user.id,
-                    },
-                },
-                {
-                    status: {
-                        equals: 'active',
-                    },
-                },
-            ],
-        }
-    }).catch((err) => {
-        console.log(err)
-        return false
-    })
-    return false
+    }
+
+    return findIfUserIsEnrolled()
 }

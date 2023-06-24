@@ -9,6 +9,7 @@ export function categoryField(overrides: Partial<Field> = {}): Field {
         // admin: {
         //     useAsTitle: 'name'
         // },
+        required: true,
         hasMany: true,
     }, overrides)
 }

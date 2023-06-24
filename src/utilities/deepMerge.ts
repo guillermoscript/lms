@@ -3,9 +3,11 @@
  * @param item
  * @returns {boolean}
  */
-export function isObject(item: unknown): boolean {
+export function isObject(item: unknown) {
 	return item && typeof item === 'object' && !Array.isArray(item)
 }
+
+// @ts-ignore
 
 /**
  * Deep merge two objects.
@@ -15,16 +17,16 @@ export function isObject(item: unknown): boolean {
 export default function deepMerge<T, R>(target: T, source: R): T {
 	const output = { ...target }
 	if (isObject(target) && isObject(source)) {
-		Object.keys(source).forEach(key => {
-			if (isObject(source[key])) {
+		Object.keys(source as string).forEach(key => {
+			if (isObject(source[key as keyof typeof source])) {
 				// @ts-expect-error
 				if (!(key in target)) {
-					Object.assign(output, { [key]: source[key] })
+					Object.assign(output as string, { [key]: source[key as keyof typeof source] })
 				} else {
-					output[key] = deepMerge(target[key], source[key])
+					output[key as keyof typeof output] = deepMerge(target[key as keyof typeof target], source[key as keyof typeof source])
 				}
 			} else {
-				Object.assign(output, { [key]: source[key] })
+				Object.assign(output as string, { [key]: source[key as keyof typeof source] })
 			}
 		})
 	}

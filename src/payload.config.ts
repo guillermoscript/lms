@@ -25,6 +25,7 @@ export default buildConfig({
       titleSuffix: 'LMS Admin',
     },
   },
+  cors: ['http://localhost:3000','http://localhost:3001'],
   collections: [
     Courses,
     Currencies,
@@ -58,4 +59,9 @@ export default buildConfig({
       payment: false
     }
   })],
+  // express: {
+  //   postMiddleware: [
+      
+  //   ]
+  // }
 });

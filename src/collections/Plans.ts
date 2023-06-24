@@ -13,7 +13,8 @@ import { slugField } from '../fields/slug';
 const Plans: CollectionConfig = {
     slug: 'plans',
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'name',
+        group: 'Información de productos',
     },
     access: {
         create : isAdminOrEditor,

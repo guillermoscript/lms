@@ -12,7 +12,8 @@ import { slugField } from '../fields/slug';
 const Products: CollectionConfig = {
     slug: 'products',
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'name',
+        group: 'Información de productos',
     },
     access: {
         create : isAdminOrEditor,
@@ -90,7 +91,7 @@ const Products: CollectionConfig = {
         {
             name: 'productImage',
             type: 'upload', 
-            required: false,
+            required: true,
             relationTo: 'medias',
         },
         {

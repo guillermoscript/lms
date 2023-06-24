@@ -168,4 +168,6 @@ dist
 
 # media files
 src/media/*
-/build
+
+# build files
+build/*
