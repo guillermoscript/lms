@@ -14,12 +14,13 @@ const Users: CollectionConfig = {
 		useAsTitle: 'email',
 		// user: 'admin'
 		defaultColumns: ['email', 'firstName', 'lastName', 'phone', 'address', 'roles'],
+		group: 'Información de usuarios',
 	},
 	access: {
 		// everyone can create a user
 		create: anyone,
 		// Admins can read all, but any other logged in user can only read themselves
-		read: isAdminOrSelf,
+		read: anyone,
 		// Admins can update all, but any other logged in user can only update themselves
 		update: isAdminOrSelf,
 		// Only admins can delete
