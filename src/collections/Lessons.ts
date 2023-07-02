@@ -12,6 +12,8 @@ import { populateTeacher } from '../hooks/poupulateTeacherField';
 import { slugField } from '../fields/slug';
 import { User } from '../payload-types';
 import { checkRole } from './Users/checkRole';
+import tryCatch from '../utilities/tryCatch';
+import completedBy from '../services/completedBy';
 
 
 
@@ -207,9 +209,32 @@ const Lessons: CollectionConfig = {
             populateTeacher,
             populateCreatedBy,
             populateLastModifiedBy,
-            
         ]
-    }
+    },
+    endpoints: [
+        {
+			path: '/:id/completed-by',
+			method: 'post',
+			handler: async (req, res, next) => {
+                const [updatedLesson, error] = await completedBy({
+                    collection: 'lessons',
+                    id: req.params.id,
+                    user: req.user,
+                    payload: req.payload,
+                    
+                })
+
+                if (error) {
+                    return res.status(error.status).json({
+                        message: error.message,
+                        error
+                    })
+                }
+                
+                res.status(200).json(updatedLesson)
+            }
+        },
+    ]
 }
 
 export default Lessons;

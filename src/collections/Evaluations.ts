@@ -13,6 +13,8 @@ import { slugField } from '../fields/slug';
 import { User } from '../payload-types';
 import { checkRole } from './Users/checkRole';
 import { isLoggedIn } from '../access/isLoggedIn';
+import tryCatch from '../utilities/tryCatch';
+import completedBy from '../services/completedBy';
 
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -172,7 +174,30 @@ const Evaluations: CollectionConfig = {
             populateLastModifiedBy,
             
         ]
-    }
+    },
+    endpoints: [
+        {
+			path: '/:id/complete-by',
+			method: 'post',
+			handler: async (req, res, next) => {
+                const [updatedEvaluation, error] = await completedBy({
+                    collection: 'evaluations',
+                    id: req.params.id,
+                    user: req.body.user,
+                    payload: payload,
+                })
+
+                if (error) {
+                    return res.status(error.status).json({
+                        message: error.message,
+                        error
+                    })
+                }
+
+                return res.status(200).json(updatedEvaluation)
+            }
+        },
+    ]
 }
 
 export default Evaluations;

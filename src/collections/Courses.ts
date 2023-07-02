@@ -11,10 +11,14 @@ import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { populateTeacher } from '../hooks/poupulateTeacherField';
 import { slugField } from '../fields/slug';
-import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import { anyone } from '../access/anyone';
 import { checkRole } from './Users/checkRole';
 import payload from 'payload';
+import tryCatch from '../utilities/tryCatch';
+import completedBy from '../services/completedBy';
+import { adminEmail, noReplyEmail } from '../utilities/consts';
+import { Course } from '../payload-types';
+import { StatusCodes } from 'http-status-codes';
 
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -26,9 +30,8 @@ const Courses: CollectionConfig = {
     },
     access: {
         create: isAdminOrTeacher,
-        // read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin','teacher'], user),
         read: anyone,
-        update: anyone,
+        update: isAdminOrCreatedBy,
         delete: isAdmin
     },
     fields: [
@@ -37,18 +40,12 @@ const Courses: CollectionConfig = {
             type: 'text',
             required: true,
             label: 'Nombre del curso',
-            access: {
-                update: isAdminOrCreatedByFieldLevel
-            }
         },
         {
             name: 'description',
             type: 'text',
             required: true,
             label: 'Descripción del curso',
-            access: {
-                update: isAdminOrCreatedByFieldLevel
-            }
         },
         categoryField(),
         {
@@ -146,18 +143,12 @@ const Courses: CollectionConfig = {
             relationTo: 'courses',
             label: 'Cursos relacionados',
             hasMany: true,
-            access: {
-                update: isAdminOrCreatedByFieldLevel
-            }
         },
         {
             name: 'completedBy',
             type: 'relationship',
             relationTo: 'users',
             label: 'Completado por',
-            access: {
-                update: isAdminOrCreatedByFieldLevel
-            },
             hasMany: true,
         },
         createdByField(),
@@ -170,9 +161,50 @@ const Courses: CollectionConfig = {
             populateTeacher,
             populateCreatedBy,
             populateLastModifiedBy,
-
         ]
-    }
+    },
+    endpoints: [
+        {
+			path: '/:id/completed-by',
+			method: 'post',
+			handler: async (req, res, next) => {
+                const [courseUpdated, error] = await completedBy({
+                    collection: 'courses',
+                    id: req.params.id,
+                    user: req.user,
+                    payload
+                })
+
+                if (error) {
+                    return res.status(error.status).json({
+                        message: error.message,
+                        error
+                    })
+                }
+
+                console.log(courseUpdated, "courseUpdated")
+                const course = courseUpdated as Course
+
+                req.payload.sendEmail({
+                    from: noReplyEmail,
+                    to: req.user.email,
+                    subject: 'Curso completado',
+                    html: `<h1>Felicidades</h1><p>Has completado el curso ${course.name}</p>`
+                })
+
+                req.payload.sendEmail({
+                    from: noReplyEmail,
+                    to: adminEmail,
+                    subject: 'Curso completado',
+                    html: `<h1>El usuario ${req.user.email} ha completado el curso ${course.name}</h1>`
+                })
+
+                res.status(StatusCodes.OK).json({
+                    message: 'Curso completado'
+                })
+            }
+        },
+    ]
 }
 
 export default Courses;
