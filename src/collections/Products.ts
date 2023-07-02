@@ -32,7 +32,7 @@ const Products: CollectionConfig = {
             name: 'description',
             type: 'text',
             required: true,
-            label: 'Descripción del producto',
+            label: 'Descripción corta del producto',
         },
         {
             name: 'productType',
@@ -101,10 +101,10 @@ const Products: CollectionConfig = {
             hasMany: true,
         },
         {
-            name: 'reviews',
-            type: 'relationship',
-            relationTo: 'reviews',
-            hasMany: true,
+            name: 'info',
+            type: 'richText',
+            label: 'Información adicional',
+            required: true,
         },
         lastModifiedBy(),
         createdByField(),
