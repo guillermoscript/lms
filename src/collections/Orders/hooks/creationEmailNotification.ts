@@ -26,8 +26,12 @@ export const creationEmailNotification: CollectionAfterChangeHook = async ({
         const mailOptions: Message = {
             from: 'noreply@pincelx.com',
             to: user.email as string,
-            subject: 'test subject',
-            html: 'test html',
+            subject: 'Nueva orden',
+            html: `<h1>¡Hola ${user.firstName}!</h1>
+            <p>Se ha creado una nueva orden con el número ${previousDoc.id}.</p>
+            <p>Para ver el estado de tu orden, puedes ingresar a tu cuenta en <a href="https://pincelx.com">pincelx.com</a></p>
+            <p>¡Gracias por tu compra!</p>
+            <p>Equipo de Pincel X</p>`
         };
         payload.sendEmail(mailOptions)
     }
