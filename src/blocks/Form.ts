@@ -14,7 +14,7 @@ export const FormBlock: Block = {
         {
             name: 'form',
             type: 'relationship',
-            relationTo: 'forms',
+            relationTo: 'examns',
             required: true,
         },
         // {

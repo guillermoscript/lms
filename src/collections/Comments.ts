@@ -24,7 +24,7 @@ const Comments: CollectionConfig = {
     fields: [
         {
             name: 'comment',
-            type: 'text',
+            type: 'textarea',
             required: true,
         },
         {

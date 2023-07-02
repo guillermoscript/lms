@@ -130,12 +130,6 @@ const Enrollments: CollectionConfig = {
         },
         orderRelation()
     ],
-    hooks: {
-        beforeChange: [
-            populateCreatedBy,
-            populateLastModifiedBy
-        ]
-    },
     endpoints: [
 		{
 			path: '/check',

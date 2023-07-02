@@ -1,7 +1,7 @@
 import type { BeforeChangeHook } from 'payload/dist/collections/config/types'
 import { CollectionConfig } from 'payload/types';
 import { isAdmin } from '../access/isAdmin';
-import { isAdminOrCreatedBy } from '../access/isAdminOrCreatedBy';
+import { isAdminOrCreatedBy, isAdminOrCreatedByFieldLevel } from '../access/isAdminOrCreatedBy';
 import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
 import { categoryField } from '../fields/category';
 import { createdByField } from '../fields/createdBy';
@@ -28,7 +28,7 @@ const Courses: CollectionConfig = {
         create: isAdminOrTeacher,
         // read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin','teacher'], user),
         read: anyone,
-        update: isAdminOrCreatedBy,
+        update: anyone,
         delete: isAdmin
     },
     fields: [
@@ -37,12 +37,18 @@ const Courses: CollectionConfig = {
             type: 'text',
             required: true,
             label: 'Nombre del curso',
+            access: {
+                update: isAdminOrCreatedByFieldLevel
+            }
         },
         {
             name: 'description',
             type: 'text',
             required: true,
             label: 'Descripción del curso',
+            access: {
+                update: isAdminOrCreatedByFieldLevel
+            }
         },
         categoryField(),
         {
@@ -60,7 +66,9 @@ const Courses: CollectionConfig = {
                         return false
                     }
                     return true
-                }
+                },
+                update: isAdminOrCreatedByFieldLevel
+                
             },
             filterOptions: ({ relationTo, siblingData, user }) => {
                 return {
@@ -129,19 +137,27 @@ const Courses: CollectionConfig = {
 
                     return findIfUserIsEnrolled()
                 },
+                update: isAdminOrCreatedByFieldLevel
             },
-        },
-        {
-            name: 'reviews',
-            type: 'relationship',
-            relationTo: 'reviews',
-            hasMany: true,
         },
         {
             name: 'relatedCourses',
             type: 'relationship',
             relationTo: 'courses',
             label: 'Cursos relacionados',
+            hasMany: true,
+            access: {
+                update: isAdminOrCreatedByFieldLevel
+            }
+        },
+        {
+            name: 'completedBy',
+            type: 'relationship',
+            relationTo: 'users',
+            label: 'Completado por',
+            access: {
+                update: isAdminOrCreatedByFieldLevel
+            },
             hasMany: true,
         },
         createdByField(),

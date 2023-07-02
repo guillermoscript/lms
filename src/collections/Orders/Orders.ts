@@ -19,6 +19,7 @@ import tryCatch from '../../utilities/tryCatch';
 import { PaymentMethod } from '../../payload-types';
 import { Response } from 'express';
 import { isSelf } from '../../access/isSelf';
+import { PaginatedDocs } from 'payload/dist/mongoose/types';
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 
@@ -201,8 +202,24 @@ const Orders: CollectionConfig = {
 
                 const { user, paymentMethod, product, referenceNumber, paymentMethodType, amount, customer } = req.body
 
-                console.log(user , '< ================= user')
                 if (user) {
+
+                    const [paymentMethods, error] = await tryCatch<PaginatedDocs<PaymentMethod>>(req.payload.find({
+                        collection: 'payment-methods',
+                        where: {
+                            paymentsOfUser: {
+                                equals: user.id
+                            }
+                        }
+                    }))
+
+                    if (error || !paymentMethods) {
+                        const [paymentMethodCreated] = await createPaymentMethodForUser(res, user, paymentMethod, paymentMethodType)
+                        const orderCreated = await createOrder(res, paymentMethodCreated as PaymentMethod, user, product as Product, referenceNumber, amount)
+                        res.status(StatusCodes.OK).send({ message: 'Orden creada correctamente', order: orderCreated })
+                        return
+                    }
+
                     const orderCreated = await createOrder(res, paymentMethod as PaymentMethod['id'], user, product as Product, referenceNumber, amount)
                     res.status(StatusCodes.OK).send({ message: 'Orden creada correctamente', order: orderCreated })
                     return
