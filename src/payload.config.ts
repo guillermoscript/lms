@@ -20,6 +20,7 @@ import { createdByField } from './fields/createdBy';
 import { populateCreatedBy } from './hooks/populateCreatedBy';
 import { populateLastModifiedBy } from './hooks/populateLastModifiedBy';
 import { lastModifiedBy } from './fields/lastModifiedBy ';
+import { noReplyEmail } from './utilities/consts';
 
 export default buildConfig({
   serverURL: 'http://localhost:3001',
@@ -132,7 +133,7 @@ export default buildConfig({
                   to: user.email,
                   subject: 'Examen calificado',
                   html: `Hola ${user.firstName} ${user.lastName}, tu examen ha sido calificado, puedes ver los resultados en tu perfil.`,
-                  from: 'noreply@pincelx.com',
+                  from: noReplyEmail,
                 })
               } catch (error) {
                 console.log(error)

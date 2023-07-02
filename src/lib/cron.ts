@@ -3,6 +3,7 @@ import payload from 'payload';
 import { PaginatedDocs } from "payload/dist/mongoose/types";
 import { Enrollment, Order, Subscription, User } from "../payload-types";
 import tryCatch from "../utilities/tryCatch";
+import { noReplyEmail } from "../utilities/consts";
 const todayDate = new Date().toISOString().substring(0, 10);
 
 async function findPastDueDateSubscription(): Promise<[PaginatedDocs<Subscription> | null, Error | null]> {
@@ -201,7 +202,7 @@ export async function runInactivateSubscriptionAndCreateRenewalOrder() {
 
     // payload.sendEmail({
     //     to: 'arepayquezo@gmail.com',
-    //     from: 'noreply@pincelx.com',
+    //     from: noReplyEmail
     //     subject: 'Subscription Renewal',
     //     html: 'Your subscription has been renewed'
     // })

@@ -2,6 +2,7 @@ import payload from 'payload';
 import { Message } from 'payload/dist/email/types';
 import { CollectionAfterChangeHook } from 'payload/types';
 import { Order, User } from '../../../payload-types';
+import { noReplyEmail } from '../../../utilities/consts';
 
 export const creationEmailNotification: CollectionAfterChangeHook = async ({
   doc, // full document data
@@ -24,7 +25,7 @@ export const creationEmailNotification: CollectionAfterChangeHook = async ({
             return
         }
         const mailOptions: Message = {
-            from: 'noreply@pincelx.com',
+            from: noReplyEmail,
             to: user.email as string,
             subject: 'Nueva orden',
             html: `<h1>¡Hola ${user.firstName}!</h1>

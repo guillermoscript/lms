@@ -1,6 +1,7 @@
 import express from 'express';
 import payload from 'payload';
 import { runInactivateSubscriptionAndCreateRenewalOrder } from './lib/cron';
+import { noReplyEmail } from './utilities/consts';
 
 require('dotenv').config();
 const app = express();
@@ -41,7 +42,7 @@ payload.init({
       }
     },
     fromName: 'LMS Payload Admin',
-    fromAddress: 'noreply@pincelx.com'
+    fromAddress: noReplyEmail
   },
   onInit: () => {
     payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`)

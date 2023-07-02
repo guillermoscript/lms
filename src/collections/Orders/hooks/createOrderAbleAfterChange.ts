@@ -6,6 +6,7 @@ import { FieldHook } from 'payload/types';
 import { Message } from 'payload/dist/email/types';
 import tryCatch from '../../../utilities/tryCatch';
 import { PaginatedDocs } from 'payload/dist/mongoose/types';
+import { noReplyEmail } from '../../../utilities/consts';
 
 const createOrderAbleAfterChange: FieldHook = async ({
     req,
@@ -174,7 +175,7 @@ async function sendUserEmail(userId: Order['customer'], payload: Payload) {
     if (userError) return
 
     const mailOptions: Message = {
-        from: 'noreply@pincelx.com',
+        from: noReplyEmail,
         to: user?.email as string,
         subject: 'Su compra ha sido exitosa',
         html: `<h1>Gracias por comprar</h1>`,
