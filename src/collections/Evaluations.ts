@@ -13,7 +13,6 @@ import { slugField } from '../fields/slug';
 import { User } from '../payload-types';
 import { checkRole } from './Users/checkRole';
 import { isLoggedIn } from '../access/isLoggedIn';
-import fieldComp from '../blocks/Fields';
 
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
