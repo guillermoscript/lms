@@ -191,10 +191,10 @@ const Courses: CollectionConfig = {
                     subject: 'Curso completado',
                     html: `<h1>Felicidades</h1><p>Has completado el curso ${course.name}</p>`
                 })
-
+                
                 req.payload.sendEmail({
                     from: noReplyEmail,
-                    to: adminEmail,
+                    to: adminEmail!,
                     subject: 'Curso completado',
                     html: `<h1>El usuario ${req.user.email} ha completado el curso ${course.name}</h1>`
                 })
