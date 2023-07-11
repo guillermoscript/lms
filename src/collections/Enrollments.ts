@@ -1,20 +1,15 @@
 import { CollectionConfig, PayloadRequest } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
-import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import orderRelation from '../fields/orderRelation';
-import { populateCreatedBy } from '../hooks/populateCreatedBy';
-import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { checkRole } from './Users/checkRole';
 import { Enrollment, Subscription, User } from '../payload-types';
 import { Response } from 'express';
 import { PaginatedDocs } from 'payload/dist/mongoose/types';
-import { z } from 'zod';
 import tryCatch from '../utilities/tryCatch';
-import { isLoggedIn } from '../access/isLoggedIn';
 import { StatusCodes } from 'http-status-codes';
 
 async function getActiveEnrollments(req: PayloadRequest, res: Response) {
-    
+
     const user = req.user as User;
     if (!user) {
         return [null, { message: 'Missing user id' }]
@@ -61,7 +56,7 @@ const Enrollments: CollectionConfig = {
     admin: {
         useAsTitle: 'id',
         hidden(args) {
-            const {  user  } = args
+            const { user } = args
             return !checkRole(['admin', 'editor'], user as unknown as User)
         },
         group: 'Información de usuarios',
@@ -88,7 +83,7 @@ const Enrollments: CollectionConfig = {
                 }
             }
 
-        }, 
+        },
         // read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
         update: isAdminOrEditor,
         delete: isAdminOrEditor
@@ -131,21 +126,21 @@ const Enrollments: CollectionConfig = {
         orderRelation()
     ],
     endpoints: [
-		{
-			path: '/check',
-			method: 'get',
-			handler: async (req, res, next) => {
+        {
+            path: '/check',
+            method: 'get',
+            handler: async (req, res, next) => {
                 const [activeEnrollments, error] = await getActiveEnrollments(req, res);
-                
+
                 res.status(200).json({ message: 'User has active enrollment' });
             }
-			
-		},
+
+        },
         {
             path: '/actives/:courseId',
             method: 'get',
             handler: async (req, res, next) => {
-                
+
                 const user = req.user as User;
                 const courseId = req.params.courseId;
                 if (!user) {
@@ -154,7 +149,7 @@ const Enrollments: CollectionConfig = {
 
                 if (!courseId) {
                     return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Missing course id' })
-                }                
+                }
 
                 // find user
                 const [userEnrollemnt, userError] = await tryCatch<PaginatedDocs<Enrollment>>(req.payload.find({
@@ -194,7 +189,7 @@ const Enrollments: CollectionConfig = {
                 const course = userEnrollemnt?.docs[0].course;
 
                 console.log(course, "course")
-                
+
                 res.status(200).json(course);
             }
         },
@@ -222,8 +217,49 @@ const Enrollments: CollectionConfig = {
 
                 return res.status(200).json(evaluations)
             },
+        },
+        {
+            path: '/course/:id/evaluations/approved',
+            method: 'get',
+            handler: async (req, res) => {
+                const { id } = req.params
+
+                try {
+                    const evaluations = await req.payload.find({
+                        collection: 'evaluations',
+                        where: {
+                            and: [
+                                {
+                                    course: {
+                                        equals: id
+                                    }
+                                },
+                                {
+                                    approved: {
+                                        equals: true
+                                    }
+                                }
+                            ]
+                        }
+                    })
+    
+                    if (!evaluations || evaluations.docs.length === 0) {
+                        return res.status(404).json({
+                            message: 'No evaluations found'
+                        })
+                    }
+    
+                    return res.status(200).json(evaluations)
+
+                }  catch (error) {
+                    console.log(error)
+                    return res.status(500).json({
+                        message: 'Error getting evaluations'
+                    })
+                }
+            }
         }
-	],
+    ],
 }
 
 export default Enrollments;
