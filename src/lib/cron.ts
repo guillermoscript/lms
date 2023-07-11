@@ -4,6 +4,7 @@ import { PaginatedDocs } from "payload/dist/mongoose/types";
 import { Enrollment, Order, Subscription, User } from "../payload-types";
 import tryCatch from "../utilities/tryCatch";
 import { noReplyEmail } from "../utilities/consts";
+import { BulkOperationResult } from "payload/dist/collections/config/types";
 const todayDate = new Date().toISOString().substring(0, 10);
 
 async function findPastDueDateSubscription(): Promise<[PaginatedDocs<Subscription> | null, Error | null]> {
@@ -105,7 +106,7 @@ async function setAsInactiveOrder(orders: string[]) {
             collection: 'orders',
             id: order,
             data: {
-                status: 'inactive'
+                status: 'finished'
             }
         }))
 
