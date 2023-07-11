@@ -41,15 +41,22 @@ export default async function completedBy({
         }]
     }
 
+    console.log(completedBy, "completedBy")
+
+    const arrayOfUsers = completedBy.map((user: User) => user.id).concat(user.id)
+    console.log(arrayOfUsers, "arrayOfUsers")
+
     const [updatedItem, errorUpdatedItem] = await tryCatch(payload.update({
         collection,
         id,
         data: {
-            completedBy: [...completedBy, user.id]
-        }
+            completedBy: arrayOfUsers
+        },
+        // user: user.id
     }))
 
     if (errorUpdatedItem) {
+        console.log(errorUpdatedItem, "errorUpdatedItem")
         return [null, {
             message: 'Error updating item',
             error: errorUpdatedItem,
