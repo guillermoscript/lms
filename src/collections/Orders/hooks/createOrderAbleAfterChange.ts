@@ -16,7 +16,7 @@ const createOrderAbleAfterChange: FieldHook = async ({
     const status = docType.status
     const type = docType.type
 
-    if (status === 'inactive' || status === 'pending' || status === 'canceled') {
+    if (status === 'inactive' || status === 'pending' || status === 'canceled' || status === 'finished' || status === 'refunded') {
         return
     }
 
@@ -166,7 +166,7 @@ const createOrderAbleAfterChange: FieldHook = async ({
 }
 
 async function sendUserEmail(userId: Order['customer'], payload: Payload) {
-    console.log(userId, '<----------- userId');
+    
     const [user, userError] = await tryCatch<User>(payload.findByID({
         collection: 'users',
         id: userId as string,
