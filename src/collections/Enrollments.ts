@@ -132,9 +132,12 @@ const Enrollments: CollectionConfig = {
             handler: async (req, res, next) => {
                 const [activeEnrollments, error] = await getActiveEnrollments(req, res);
 
-                res.status(200).json({ message: 'User has active enrollment' });
-            }
+                if (error) {
+                    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error finding user enrollment' })
+                }
 
+                res.status(StatusCodes.OK).json(activeEnrollments);
+            }
         },
         {
             path: '/actives/:courseId',
