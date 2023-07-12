@@ -21,7 +21,7 @@ import { populateCreatedBy } from './hooks/populateCreatedBy';
 import { populateLastModifiedBy } from './hooks/populateLastModifiedBy';
 import { lastModifiedBy } from './fields/lastModifiedBy ';
 import { noReplyEmail } from './utilities/consts';
-import { Evaluation } from './payload-types';
+import { Evaluation, ExamnsSubmission, User } from './payload-types';
 import tryCatch from './utilities/tryCatch';
 
 export default buildConfig({
@@ -181,18 +181,22 @@ export default buildConfig({
                 console.log(evaluationError)
                 return doc
               }
-
-              const usersApproved = evaluation.approvedBy || []
-
-              if (doc.approved === 'approved') {
+              const docNow = doc as ExamnsSubmission
+              
+              console.log(evaluation.approvedBy)
+              if (docNow.approved === 'approved') {
+            
+                const usersApproved = evaluation.approvedBy ? evaluation.approvedBy.map((user: User) => user.id) : []
+                console.log(usersApproved)
 
                 usersApproved.push(doc.createdBy)
 
+                console.log(usersApproved, 'usersApproved')
                 const [approvedEvaluation,approvedEvaluationError ] = await tryCatch(req.payload.update({
                   collection: 'evaluations',
                   id: evaluation.id,
                   data: {
-                    approvedBy: usersApproved
+                    approvedBy: usersApproved,
                   }
                 }))
 
@@ -217,7 +221,9 @@ export default buildConfig({
                   html: `Hola ${user.firstName} ${user.lastName}, tu examen ha sido aprobado, puedes ver los resultados en tu perfil.`,
                   from: noReplyEmail,
                 })
-              } else if (doc.approved === 'rejected') {
+              } else if (docNow.approved === 'rejected') {
+
+                const userReproved = evaluation.reprovedBy ? evaluation.reprovedBy.map((user: User) => user.id) : []
                 const [user, userError] = await tryCatch(req.payload.findByID({
                   collection: 'users',
                   id: doc.createdBy,
@@ -227,6 +233,16 @@ export default buildConfig({
                   console.log(userError)
                   return doc
                 }
+
+                userReproved.push(doc.createdBy)
+
+                const [rejectedEvaluation,rejectedEvaluationError ] = await tryCatch(req.payload.update({
+                  collection: 'evaluations',
+                  id: evaluation.id,
+                  data: {
+                    reprovedBy: userReproved,
+                  }
+                }))
 
                 req.payload.sendEmail({
                   to: user.email,
