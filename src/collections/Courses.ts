@@ -117,9 +117,6 @@ const Courses: CollectionConfig = {
                                     ],
                                 }
                             })
-
-                            console.log(enrollment, "enrollment")
-
                             // return enrollment ? true : false
                             if (!enrollment || enrollment.docs.length === 0) {
                                 return false
