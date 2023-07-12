@@ -272,7 +272,7 @@ export interface PaymentMethod {
     paypalEmail?: string;
   };
   pagoMovil?: {
-    phoneNumber: string;
+    pagoMovilPhone: string;
     bank?:
       | 'banco-de-venezuela'
       | 'banco-mercantil'
