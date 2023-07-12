@@ -131,7 +131,7 @@ const PaymentMethods: CollectionConfig = {
             },
             fields: [
                 {
-                    name: 'phoneNumber',
+                    name: 'pagoMovilPhone',
                     type: 'text',
                     required: true,
                     label: 'Número de teléfono',
