@@ -6,10 +6,32 @@ import { isAdminOrSelf } from '../../access/isAdminOrSelf';
 import { populateCreatedBy } from '../../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../../hooks/populateLastModifiedBy';
 import { slugField } from '../../fields/slug';
+import { User } from '../../payload-types';
 
 const Users: CollectionConfig = {
 	slug: 'users',
-	auth: true,
+	auth: {
+		forgotPassword: {
+			generateEmailHTML: (args) => {
+				// const { req, token, user } = args;
+				args?.req
+			  // Use the token provided to allow your user to reset their password
+			  	const resetPasswordURL = `${process.env.PAYLOAD_PUBLIC_FRONTEND_URL}/auth/reset-password?token=${args?.token}`;
+	  
+			  return `
+				<!doctype html>
+				<html>
+				  <body>
+					<h1>Hola, ${(args?.user as User)?.firstName || 'usuario'}</h1>
+					<p>Estás recibiendo esto porque tú (o alguien más) ha solicitado restablecer la contraseña de tu cuenta. Por favor haz click en el siguiente enlace o pégalo en tu navegador para completar el proceso: </p>
+					<a href="${resetPasswordURL}">${resetPasswordURL}</a>
+					<p>Si no solicitaste esto, por favor ignora este correo y tu contraseña permanecerá sin cambios.</p>
+				  </body>
+				</html>
+			  `;
+			}
+		  }
+	},
 	admin: {
 		useAsTitle: 'email',
 		// user: 'admin'
@@ -22,7 +44,17 @@ const Users: CollectionConfig = {
 		// Admins can read all, but any other logged in user can only read themselves
 		read: anyone,
 		// Admins can update all, but any other logged in user can only update themselves
-		update: isAdminOrSelf,
+		update: ( { req: { user } } ) => {
+			if (!user) {
+				return false
+			}
+			if (user.roles.includes('admin')) {
+				return true
+			}
+			return {
+				id: user.id
+			}
+		},
 		// Only admins can delete
 		delete: isAdmin,
 		admin: ({ req: { user } }) => {
@@ -130,6 +162,15 @@ const Users: CollectionConfig = {
 					value: 'user'
 				}
 			]
+		},
+		{
+			name: 'photo',
+			type: 'upload',
+			relationTo: 'medias',
+			// required: true,
+			// admin: {
+			// 	position: 'sidebar',
+			// }	
 		},
 		slugField('email'),
 	],

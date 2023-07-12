@@ -48,9 +48,10 @@ export const isEnrolledOrHasAccess = (roles: User['roles'] = [], user?: User) =>
 
             console.log(userCourses, "userCourses")
 
+            const arrayOfCourseIds = userCourses.map((course) => course.id)
             return {
                 id: {
-                    in: userCourses.map((course) => course.id),
+                    in: arrayOfCourseIds,
                 }
             }
         } catch (error) {

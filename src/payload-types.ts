@@ -105,6 +105,7 @@ export interface User {
   gender?: 'male' | 'female' | 'other';
   profilePicture?: string | Media;
   roles?: ('admin' | 'teacher' | 'editor' | 'user')[];
+  photo?: string | Media;
   slug?: string;
   updatedAt: string;
   createdAt: string;
@@ -132,7 +133,6 @@ export interface Lesson {
     id?: string;
   }[];
   completedBy?: string[] | User[];
-  course?: string | Course;
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   isPublic?: boolean;
@@ -243,7 +243,7 @@ export interface Subscription {
 export interface Order {
   id: string;
   amount: number;
-  status?: 'active' | 'inactive' | 'canceled' | 'pending';
+  status?: 'active' | 'inactive' | 'canceled' | 'pending' | 'finished' | 'refunded';
   type?: 'order' | 'renewal' | 'enrollment' | 'subscription';
   customer?: string | User;
   products?: string[] | Product[];
@@ -272,7 +272,7 @@ export interface PaymentMethod {
     paypalEmail?: string;
   };
   pagoMovil?: {
-    phoneNumber: string;
+    pagoMovilPhone: string;
     bank?:
       | 'banco-de-venezuela'
       | 'banco-mercantil'
@@ -352,6 +352,8 @@ export interface Evaluation {
     id?: string;
   }[];
   completedBy?: string[] | User[];
+  approvedBy?: string[] | User[];
+  reprovedBy?: string[] | User[];
   lastModifiedBy?: string | User;
   createdBy?: string | User;
   slug?: string;
@@ -532,6 +534,7 @@ export interface ExamnsSubmission {
   teacherComments?: {
     [k: string]: unknown;
   }[];
+  approved: 'approved' | 'rejected' | 'pending';
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   updatedAt: string;

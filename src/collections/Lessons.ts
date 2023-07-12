@@ -193,12 +193,12 @@ const Lessons: CollectionConfig = {
             label: 'Completado por',
             hasMany: true,
         },
-        {
-            name: 'course',
-            type: 'relationship',
-            relationTo: 'courses',
-            hasMany: false,
-        },
+            // {
+            //     name: 'course',
+            //     type: 'relationship',
+            //     relationTo: 'courses',
+            //     hasMany: false,
+            // },
         createdByField(),
         lastModifiedBy(),
         isPublicField(),

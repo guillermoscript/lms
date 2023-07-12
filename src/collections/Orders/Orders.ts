@@ -37,7 +37,6 @@ const Orders: CollectionConfig = {
         create: anyone,
         read: ({ req: { user } }) => {
 
-            console.log(user, '<----------- user');
             if (!user) return false
 
             if (checkRole(['admin', 'editor'], user)) return true
@@ -48,9 +47,9 @@ const Orders: CollectionConfig = {
                 }
             }
         },
-        update: ({ req: { user } }) => {
-            return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' })
-        },
+        // update: ({ req: { user } }) => {
+        //     return isRole({ user, role: 'admin' }) || isRole({ user, role: 'editor' })
+        // },
         delete: isAdmin
     },
     fields: [
@@ -58,6 +57,9 @@ const Orders: CollectionConfig = {
             name: 'amount',
             type: 'number',
             required: true,
+            access: {
+                update: ({ req: { user } }) => checkRole(['admin', 'editor'], user as unknown as User)
+            }
         },
         {
             name: 'status',
@@ -79,6 +81,14 @@ const Orders: CollectionConfig = {
                 {
                     label: 'Pendiente',
                     value: 'pending',
+                },
+                {
+                    label: 'Finalizada (Solo para renovaciones)',
+                    value: 'finished',
+                },
+                {
+                    label: 'Reembolsada',
+                    value: 'refunded',
                 }
             ],
             hooks: {
@@ -109,18 +119,27 @@ const Orders: CollectionConfig = {
                     value: 'subscription',
                 }
             ],
+            access: {
+                update: ({ req: { user } }) => checkRole(['admin', 'editor'], user as unknown as User)
+            }
         },
         {
             name: 'customer',
             type: 'relationship',
             relationTo: 'users',
             hasMany: false,
+            access: {
+                update: ({ req: { user } }) => checkRole(['admin', 'editor'], user as unknown as User)
+            }
         },
         {
             name: 'products',
             type: 'relationship',
             relationTo: 'products',
             hasMany: true,
+            access: {
+                update: ({ req: { user } }) => checkRole(['admin', 'editor'], user as unknown as User)
+            }
         },
         {
             name: 'referenceNumber',
@@ -132,11 +151,17 @@ const Orders: CollectionConfig = {
             type: 'relationship',
             relationTo: 'payment-methods',
             hasMany: false,
+            access: {
+                update: ({ req: { user } }) => checkRole(['admin', 'editor'], user as unknown as User)
+            }
         },
         {
             name: 'details',
             type: 'richText',
             label: 'Detalles',
+            access: {
+                update: ({ req: { user } }) => checkRole(['admin', 'editor'], user as unknown as User)
+            }
         },
         {
             name: 'total',
@@ -149,36 +174,6 @@ const Orders: CollectionConfig = {
                 update: () => false, // prevents the field from being updated
                 create: () => false, // prevents the field from being created
             },
-            // hooks: {
-            //     beforeChange: [
-            //         ({ siblingData }) => {
-            //             // ensures data is not stored in DB
-            //             delete siblingData['total']
-            //         }
-            //     ],
-            //     afterRead: [
-            //         async ({ data }) => {
-            //             // search for the total in the products
-            //             const { products } = data as { products: string[] }
-            //             let total = 0
-            //             let currency = ''
-                    
-            //             for (const product of products) {
-
-            //                 const productsData = await payload.findByID({
-            //                     collection: 'products',
-            //                     id: product
-            //                 })
-
-            //                 const productPrice = productsData.productPrice[0].price
-            //                 const productCurrency = productsData.productPrice[0].aceptedCurrency
-            //                 total += productPrice
-            //                 currency = productCurrency
-            //             }
-            //             return `${total} ${currency}`
-            //         }
-            //     ],
-            // },
         },
         createdByField(),
         lastModifiedBy(),
@@ -200,10 +195,10 @@ const Orders: CollectionConfig = {
 			method: 'post',
 			handler: async (req, res, next) => {
 
-                const { user, paymentMethod, product, referenceNumber, paymentMethodType, amount, customer } = req.body
+                const { user } = req
+                const { paymentMethod, product, referenceNumber, paymentMethodType, amount, customer } = req.body
 
-                if (user) {
-
+                if (user) {                    
                     const [paymentMethods, error] = await tryCatch<PaginatedDocs<PaymentMethod>>(req.payload.find({
                         collection: 'payment-methods',
                         where: {
@@ -213,25 +208,52 @@ const Orders: CollectionConfig = {
                         }
                     }))
 
-                    if (error || !paymentMethods) {
-                        const [paymentMethodCreated] = await createPaymentMethodForUser(res, user, paymentMethod, paymentMethodType)
-                        const orderCreated = await createOrder(res, paymentMethodCreated as PaymentMethod, user, product as Product, referenceNumber, amount)
+                    console.log(paymentMethods)
+
+                    if (error || paymentMethods?.docs.length === 0) {
+                        console.log(paymentMethod)
+                        const [paymentMethodCreated,paymentMethodCreatedError ] = await createPaymentMethodForUser(res, user, paymentMethod, paymentMethodType)
+                        if (paymentMethodCreatedError) {
+                            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(paymentMethodCreatedError)
+                            return
+                        }
+                        const [orderCreated, orderCreatedError] = await createOrder(res, paymentMethodCreated as PaymentMethod, user, product as Product, referenceNumber, amount)
+                        if (orderCreatedError) {
+                            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(orderCreatedError)
+                            return
+                        }
                         res.status(StatusCodes.OK).send({ message: 'Orden creada correctamente', order: orderCreated })
                         return
                     }
 
-                    const orderCreated = await createOrder(res, paymentMethod as PaymentMethod['id'], user, product as Product, referenceNumber, amount)
+                    const [orderCreated,orderCreatedError] = await createOrder(res, paymentMethod as PaymentMethod['id'], user, product as Product, referenceNumber, amount)
+                    if (orderCreatedError) {
+                        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(orderCreatedError)
+                        return
+                    }
                     res.status(StatusCodes.OK).send({ message: 'Orden creada correctamente', order: orderCreated })
                     return
                 } 
 
                 guardValidationOrder(req, res, paymentMethod, product, customer)
 
-                const [userCreated] = await createNewUser(customer, res)                
-                const [paymentMethodCreated] = await createPaymentMethodForUser(res, userCreated as User, paymentMethod, paymentMethodType)
+                const [userCreated,userCreatedError ] = await createNewUser(customer, res)                
+                if (userCreatedError) {
+                    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(userCreatedError)
+                    return
+                }
+                const [paymentMethodCreated, paymentMethodCreatedError] = await createPaymentMethodForUser(res, userCreated as User, paymentMethod, paymentMethodType)
+                if (paymentMethodCreatedError) {
+                    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(paymentMethodCreatedError)
+                    return
+                }
                 console.log(paymentMethodCreated, '< ================= paymentMethodCreated')
 
-                const orderCreated = await createOrder(res, paymentMethodCreated as PaymentMethod, userCreated as User, product as Product, referenceNumber, amount)
+                const [orderCreated, orderCreatedError] = await createOrder(res, paymentMethodCreated as PaymentMethod, userCreated as User, product as Product, referenceNumber, amount)
+                if (orderCreatedError) {
+                    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(orderCreatedError)
+                    return
+                }
 
                 console.log(orderCreated, '< ================= orderCreated')
                 res.status(StatusCodes.OK).send({ message: 'Orden creada correctamente', order: orderCreated })
@@ -268,8 +290,11 @@ async function createOrder(res: Response, paymentMethodCreated: PaymentMethod | 
 
     if (orderCreatedError) {
         console.log(orderCreatedError, '< ================= orderCreatedError')
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Error al crear la orden' })
-        return [null, orderCreatedError]
+        // res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Error al crear la orden' })
+        return [null, {
+            message: 'Error al crear la orden',
+            error: orderCreatedError
+        }]
     }
 
     return [orderCreated, null]
@@ -290,8 +315,11 @@ async function createPaymentMethodForUser(res: Response, user: User,  paymentMet
 
     if (paymentMethodCreatedError || !paymentMethodCreated) {
         console.log(paymentMethodCreatedError)
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Error al crear el método de pago' })
-        return [null, paymentMethodCreatedError]
+        // res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Error al crear el método de pago' })
+        return [null, {
+            message: 'Error al crear el método de pago',
+            error: paymentMethodCreatedError
+        }]
     }
 
     return [paymentMethodCreated, null]
@@ -321,8 +349,11 @@ async function createNewUser(user: User, res: Response, next?: any) {
 
     if (userCreatedError || !userCreated) {
         console.log(userCreatedError)
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Error al crear el usuario' })
-        return [null, userCreatedError]
+        // res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Error al crear el usuario' })
+        return [null, {
+            message: 'Error al crear el usuario',
+            error: userCreatedError
+        }]
     }
 
     return [userCreated, null]

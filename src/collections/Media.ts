@@ -5,13 +5,15 @@ import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { isAdmin } from '../access/isAdmin';
 import { slugField } from '../fields/slug';
+import { anyone } from '../access/anyone';
+import { isLoggedIn } from '../access/isLoggedIn';
 
 
 const Media: CollectionConfig = {
   slug: 'medias',
   access: {
-    create: isAdmin,
-    read: () => true,
+    create: isLoggedIn,
+    read: anyone,
   },
   admin: {
     useAsTitle: 'filename',

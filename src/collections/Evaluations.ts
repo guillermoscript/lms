@@ -15,6 +15,7 @@ import { checkRole } from './Users/checkRole';
 import { isLoggedIn } from '../access/isLoggedIn';
 import tryCatch from '../utilities/tryCatch';
 import completedBy from '../services/completedBy';
+import { anyone } from '../access/anyone';
 
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
@@ -30,7 +31,9 @@ const Evaluations: CollectionConfig = {
     },
     access: {
         create: isAdminOrTeacher,
-        read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'teacher'], user),
+        // TODO 
+        // read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'teacher'], user),
+        read: anyone,
         update: isLoggedIn,
         delete: isAdmin
     },
@@ -61,13 +64,15 @@ const Evaluations: CollectionConfig = {
             // access: {
             //     update: ({ req: { user } }) => checkRole(['admin', 'teacher'], user as unknown as User)
             // },
-            filterOptions: ({ relationTo, siblingData, user }) => {
-                return {
-                    createdBy: {
-                        equals: user.id
-                    }
-                }
-            }
+            // filterOptions: ({ relationTo, siblingData, user, data }) => {
+            //     console.log(user)
+
+            //     return {
+            //         createdBy: {
+            //             equals: user.id
+            //         }
+            //     }
+            // }
         },
         {
             name: 'endDate',
@@ -164,6 +169,19 @@ const Evaluations: CollectionConfig = {
             hasMany: true,
             label: 'Completado por',
         },
+        {
+            name: 'approvedBy',
+            type: 'relationship',
+            relationTo: 'users',
+            hasMany: true,
+            label: 'Aprobado por',
+        },
+        {
+            name: 'reprovedBy',
+            type: 'relationship',
+            relationTo: 'users',
+            hasMany: true,
+        },
         lastModifiedBy(),
         createdByField(),
         slugField('name'),
@@ -177,13 +195,14 @@ const Evaluations: CollectionConfig = {
     },
     endpoints: [
         {
-			path: '/:id/complete-by',
+			path: '/:id/completed-by',
 			method: 'post',
 			handler: async (req, res, next) => {
+                console.log(req.params.id, "req.params.id")
                 const [updatedEvaluation, error] = await completedBy({
                     collection: 'evaluations',
                     id: req.params.id,
-                    user: req.body.user,
+                    user: req.user,
                     payload: payload,
                 })
 
