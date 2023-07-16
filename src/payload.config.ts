@@ -23,6 +23,8 @@ import { lastModifiedBy } from './fields/lastModifiedBy ';
 import { noReplyEmail } from './utilities/consts';
 import { Evaluation, ExamnsSubmission, User } from './payload-types';
 import tryCatch from './utilities/tryCatch';
+import pagoMovil from './globals/pago-movil';
+import zelle from './globals/zelle';
 
 export default buildConfig({
   serverURL: 'http://localhost:3001',
@@ -49,6 +51,10 @@ export default buildConfig({
     Subscriptions,
     Orders,
     Users,
+  ],
+  globals: [
+    pagoMovil,
+    zelle
   ],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
