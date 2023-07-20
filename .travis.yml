@@ -1,6 +1,11 @@
 language: node_js
 node_js:
   - 17
+
+# safelist
+branches:
+  only:
+  - master
 install:
 - npm install newman
 
