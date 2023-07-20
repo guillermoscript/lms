@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- "18.0.0"
+-  "16.13.2"
 
 install:
 - npm install newman
@@ -12,12 +12,3 @@ before_script:
 script:
   - node_modules/.bin/newman run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
   - node_modules/.bin/newman run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
-# env:
-#   - NODE_ENV=test
-#   - PAYLOAD_SECRET="2cb23fwe343gd449e0a86ase332f4343432d"
-#   - MONGODB_USER=venital
-#   - MONGODB_PASSWORD=venital
-#   - MONGODB_DATABASE=venital_db
-#   - MONGODB_URI="mongodb://venital:venital@localhost:27017/venital_db?authSource=admin&readPreference=primary&directConnection=true&ssl=false"
-#   - PORT=3001
-#   - PAYLOAD_PUBLIC_FRONTEND_URL="http://localhost:3000"
