@@ -1,12 +1,10 @@
 language: node_js
 node_js:
-  - "18"
-install:
-  - npm install newman
+- "18.0.0"
 
-cache:
-  directories:
-    - "node_modules"
+install:
+- npm install newman
+
 before_script:
 - node --version
 - npm --version
