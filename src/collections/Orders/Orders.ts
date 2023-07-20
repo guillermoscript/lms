@@ -222,7 +222,7 @@ const Orders: CollectionConfig = {
                             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(orderCreatedError)
                             return
                         }
-                        res.status(StatusCodes.OK).send({ message: 'Orden creada correctamente', order: orderCreated })
+                        res.status(StatusCodes.CREATED).send({ message: 'Orden creada correctamente', order: orderCreated })
                         return
                     }
 
@@ -231,7 +231,7 @@ const Orders: CollectionConfig = {
                         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(orderCreatedError)
                         return
                     }
-                    res.status(StatusCodes.OK).send({ message: 'Orden creada correctamente', order: orderCreated })
+                    res.status(StatusCodes.CREATED).send({ message: 'Orden creada correctamente', order: orderCreated })
                     return
                 } 
 
@@ -256,7 +256,7 @@ const Orders: CollectionConfig = {
                 }
 
                 console.log(orderCreated, '< ================= orderCreated')
-                res.status(StatusCodes.OK).send({ message: 'Orden creada correctamente', order: orderCreated })
+                res.status(StatusCodes.CREATED).send({ message: 'Orden creada correctamente', order: orderCreated })
             }	
 		},
 	],

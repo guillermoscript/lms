@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - 17
+
+# safelist
+branches:
+  only:
+  - master
+install:
+- npm install newman
+
+before_script:
+- node --version
+- npm --version
+- node_modules/.bin/newman --version
+script:
+  - node_modules/.bin/newman run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
+  - node_modules/.bin/newman run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
