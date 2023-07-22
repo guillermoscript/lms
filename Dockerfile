@@ -1,26 +1,26 @@
-FROM node:18.8-alpine as base
+FROM node:18-alpine as base
 
 FROM base as builder
 
-WORKDIR /home/node/app
+WORKDIR /home/node
 COPY package*.json ./
 
 COPY . .
-RUN npm install
-RUN npm run build
+RUN yarn install
+RUN yarn build
 
 FROM base as runtime
 
 ENV NODE_ENV=production
-ENV PAYLOAD_CONFIG_PATH=dist/payload.config.js
 
-WORKDIR /home/node/app
+WORKDIR /home/node
 COPY package*.json  ./
 
-RUN npm install --production
-COPY --from=builder /home/node/app/dist ./dist
-COPY --from=builder /home/node/app/build ./build
+RUN yarn install --production
+COPY --from=builder /home/node/dist ./dist
+COPY --from=builder /home/node/build ./build
 
-EXPOSE 3000
+EXPO´SE 3001
 
 CMD ["node", "dist/server.js"]
+

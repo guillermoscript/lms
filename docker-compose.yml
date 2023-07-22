@@ -1,15 +1,34 @@
-version: '3'
+version: "3"
 
 services:
-  mongo-sync:
+  payload:
+    image: node:18-alpine
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    working_dir: /home/node/app/
+    command: sh -c "yarn install && yarn dev"
+    depends_on:
+      - mongo
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/payload
+      PORT: 3001
+      NODE_ENV: development
+      PAYLOAD_SECRET: TESTING
+
+  mongo:
+    image: mongo:latest
     ports:
       - "27017:27017"
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+    command:
+      - --storageEngine=wiredTiger
     volumes:
-      - mongo-sync-data:/data/db
+      - data:/data/db
+    logging:
+      driver: none
+
 volumes:
-  mongo-sync-data: {}
+  data:
+  node_modules:
