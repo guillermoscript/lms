@@ -127,12 +127,6 @@ const Users: CollectionConfig = {
 			]
 		},
 		{
-			name: 'profilePicture',
-			type: 'upload',
-			required: false,
-			relationTo: 'medias',
-		},
-		{
 			name: 'roles',
 			// Save this field to JWT so we can use from `req.user`
 			saveToJWT: true,
@@ -167,10 +161,6 @@ const Users: CollectionConfig = {
 			name: 'photo',
 			type: 'upload',
 			relationTo: 'medias',
-			// required: true,
-			// admin: {
-			// 	position: 'sidebar',
-			// }	
 		},
 		slugField('email'),
 	],

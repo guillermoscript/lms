@@ -2,6 +2,7 @@ import express from 'express';
 import payload from 'payload';
 import { runInactivateSubscriptionAndCreateRenewalOrder } from './lib/cron';
 import { noReplyEmail } from './utilities/consts';
+import { StatusCodes } from 'http-status-codes';
 
 require('dotenv').config();
 const app = express();
@@ -52,12 +53,14 @@ payload.init({
 // Add your own express routes here
 
 app.get('/cron', async (req, res) => {
-
-  runInactivateSubscriptionAndCreateRenewalOrder().then((result) => {
+  try {
+    const result = await runInactivateSubscriptionAndCreateRenewalOrder();
     console.log(result, '<----------- result');
-  }).catch((error) => {
+    res.status(StatusCodes.OK).send(result);
+  } catch (error) {
     console.log(error, '<----------- error');
-  })
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+  }
 })
 
 app.listen(process.env.PORT);
