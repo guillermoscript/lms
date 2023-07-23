@@ -21,13 +21,21 @@ import zelle from './globals/zelle';
 import { runInactivateSubscriptionAndCreateRenewalOrder } from './lib/cron';
 import { StatusCodes } from 'http-status-codes';
 import { ExamnsSubmissionsAccess, ExamnsSubmissionsFields, ExamnsSubmissionsHooks } from './collections/ExamnsSubmissions';
+import GoogleButton from './components/Google/GoogleButton';
 
 export default buildConfig({
-  serverURL: 'http://localhost:3001',
+  serverURL: 'http://localhost:3000',
   admin: {
     user: Users.slug,
     meta: {
       titleSuffix: 'LMS Admin',
+    },
+
+    components: {
+      // The BeforeDashboard component renders the 'welcome' block that you see after logging into your admin panel.
+      // Feel free to delete this at any time. Simply remove the line below and the import BeforeDashboard statement on line 15.
+      // beforeDashboard: [BeforeDashboard],
+      beforeLogin: [GoogleButton],
     },
   },
   cors: ['http://localhost:3000', 'http://localhost:3001'],
