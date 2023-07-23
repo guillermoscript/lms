@@ -3,7 +3,6 @@ import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
-import { isAdmin } from '../access/isAdmin';
 import { slugField } from '../fields/slug';
 import { anyone } from '../access/anyone';
 import { isLoggedIn } from '../access/isLoggedIn';

@@ -213,13 +213,19 @@ export async function runInactivateSubscriptionAndCreateRenewalOrder() {
     return [newOrders, null]
 }
 
-export const cronJob = () => {
-    cron.schedule('0 1 * * *', () => {
-        console.log('Running a task every midnight (1:00 am)')
-        runInactivateSubscriptionAndCreateRenewalOrder().then((result) => {
-            console.log(result, '<----------- result');
-        }).catch((error) => {
-            console.log(error, '<----------- error');
-        })
-    })
-}
+//TODO Fix docker error
+/**
+ * Run every day at 1:00 am
+ * 0 1 * * *
+ * 
+ */
+// export const cronJob = () => {
+//     cron.schedule('0 1 * * *', () => {
+//         console.log('Running a task every midnight (1:00 am)')
+//         runInactivateSubscriptionAndCreateRenewalOrder().then((result) => {
+//             console.log(result, '<----------- result');
+//         }).catch((error) => {
+//             console.log(error, '<----------- error');
+//         })
+//     })
+// }

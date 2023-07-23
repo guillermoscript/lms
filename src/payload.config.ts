@@ -16,25 +16,29 @@ import Comments from './collections/Comments';
 import Lessons from './collections/Lessons';
 import Reviews from './collections/Reviews';
 import FormBuilder from '@payloadcms/plugin-form-builder';
-import { createdByField } from './fields/createdBy';
-import { populateCreatedBy } from './hooks/populateCreatedBy';
-import { populateLastModifiedBy } from './hooks/populateLastModifiedBy';
-import { lastModifiedBy } from './fields/lastModifiedBy ';
-import { noReplyEmail } from './utilities/consts';
-import { Evaluation, ExamnsSubmission, User } from './payload-types';
-import tryCatch from './utilities/tryCatch';
 import pagoMovil from './globals/pago-movil';
 import zelle from './globals/zelle';
+import { runInactivateSubscriptionAndCreateRenewalOrder } from './lib/cron';
+import { StatusCodes } from 'http-status-codes';
+import { ExamnsSubmissionsAccess, ExamnsSubmissionsFields, ExamnsSubmissionsHooks } from './collections/ExamnsSubmissions';
+import GoogleButton from './components/Google/GoogleButton';
 
 export default buildConfig({
-  serverURL: 'http://localhost:3001',
+  serverURL: 'http://localhost:3000',
   admin: {
     user: Users.slug,
     meta: {
       titleSuffix: 'LMS Admin',
     },
+
+    components: {
+      // The BeforeDashboard component renders the 'welcome' block that you see after logging into your admin panel.
+      // Feel free to delete this at any time. Simply remove the line below and the import BeforeDashboard statement on line 15.
+      // beforeDashboard: [BeforeDashboard],
+      beforeLogin: [GoogleButton],
+    },
   },
-  cors: ['http://localhost:3000','http://localhost:3001'],
+  cors: ['http://localhost:3000', 'http://localhost:3001'],
   collections: [
     Courses,
     Currencies,
@@ -84,189 +88,25 @@ export default buildConfig({
         group: "Cursos",
         defaultColumns: ['createdAt', 'user', 'score'],
       },
-      access: {
-        create: () => true,
-        read: () => true,
-        update: () => true,
-      },
-      fields: [
-        // {
-        //   name: 'user',
-        //   type: 'relationship',
-        //   relationTo: 'users',
-        //   hasMany: false,
-        // },
-        {
-          name: 'evaluation',
-          type: 'relationship',
-          relationTo: 'evaluations',
-          hasMany: false,
-        },
-        {
-          name: 'score',
-          type: 'number',
-          required: false,
-        },
-        {
-          name: 'teacherComments',
-          type: 'richText',
-          required: false,
-        },
-        {
-          name: 'approved',
-          type: 'radio',
-          options: [
-            {
-              label: 'Aprobado',
-              value: 'approved',
-            },
-            {
-              label: 'Reprobado',
-              value: 'rejected',
-            },
-            {
-              label: 'Pendiente',
-              value: 'pending',
-            }
-          ],
-          defaultValue: 'pending',
-          required: true,
-        },
-        createdByField(),
-        lastModifiedBy(),
-      ],
-      hooks: {
-        beforeChange: [
-          populateCreatedBy,
-          populateLastModifiedBy,
-        ],
-        afterChange: [
-          async ({
-            doc, // full document data
-            req, // full express request
-            previousDoc, // document data before updating the collection
-            operation, // name of the operation ie. 'create', 'update'
-          }) => {
-            if (operation === 'update') {
-              // const user = doc.createdBy
-              console.log(doc)
-              console.log(doc.createdBy)
-              try {
-                const user = await req.payload.findByID({
-                  collection: 'users',
-                  id: doc.createdBy,
-                })
-
-                req.payload.sendEmail({
-                  to: user.email,
-                  subject: 'Examen calificado',
-                  html: `Hola ${user.firstName} ${user.lastName}, tu examen ha sido calificado, puedes ver los resultados en tu perfil.`,
-                  from: noReplyEmail,
-                })
-              } catch (error) {
-                console.log(error)
-              }
-            }
-            return doc
-          },
-          async ({
-            doc, // full document data
-            req, // full express request
-            previousDoc, // document data before updating the collection
-            operation, // name of the operation ie. 'create', 'update'
-          }) => {
-
-            if (operation === 'update') {
-              
-              const [evaluation, evaluationError ] = await tryCatch(req.payload.findByID({
-                collection: 'evaluations',
-                id: doc.evaluation,
-              }))
-
-              if (evaluationError) {
-                console.log(evaluationError)
-                return doc
-              }
-              const docNow = doc as ExamnsSubmission
-              
-              console.log(evaluation.approvedBy)
-              if (docNow.approved === 'approved') {
-            
-                const usersApproved = evaluation.approvedBy ? evaluation.approvedBy.map((user: User) => user.id) : []
-                console.log(usersApproved)
-
-                usersApproved.push(doc.createdBy)
-
-                console.log(usersApproved, 'usersApproved')
-                const [approvedEvaluation,approvedEvaluationError ] = await tryCatch(req.payload.update({
-                  collection: 'evaluations',
-                  id: evaluation.id,
-                  data: {
-                    approvedBy: usersApproved,
-                  }
-                }))
-
-                if (approvedEvaluationError) {
-                  console.log(approvedEvaluationError)
-                  return doc
-                }
-
-                const [user, userError] = await tryCatch(req.payload.findByID({
-                  collection: 'users',
-                  id: doc.createdBy,
-                }))
-
-                if (userError) {
-                  console.log(userError)
-                  return doc
-                }
-
-                req.payload.sendEmail({
-                  to: user.email,
-                  subject: 'Examen aprobado',
-                  html: `Hola ${user.firstName} ${user.lastName}, tu examen ha sido aprobado, puedes ver los resultados en tu perfil.`,
-                  from: noReplyEmail,
-                })
-              } else if (docNow.approved === 'rejected') {
-
-                const userReproved = evaluation.reprovedBy ? evaluation.reprovedBy.map((user: User) => user.id) : []
-                const [user, userError] = await tryCatch(req.payload.findByID({
-                  collection: 'users',
-                  id: doc.createdBy,
-                }))
-
-                if (userError) {
-                  console.log(userError)
-                  return doc
-                }
-
-                userReproved.push(doc.createdBy)
-
-                const [rejectedEvaluation,rejectedEvaluationError ] = await tryCatch(req.payload.update({
-                  collection: 'evaluations',
-                  id: evaluation.id,
-                  data: {
-                    reprovedBy: userReproved,
-                  }
-                }))
-
-                req.payload.sendEmail({
-                  to: user.email,
-                  subject: 'Examen reprobado',
-                  html: `Hola ${user.firstName} ${user.lastName}, tu examen ha sido reprobado, puedes ver los resultados en tu perfil.`,
-                  from: noReplyEmail,
-                })
-              }
-            }
-            return doc
-          }
-        ],
-      }
+      access: ExamnsSubmissionsAccess,
+      fields: ExamnsSubmissionsFields,
+      hooks: ExamnsSubmissionsHooks,
     }
   })],
-  // express: {
-  //   postMiddleware: [
-      
-  //   ]
-  // }
+  endpoints: [
+    {
+      path: '/v1/inactivate-subscription-and-create-renewal-order',
+      method: 'get',
+      handler: async (req, res) => {
+        try {
+          const result = await runInactivateSubscriptionAndCreateRenewalOrder();
+          console.log(result, '<----------- result');
+          res.status(StatusCodes.OK).send(result);
+        } catch (error) {
+          console.log(error, '<----------- error');
+          res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+        }
+      },
+    }
+  ]
 });
