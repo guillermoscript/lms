@@ -7,6 +7,7 @@ import generator from 'generate-password'
 import getCookieExpiration from 'payload/dist/utilities/getCookieExpiration'
 import jwt from 'jwt-simple'
 import tryCatch from './utilities/tryCatch';
+import { seed } from './seed';
 
 
 type GoogleUserInfo = {
@@ -182,6 +183,13 @@ async function start() {
       res.redirect('http://localhost:3001/dashboard/account')
     }
   );
+
+  if (process.env.PAYLOAD_SEED === 'true') {
+    payload.logger.info('Seeding Payload...')
+    await seed(payload)
+    payload.logger.info('Done.')
+  }
+
 
   app.listen(process.env.PORT, () => {
     payload.logger.info(`Server running on port ${process.env.PORT}`)
