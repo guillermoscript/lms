@@ -30,7 +30,7 @@ const Users: CollectionConfig = {
 				</html>
 			  `;
 			}
-		  }
+		}		
 	},
 	admin: {
 		useAsTitle: 'email',
@@ -161,6 +161,39 @@ const Users: CollectionConfig = {
 			name: 'photo',
 			type: 'upload',
 			relationTo: 'medias',
+		},
+		{
+			name: 'sub',
+			label: 'Sub',
+			type: 'text',
+			// required: true,
+			access: {
+				read: isAdminFieldLevel,
+			},
+		},
+		{
+			name: 'googleId',
+			label: 'Google ID',
+			type: 'text',
+			required: false,
+			access: {
+				read: isAdminFieldLevel,
+			},
+		},
+		{
+			name: 'googleProfilePicture',
+			label: 'Google Profile Picture',
+			type: 'text',
+			required: false,
+		},
+		{
+			name: 'googleAccessToken',
+			label: 'Google Access Token',
+			type: 'text',
+			// required: true,
+			access: {
+				read: isAdminFieldLevel,
+			},
 		},
 		slugField('email'),
 	],
