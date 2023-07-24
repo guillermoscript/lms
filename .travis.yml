@@ -30,7 +30,7 @@ jobs:
         - docker --version
         - docker-compose --version
         - >
-          docker-compose run postmanTests
+          docker-compose run postman
           newman run tests/User-auth.postman_collection.json
           -e tests/LMS-ENV-LOCAL.postman_environment.json
           -r cli,json
