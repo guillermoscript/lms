@@ -21,7 +21,7 @@ services:
       - app-network
 
   mongo:
-    image: mongo:alpine
+    image: mongo:latest
     ports:
       - "27017:27017"
     command:
