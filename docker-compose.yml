@@ -17,6 +17,8 @@ services:
       PORT: 3000
       NODE_ENV: development
       PAYLOAD_SECRET: TESTING
+    networks:
+      - app-network
 
   mongo:
     image: mongo:latest
@@ -28,6 +30,29 @@ services:
       - data:/data/db
     logging:
       driver: none
+    networks:
+      - app-network
+
+  postman:
+    image: postman/newman:alpine
+    container_name: postmanTests
+    environment:
+      PAYLOAD_HOST: payload
+    command:
+      run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json  -r cli,json
+      --reporter-json-export="reports/report.json"
+    volumes:
+      - .:/etc/newman
+    depends_on:
+      - payload
+    networks:
+      - app-network
+
+      # | run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   data:
