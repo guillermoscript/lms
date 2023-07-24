@@ -29,7 +29,8 @@ jobs:
       script:
         - docker --version
         - docker-compose --version
-        - docker network inspect app-network
+        - docker-compose ps -a
+        - docker network inspect bridge
         - >
           docker-compose run postman
           newman run tests/User-auth.postman_collection.json
