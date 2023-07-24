@@ -1,4 +1,8 @@
 language: node_js
+
+vm:
+  size: [large]
+
 node_js:
   - 16
 
