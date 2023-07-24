@@ -30,7 +30,8 @@ jobs:
         - docker --version
         - docker-compose --version
         - docker-compose ps -a
-        - docker network inspect bridge
+        - docker-compose logs payload
+        - docker-compose logs postman
         - >
           docker-compose run postman
           newman run tests/User-auth.postman_collection.json
