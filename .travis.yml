@@ -15,8 +15,8 @@ before_script:
   - docker-compose ps
 
 script:
-  - docker-compose exec postman run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
-  - docker-compose exec postman run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
+  - docker-compose exec postman run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json -r cli,junit --reporter-junit-export tests/report.xml
+  - docker-compose exec postman run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json -r cli,junit --reporter-junit-export tests/report.xml
 
 after_script:
   - docker-compose down
