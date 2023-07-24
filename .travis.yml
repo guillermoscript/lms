@@ -29,6 +29,7 @@ jobs:
       script:
         - docker --version
         - docker-compose --version
+        - docker network inspect app-network
         - >
           docker-compose run postman
           newman run tests/User-auth.postman_collection.json
@@ -36,6 +37,7 @@ jobs:
           -r cli,json
           --reporter-json-export tests/report.json
           --verbose
+        
       after_script:
         - docker-compose down
 
