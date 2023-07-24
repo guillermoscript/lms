@@ -13,10 +13,12 @@ branches:
 before_script:
   - docker-compose up -d
   - docker-compose ps
+  - docker stats mongo
+  - docker-compose exec postmanTests ls
 
 script:
 # wait 10 seconds for the server to start
-  - sleep 10
+  - sleep 4
   # - docker-compose exec postmanTests ls 
   # - docker-compose exec postmanTests ls tests/
   # - docker-compose exec postmanTests newman --version
