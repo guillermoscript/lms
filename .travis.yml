@@ -26,12 +26,12 @@ jobs:
       before_script:
         - docker-compose up -d
         - docker-compose ps -a
+        - docker-compose exec payload yarn install && yarn dev 
+        - docker-compose logs payload
       script:
         - docker --version
         - docker-compose --version
-        - docker-compose ps -a
         - docker-compose logs payload
-        - docker-compose logs postman
         - >
           docker-compose run postman
           newman run tests/User-auth.postman_collection.json
