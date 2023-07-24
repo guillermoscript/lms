@@ -26,11 +26,14 @@ jobs:
       before_script:
         - docker-compose up -d
         - docker-compose ps -a
-        - docker-compose exec payload yarn install && yarn dev 
-        - docker-compose logs payload
       script:
-        - docker --version
-        - docker-compose --version
+        - sleep 10 # Wait for yarn install to finish
+        - docker-compose logs payload
+        - sleep 10 # Wait for yarn install to finish
+        - docker-compose logs payload
+        - sleep 10 # Wait for yarn install to finish
+        - docker-compose logs payload
+        - sleep 10 # Wait for yarn install to finish
         - docker-compose logs payload
         - >
           docker-compose run postman
