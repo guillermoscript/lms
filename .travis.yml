@@ -4,6 +4,7 @@ node_js:
 
 services:
   - docker
+  - mongodb
 
 # safelist
 branches:
@@ -12,9 +13,7 @@ branches:
 
 before_script:
   - docker-compose up -d
-  - docker-compose ps
-  - docker stats mongo
-  - docker-compose exec postmanTests ls
+  - docker-compose ps -a
 
 script:
 # wait 10 seconds for the server to start
