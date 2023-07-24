@@ -39,7 +39,9 @@ services:
     environment:
       PAYLOAD_HOST: payload
     command:
-      run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json  -r cli,json
+      # run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json  -r cli,json
+      # --reporter-json-export="reports/report.json"
+      run tests/User-auth.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json  -r cli,json
       --reporter-json-export="reports/report.json"
     volumes:
       - .:/etc/newman
