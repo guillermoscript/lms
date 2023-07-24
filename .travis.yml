@@ -19,19 +19,36 @@ branches:
   only:
   - master
 
-before_script:
-  - docker-compose up -d
-  - docker-compose ps -a
+jobs:
+  include:
+    - stage: api tests
 
-script:
-# wait 10 seconds for the server to start
-  # - sleep 4
-  - docker-compose exec postmanTests ls 
-  - docker-compose exec postmanTests ls tests/
-  - docker-compose exec postmanTests newman --version
-  - docker-compose exec postmanTests newman run tests/User-auth.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json -r cli,junit --reporter-junit-export tests/report.xml --verbose
-  # - docker-compose exec postmanTests newman run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json -r cli,junit --reporter-junit-export tests/report.xml
-  # - docker-compose exec postmanTests newman run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json -r cli,junit --reporter-junit-export tests/report.xml
+      before_script:
+        - docker-compose up -d
+        - docker-compose ps -a
+      script:
+        - docker --version
+        - docker-compose --version
+        - >
+          docker-compose run api-test
+          newman run tests/User-auth.postman_collection.json
+          -e tests/LMS-ENV-LOCAL.postman_environment.json
+          -r cli,json
+          --reporter-json-export tests/report.json
+          --verbose
+      after_script:
+        - docker-compose down
 
-after_script:
-  - docker-compose down
+
+# script:
+# # wait 10 seconds for the server to start
+#   # - sleep 4
+#   - docker-compose exec postmanTests ls 
+#   - docker-compose exec postmanTests ls tests/
+#   - docker-compose exec postmanTests newman --version
+#   - docker-compose exec postmanTests newman run tests/User-auth.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json -r cli,junit --reporter-junit-export tests/report.xml --verbose
+#   # - docker-compose exec postmanTests newman run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json -r cli,junit --reporter-junit-export tests/report.xml
+#   # - docker-compose exec postmanTests newman run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json -r cli,junit --reporter-junit-export tests/report.xml
+
+# after_script:
+#   - docker-compose down
