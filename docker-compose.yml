@@ -17,6 +17,18 @@ services:
       PORT: 3000
       NODE_ENV: development
       PAYLOAD_SECRET: TESTING
+      PAYLOAD_PUBLIC_FRONTEND_URL: "http://localhost:3001"
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      OAUTH_SERVER: ${OAUTH_SERVER}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+
     networks:
       - app-network
 
