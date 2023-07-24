@@ -64,9 +64,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{api}}/users",
+					"raw": "{{api-url}}/users",
 					"host": [
-						"{{api}}"
+						"{{api-url}}"
 					],
 					"path": [
 						"users"
@@ -241,9 +241,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{api}}/users/login",
+					"raw": "{{api-url}}/users/login",
 					"host": [
-						"{{api}}"
+						"{{api-url}}"
 					],
 					"path": [
 						"users",
