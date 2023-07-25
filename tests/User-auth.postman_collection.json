@@ -1,0 +1,310 @@
+{
+	"info": {
+		"_postman_id": "688754e2-a1a9-418e-93fc-7454600bb434",
+		"name": "User auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9827180",
+		"_collection_link": "https://lively-resonance-96742.postman.co/workspace/LMS~561fa2bf-dcf3-4e9d-a566-4f28d32cf25c/collection/9827180-688754e2-a1a9-418e-93fc-7454600bb434?action=share&creator=9827180&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "User Creation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = JSON.parse(pm.request.body.raw)\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.collectionVariables.set(\"userEmail\", body.email );\r",
+							"pm.collectionVariables.set(\"userPassword\", body.password );\r",
+							"pm.collectionVariables.set(\"userId\", responseJson.doc.id );\r",
+							"\r",
+							"\r",
+							"pm.test(\"Body is correct\", function () {\r",
+							"    pm.response.to.have.body();\r",
+							"});\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"response should be okay to process\", function () {\r",
+							"    pm.response.to.not.be.error;\r",
+							"    pm.response.to.not.have.jsonBody(\"error\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"response message should have the User successfully created.\", function () {\r",
+							"    pm.expect(responseJson.message).to.eql(\"User successfully created.\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\":\"{{$randomLastName}}\",\r\n    \"email\":\"{{$randomEmail}}\",\r\n    \"password\":\"{{$randomPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/users",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "User Creation",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\":\"{{$randomLastName}}\",\r\n    \"email\":\"{{$randomEmail}}\",\r\n    \"password\":\"{{$randomPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/users",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "X-RateLimit-Limit",
+							"value": "500"
+						},
+						{
+							"key": "X-RateLimit-Remaining",
+							"value": "498"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 01 Mar 2023 02:42:08 GMT"
+						},
+						{
+							"key": "X-RateLimit-Reset",
+							"value": "1677638561"
+						},
+						{
+							"key": "Content-Language",
+							"value": "en"
+						},
+						{
+							"key": "Vary",
+							"value": "X-HTTP-Method-Override, Accept-Encoding"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "PUT, PATCH, POST, GET, DELETE, OPTIONS"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Content-Encoding, x-apollo-tracing"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "247"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"f7-GS9EUuKxL+QakNIFzgVFl17Ppio\""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"User successfully created.\",\n    \"doc\": {\n        \"id\": \"63febb814bcf6baf2d54c18a\",\n        \"firstName\": \"Mariela\",\n        \"lastName\": \"Russel\",\n        \"roles\": [\n            \"user\"\n        ],\n        \"email\": \"yazmin0@hotmail.com\",\n        \"createdAt\": \"2023-03-01T02:42:09.221Z\",\n        \"updatedAt\": \"2023-03-01T02:42:09.221Z\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "User Login Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"console.log(responseJson)\r",
+							"\r",
+							"pm.test(\"Body is correct\", function () {\r",
+							"    pm.response.to.have.body();\r",
+							"});\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"response should be okay to process\", function () {\r",
+							"    pm.response.to.not.be.error;\r",
+							"    pm.response.to.not.have.jsonBody(\"error\");\r",
+							"});\r",
+							"pm.test(\"response message should have the Auth Passed message\", function () {\r",
+							"    pm.expect(responseJson.message).to.eql(\"Auth Passed\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Cookie payload-token is present\", () => {\r",
+							"  pm.expect(pm.cookies.has('payload-token')).to.be.true;\r",
+							"});\r",
+							"\r",
+							"const schema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": { \"type\": \"string\", \"const\": \"Auth Passed\" },\r",
+							"    \"user\": {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"id\": { \"type\": \"string\" },\r",
+							"        \"firstName\": { \"type\": \"string\" },\r",
+							"        \"lastName\": { \"type\": \"string\" },\r",
+							"        \"roles\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\r",
+							"        \"slug\": { \"type\": \"string\" },\r",
+							"        \"email\": { \"type\": \"string\", \"format\": \"email\" },\r",
+							"        \"createdAt\": { \"type\": \"string\", \"format\": \"date-time\" },\r",
+							"        \"updatedAt\": { \"type\": \"string\", \"format\": \"date-time\" }\r",
+							"      },\r",
+							"      \"required\": [\"id\", \"firstName\", \"lastName\", \"roles\", \"slug\", \"email\", \"createdAt\", \"updatedAt\"]\r",
+							"    },\r",
+							"    \"token\": { \"type\": \"string\" },\r",
+							"    \"exp\": { \"type\": \"number\" }\r",
+							"  },\r",
+							"  \"required\": [\"message\", \"user\", \"token\", \"exp\"]\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Response matches schema\", function () {\r",
+							"    \r",
+							"    var response = pm.response.json();\r",
+							"    pm.expect(tv4.validate(response, schema)).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"{{userEmail}}\",\r\n    \"password\":\"{{userPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/users/login",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "userId",
+			"value": "6416138947fb5b4b74fdc939",
+			"type": "string"
+		},
+		{
+			"key": "productId1",
+			"value": "641517e33bbe3299a792ce4c",
+			"type": "string"
+		},
+		{
+			"key": "productId2",
+			"value": "640e8d7c4cba92be049f8c96",
+			"type": "string"
+		},
+		{
+			"key": "randomAmmount",
+			"value": ""
+		},
+		{
+			"key": "transactionId",
+			"value": ""
+		},
+		{
+			"key": "userEmail",
+			"value": ""
+		},
+		{
+			"key": "userPassword",
+			"value": ""
+		}
+	]
+}

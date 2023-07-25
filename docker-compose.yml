@@ -2,7 +2,7 @@ version: "3"
 
 services:
   payload:
-    image: node:18-alpine
+    image: node:16-alpine
     ports:
       - "3000:3000"
     volumes:
@@ -17,6 +17,20 @@ services:
       PORT: 3000
       NODE_ENV: development
       PAYLOAD_SECRET: TESTING
+      PAYLOAD_PUBLIC_FRONTEND_URL: "http://localhost:3001"
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      OAUTH_SERVER: ${OAUTH_SERVER}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+
+    networks:
+      - app-network
 
   mongo:
     image: mongo:latest
@@ -28,6 +42,32 @@ services:
       - data:/data/db
     logging:
       driver: none
+    networks:
+      - app-network
+
+  postman:
+    image: postman/newman:alpine
+    container_name: postmanTests
+    environment:
+      PAYLOAD_HOST: payload
+    # command:
+    #   run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json  -r cli,json
+    #   --reporter-json-export="reports/report.json"
+
+    entrypoint: [""]
+    command: newman run -v
+    volumes:
+      - .:/etc/newman
+    depends_on:
+      - payload
+    networks:
+      - app-network
+
+      # | run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   data:

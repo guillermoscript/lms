@@ -1,18 +1,47 @@
 language: node_js
+
+arch: amd64          # optional, this is default, routes to a full VM
+os: linux            # optional, this is default
+dist: focal          # or bionic | xenial | trusty | precise with xenial as default
+
+
+# vm:
+#   size: [large]
+
 node_js:
-  - 17
+  - 16
+
+services:
+  - docker
 
 # safelist
 branches:
   only:
   - master
-install:
-- npm install newman
 
-before_script:
-- node --version
-- npm --version
-- node_modules/.bin/newman --version
-script:
-  - node_modules/.bin/newman run tests/Order-New-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
-  - node_modules/.bin/newman run tests/Order-Existing-User.postman_collection.json -e tests/LMS-ENV-LOCAL.postman_environment.json
+jobs:
+  include:
+    - stage: api tests
+
+      before_script:
+        - docker-compose up -d
+        - docker-compose ps -a
+      script:
+        - sleep 10 # Wait for yarn install to finish
+        - docker-compose logs payload
+        - sleep 10 # Wait for yarn install to finish
+        - docker-compose logs payload
+        - sleep 10 # Wait for yarn install to finish
+        - docker-compose logs payload
+        - sleep 10 # Wait for yarn install to finish
+        - docker-compose logs payload
+        - >
+          docker-compose run postman
+          newman run tests/User-auth.postman_collection.json
+          -e tests/LMS-ENV-LOCAL.postman_environment.json
+          -r cli,json
+          --reporter-json-export tests/report.json
+          --verbose
+        
+      after_script:
+        - docker-compose down
