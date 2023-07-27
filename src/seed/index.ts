@@ -4,6 +4,7 @@ import { mediaData } from './media'
 import tryCatch from '../utilities/tryCatch';
 import { Media } from '../payload-types';
 import { categoriesData } from './category';
+import usersData from './user';
 
 async function seeder<T>(payload: Payload, collectionData: Array<{
     collection: string,
@@ -52,6 +53,12 @@ export const seed = async (payload: Payload): Promise<void> => {
     if (err2 || !categoriesSeeded) return
 
     console.log(categoriesSeeded, '<----------- categoriesSeeded')
+
+    const [users, err3] = await seeder(payload, usersData)
+
+    if (err3 || !users) return
+
+    console.log(users, '<----------- users')
 
     payload.logger.info('Seeding complete')
 
