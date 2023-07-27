@@ -6,12 +6,15 @@ import { Media } from '../payload-types';
 import { categoriesData } from './category';
 import usersData from './user';
 import lessonsData from './lessons';
+import programmingExam from './Exam';
 
-async function seeder<T>(payload: Payload, collectionData: Array<{
+export type Seeder = Array<{
     collection: string,
     filePath?: string,
     data: any
-}>) {
+}>
+
+async function seeder<T>(payload: Payload, collectionData: Seeder) {
     const data: Array<T> = []
     for (let index = 0; index < collectionData.length; index++) {
         const collection = collectionData[index];
@@ -74,6 +77,12 @@ export const seed = async (payload: Payload): Promise<void> => {
     if (err4 || !lessonsSeeded) return
 
     console.log(lessonsSeeded, 'lessonsSeeded')
+
+    const [exams, err5] = await seeder(payload, programmingExam)
+
+    if (err5 || !exams) return
+
+    console.log(exams, ' < === exams')
 
     payload.logger.info('Seeding complete')
 
