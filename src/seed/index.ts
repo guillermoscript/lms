@@ -5,6 +5,7 @@ import tryCatch from '../utilities/tryCatch';
 import { Media } from '../payload-types';
 import { categoriesData } from './category';
 import usersData from './user';
+import lessonsData from './lessons';
 
 async function seeder<T>(payload: Payload, collectionData: Array<{
     collection: string,
@@ -33,9 +34,7 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     if (err || !media) return
     
-    console.log(media, '<----------- media');
     const categories = categoriesData.map((category, index) => {
-
         // TODO: Fix this
         // @ts-ignore
         const mediaId = (media[index] as Media).id as string
@@ -52,13 +51,29 @@ export const seed = async (payload: Payload): Promise<void> => {
     
     if (err2 || !categoriesSeeded) return
 
-    console.log(categoriesSeeded, '<----------- categoriesSeeded')
-
     const [users, err3] = await seeder(payload, usersData)
 
     if (err3 || !users) return
 
-    console.log(users, '<----------- users')
+    const lessons = lessonsData.map((lesson, index) => {
+        // TODO: Fix this
+        return {
+            ...lesson,
+            data: {
+                ...lesson.data,
+                // @ts-ignore
+                category: categoriesSeeded[index].id,
+                // @ts-ignore
+                teacher: users[2].id
+            }
+        }
+    })
+
+    const [lessonsSeeded, err4] = await seeder(payload, lessons)
+
+    if (err4 || !lessonsSeeded) return
+
+    console.log(lessonsSeeded, 'lessonsSeeded')
 
     payload.logger.info('Seeding complete')
 
