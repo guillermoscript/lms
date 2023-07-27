@@ -7,6 +7,7 @@ import { categoriesData } from './category';
 import usersData from './user';
 import lessonsData from './lessons';
 import programmingExam from './Exam';
+import evaluationData from './evaluation';
 
 export type Seeder = Array<{
     collection: string,
@@ -22,7 +23,7 @@ async function seeder<T>(payload: Payload, collectionData: Seeder) {
 
         if (err) {
             payload.logger.error(`Error seeding ${collection.collection}: ${err.message}`)
-            return [null , err]
+            return [null, err]
         } else {
             payload.logger.info(`${collection.collection} seeded`)
             data.push(response)
@@ -36,7 +37,7 @@ export const seed = async (payload: Payload): Promise<void> => {
     const [media, err] = await seeder<Media>(payload, mediaData)
 
     if (err || !media) return
-    
+
     const categories = categoriesData.map((category, index) => {
         // TODO: Fix this
         // @ts-ignore
@@ -51,7 +52,7 @@ export const seed = async (payload: Payload): Promise<void> => {
     })
 
     const [categoriesSeeded, err2] = await seeder(payload, categories)
-    
+
     if (err2 || !categoriesSeeded) return
 
     const [users, err3] = await seeder(payload, usersData)
@@ -76,13 +77,37 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     if (err4 || !lessonsSeeded) return
 
-    console.log(lessonsSeeded, 'lessonsSeeded')
-
     const [exams, err5] = await seeder(payload, programmingExam)
 
     if (err5 || !exams) return
 
-    console.log(exams, ' < === exams')
+    const evaluations = evaluationData.map((evaluation, index) => {
+        return {
+            ...evaluation,
+            data: {
+                ...evaluation.data,
+                exam: {
+                    content: [
+                        {
+                            type: 'paragraph',
+                            children: [
+                                {
+                                    text: 'Create a responsive layout using CSS Grid',
+                                },
+                            ],
+                        },
+                    ],
+                    timeToAnswer: 20
+                }
+            }
+        }
+    })
+
+    const [evaluationsSeeded, err6] = await seeder(payload, evaluations)
+
+    if (err6 || !evaluationsSeeded) return
+
+    console.log(evaluationsSeeded, ' < === evaluationsSeeded')
 
     payload.logger.info('Seeding complete')
 
