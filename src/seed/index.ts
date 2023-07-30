@@ -8,6 +8,7 @@ import usersData from './user';
 import lessonsData from './lessons';
 import programmingExam from './Exam';
 import evaluationData from './evaluation';
+import courseSeed from './course';
 
 export type Seeder = Array<{
     collection: string,
@@ -107,7 +108,28 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     if (err6 || !evaluationsSeeded) return
 
-    console.log(evaluationsSeeded, ' < === evaluationsSeeded')
+    const course = courseSeed.map((course, index) => {
+        return {
+            ...course,
+            data: {
+                ...course.data,
+                // @ts-ignore
+                category: categoriesSeeded[index].id,
+                // @ts-ignore
+                teacher: users[2].id,
+                // @ts-ignore
+                lessons: [lessonsSeeded[index].id],
+                // @ts-ignore
+                evaluations: [evaluationsSeeded[index].id]
+            }
+        }
+    })
+
+    const [courseSeeded, err7] = await seeder(payload, course)
+
+    if (err7 || !courseSeeded) return
+
+    console.log(courseSeeded, ' < === courseSeeded')
 
     payload.logger.info('Seeding complete')
 
