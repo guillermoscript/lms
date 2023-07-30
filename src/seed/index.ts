@@ -10,6 +10,7 @@ import programmingExam from './Exam';
 import evaluationData from './evaluation';
 import courseSeed from './course';
 import plansSeed from './plans';
+import productsSeed from './product';
 
 export type Seeder = Array<{
     collection: string,
@@ -151,6 +152,28 @@ export const seed = async (payload: Payload): Promise<void> => {
     if (err8 || !plansSeeded) return
 
     console.log(plansSeeded, ' < === plansSeeded')
+
+    const products = productsSeed.map((product, index) => {
+        return {
+            ...product,
+            data: {
+                ...product.data,
+                productType: {
+                    // @ts-ignore
+                    value: plansSeeded[index].id,
+                    relationTo: 'plans'
+                },
+                // @ts-ignore
+                productImage: media[index].id,
+            }
+        }
+    })
+
+    const [productsSeeded, err9] = await seeder(payload, products)
+
+    if (err9 || !productsSeeded) return
+
+    console.log(productsSeeded, ' < === productsSeeded')
 
     payload.logger.info('Seeding complete')
 
