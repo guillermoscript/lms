@@ -156,18 +156,25 @@ export const seed = async (payload: Payload): Promise<void> => {
     const products = productsSeed.map((product, index) => {
         return {
             ...product,
-            data: {
-                ...product.data,
-                productType: {
-                    // @ts-ignore
-                    value: plansSeeded[index].id,
-                    relationTo: 'plans'
-                },
-                // @ts-ignore
-                productImage: media[index].id,
-            }
+            data: { ...product.data }
         }
     })
+    // @ts-ignore
+    products[0].data.productType = {
+        relationTo: 'courses',
+        // @ts-ignore
+        value: courseSeeded[0].id
+    }
+    // @ts-ignore
+    products[0].data.productImage = media[0].id
+    // @ts-ignore
+    products[1].data.productType = {
+        relationTo: 'plans',
+        // @ts-ignore
+        value: plansSeeded[0].id
+    }
+    // @ts-ignore
+    products[1].data.productImage = media[1].id
 
     const [productsSeeded, err9] = await seeder(payload, products)
 

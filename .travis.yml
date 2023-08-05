@@ -24,7 +24,7 @@ jobs:
     - stage: api tests
 
       before_script:
-        - docker-compose up -d
+        - docker-compose up -d 
         - docker-compose ps -a
       script:
         - sleep 10 # Wait for yarn install to finish
@@ -35,9 +35,17 @@ jobs:
         - docker-compose logs payload
         - sleep 10 # Wait for yarn install to finish
         - docker-compose logs payload
+        - sleep 4 # Wait for yarn install to finish
         - >
           docker-compose run postman
           newman run tests/User-auth.postman_collection.json
+          -e tests/LMS-ENV-LOCAL.postman_environment.json
+          -r cli,json
+          --reporter-json-export tests/report.json
+          --verbose
+        - >
+          docker-compose run postman
+          newman  run tests/Enrollement-Process.postman_collection.json
           -e tests/LMS-ENV-LOCAL.postman_environment.json
           -r cli,json
           --reporter-json-export tests/report.json
