@@ -38,7 +38,7 @@ jobs:
         - sleep 4 # Wait for yarn install to finish
         - >
           docker-compose run postman
-          newman  run postman/collections/Enrollement-Process.postman_collection.json
+          newman  run postman/collections/Enrollement-Process.json
           -e tests/LMS-ENV-LOCAL.postman_environment.json
           -r cli,json
           --reporter-json-export tests/report.json
