@@ -1,0 +1,1164 @@
+{
+	"info": {
+		"_postman_id": "2d01b228-6261-4f73-a268-74f89ce287b0",
+		"name": "Enrollement-Process",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "9827180-2d01b228-6261-4f73-a268-74f89ce287b0"
+	},
+	"item": [
+		{
+			"name": "Products that are plans",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "abc38458-08b4-4460-b499-1964f28faa6b",
+						"exec": [
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"const products = responseJson.docs\r",
+							"\r",
+							"\r",
+							"pm.test(\"Body is correct\", function () {\r",
+							"    pm.response.to.have.body();\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"response should be okay to process\", function () {\r",
+							"    pm.response.to.not.be.error;\r",
+							"    pm.response.to.not.have.jsonBody(\"error\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Id is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    responseData.docs.forEach(function (doc) {\r",
+							"        pm.expect(doc.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.docs).to.be.an('array');\r",
+							"    pm.expect(responseData.docs).to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
+							"\r",
+							"    responseData.docs.forEach(function (doc) {\r",
+							"        pm.expect(doc.name).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Description is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData.docs).to.be.an('array');\r",
+							"    responseData.docs.forEach(function (doc) {\r",
+							"        pm.expect(doc.description).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Description should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"productType.relationTo is a plans\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData.docs).to.be.an('array');\r",
+							"    responseData.docs.forEach(function (doc) {\r",
+							"        pm.expect(doc.productType.relationTo).to.equal(\"plans\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"if (products.length > 0) {\r",
+							"    pm.collectionVariables.set(\"productPlanId\", products[0].id);\r",
+							"}\r",
+							"\r",
+							"\r",
+							"if (products.length > 0) {\r",
+							"    pm.collectionVariables.set(\"productPlanObj\", JSON.stringify(products[0]));\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "7c9014df-8b24-448e-bfd8-78c2a78fa1ab",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/products?where[productType.relationTo][equals]=plans",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "where[productType.relationTo][equals]",
+							"value": "plans"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Products that are courses",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "56db1760-042c-44ac-af90-6bd8cb4f3cf8",
+						"exec": [
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"const products = responseJson.docs\r",
+							"\r",
+							"\r",
+							"pm.test(\"Body is correct\", function () {\r",
+							"    pm.response.to.have.body();\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"response should be okay to process\", function () {\r",
+							"    pm.response.to.not.be.error;\r",
+							"    pm.response.to.not.have.jsonBody(\"error\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Id is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    responseData.docs.forEach(function (doc) {\r",
+							"        pm.expect(doc.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.docs).to.be.an('array');\r",
+							"    pm.expect(responseData.docs).to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
+							"\r",
+							"    responseData.docs.forEach(function (doc) {\r",
+							"        pm.expect(doc.name).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Description is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData.docs).to.be.an('array');\r",
+							"    responseData.docs.forEach(function (doc) {\r",
+							"        pm.expect(doc.description).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Description should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"productType.relationTo is a courses\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData.docs).to.be.an('array');\r",
+							"    responseData.docs.forEach(function (doc) {\r",
+							"        pm.expect(doc.productType.relationTo).to.equal(\"courses\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"if (products.length > 0) {\r",
+							"    pm.collectionVariables.set(\"producCourseId\", products[0].id);\r",
+							"}\r",
+							"\r",
+							"\r",
+							"if (products.length > 0) {\r",
+							"    pm.collectionVariables.set(\"producCourseObj\", JSON.stringify(products[0]));\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "0c3379c0-0014-4003-80ff-5aedcc9b52d3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/products?where[productType.relationTo][equals]=courses",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "where[productType.relationTo][equals]",
+							"value": "courses"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New User Order Course Creation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "92b47cb2-6561-46a7-a236-7b5f1b36a7f5",
+						"exec": [
+							"pm.collectionVariables.set('product', Math.floor(Math.random() * 1000));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "5b54615e-eaa2-4571-830c-4470f5f49b58",
+						"exec": [
+							"\r",
+							"pm.test(\"Validate the message field is not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData.message).to.exist.and.to.not.be.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Amount is a non-negative integer\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.order.amount).to.be.a('number');\r",
+							"    pm.expect(responseData.order.amount).to.be.at.least(0, \"Amount should be non-negative\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Verify that the 'products' array is present and not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.order.products).to.exist.and.to.be.an('array');\r",
+							"    pm.expect(responseData.order.products.length).to.be.at.least(1, \"Array should contain at least one element\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "c559c2c2-d7f8-4600-8f6e-67a51647c751",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentMethodType\": \"zelle\",\r\n    \"paymentMethod\": {\r\n        \"zelleEmail\": \"{{$randomEmail}}\",\r\n        \"zelleName\": \"{{$randomFullName}}\"\r\n    },\r\n    \"customer\": {\r\n        \"firstName\": \"{{$randomFirstName}}\",\r\n        \"lastName\":\"{{$randomLastName}}\",\r\n        \"email\":\"{{$randomEmail}}\",\r\n        \"password\":\"{{$randomPassword}}\",\r\n        \"phone\": \"{{$randomPhoneNumber}}\"\r\n    },\r\n    \"product\": {{producCourseObj}},\r\n    \"referenceNumber\": \"{{randomNumber}}\",\r\n    \"amount\": {{$randomPrice}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/orders/new-user-order",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"orders",
+						"new-user-order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New User Order Plan Creation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a0100402-b46c-4668-b419-7cb7298e06a9",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "f253b91d-b4af-4b21-8d0f-4285c2929daf",
+						"exec": [
+							"\r",
+							"pm.test(\"Validate the message field is not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData.message).to.exist.and.to.not.be.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Amount is a non-negative integer\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.order.amount).to.be.a('number');\r",
+							"    pm.expect(responseData.order.amount).to.be.at.least(0, \"Amount should be non-negative\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Verify that the 'products' array is present and not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.order.products).to.exist.and.to.be.an('array');\r",
+							"    pm.expect(responseData.order.products.length).to.be.at.least(1, \"Array should contain at least one element\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "953e3b58-9739-438f-8091-0e9a9e4776bf",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentMethodType\": \"zelle\",\r\n    \"paymentMethod\": {\r\n        \"zelleEmail\": \"{{$randomEmail}}\",\r\n        \"zelleName\": \"{{$randomFullName}}\"\r\n    },\r\n    \"customer\": {\r\n        \"firstName\": \"{{$randomFirstName}}\",\r\n        \"lastName\":\"{{$randomLastName}}\",\r\n        \"email\":\"{{$randomEmail}}\",\r\n        \"password\":\"{{$randomPassword}}\",\r\n        \"phone\": \"{{$randomPhoneNumber}}\"\r\n    },\r\n    \"product\": {{productPlanObj}},\r\n    \"referenceNumber\": \"{{randomNumber}}\",\r\n    \"amount\": {{$randomPrice}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/orders/new-user-order",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"orders",
+						"new-user-order"
+					]
+				}
+			},
+			"response": [
+				{
+					"id": "6faffb0c-ebcd-42b8-b29f-46d92bb21441",
+					"name": "New User Order Plan Creation",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"paymentMethodType\": \"zelle\",\r\n    \"paymentMethod\": {\r\n        \"zelleEmail\": \"{{$randomEmail}}\",\r\n        \"zelleName\": \"{{$randomFullName}}\"\r\n    },\r\n    \"customer\": {\r\n        \"firstName\": \"{{$randomFirstName}}\",\r\n        \"lastName\":\"{{$randomLastName}}\",\r\n        \"email\":\"{{$randomEmail}}\",\r\n        \"password\":\"{{$randomPassword}}\",\r\n        \"phone\": \"{{$randomPhoneNumber}}\"\r\n    },\r\n    \"product\": {{productPlanObj}},\r\n    \"referenceNumber\": \"{{randomNumber}}\",\r\n    \"amount\": {{$randomPrice}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api-url}}/orders/new-user-order",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"orders",
+								"new-user-order"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "X-RateLimit-Limit",
+							"value": "500"
+						},
+						{
+							"key": "X-RateLimit-Remaining",
+							"value": "498"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 05 Aug 2023 18:30:58 GMT"
+						},
+						{
+							"key": "X-RateLimit-Reset",
+							"value": "1691260307"
+						},
+						{
+							"key": "Content-Language",
+							"value": "en"
+						},
+						{
+							"key": "Vary",
+							"value": "X-HTTP-Method-Override, Accept-Encoding"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "PUT, PATCH, POST, GET, DELETE, OPTIONS"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Content-Encoding, x-apollo-tracing"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"9d3-OV3jfZS+zx3MyM6ntBNcCLJ8i00\""
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Orden creada correctamente\",\n    \"order\": {\n        \"id\": \"64ce9562027dd21224420323\",\n        \"amount\": 142.67,\n        \"status\": \"inactive\",\n        \"type\": \"subscription\",\n        \"customer\": {\n            \"id\": \"64ce898248fde8938d7b0128\",\n            \"firstName\": \"Scot\",\n            \"lastName\": \"Balistreri\",\n            \"roles\": [\n                \"user\"\n            ],\n            \"slug\": \"philip80yahoocom\",\n            \"email\": \"philip80@yahoo.com\",\n            \"createdAt\": \"2023-08-05T17:40:18.209Z\",\n            \"updatedAt\": \"2023-08-05T17:40:18.317Z\"\n        },\n        \"products\": [\n            {\n                \"id\": \"64ce7f4e6dee708d341f1c40\",\n                \"name\": \"Premium Plan Subscription\",\n                \"description\": \"A subscription to access all courses and exclusive content\",\n                \"productType\": {\n                    \"relationTo\": \"plans\",\n                    \"value\": {\n                        \"id\": \"64ce7f4e6dee708d341f1c18\",\n                        \"name\": \"Basic Plan\",\n                        \"description\": \"A basic plan with access to a limited number of courses\",\n                        \"status\": \"active\",\n                        \"category\": [\n                            \"64ce7f4e6dee708d341f1bc8\"\n                        ],\n                        \"courses\": [\n                            \"64ce7f4e6dee708d341f1bfa\"\n                        ],\n                        \"subscriptions\": [],\n                        \"periodicity\": \"monthly\",\n                        \"slug\": \"basic-plan\",\n                        \"createdAt\": \"2023-08-05T16:56:46.935Z\",\n                        \"updatedAt\": \"2023-08-05T16:56:46.935Z\"\n                    }\n                },\n                \"productStatus\": \"active\",\n                \"productPrice\": [\n                    {\n                        \"price\": 100,\n                        \"aceptedCurrency\": \"USD\",\n                        \"id\": \"64ce7f4e2270680039552ccc\"\n                    }\n                ],\n                \"productImage\": {\n                    \"id\": \"64ce7f4e6dee708d341f1bc6\",\n                    \"altText\": \"media2\",\n                    \"slug\": \"media2-27png\",\n                    \"filename\": \"media2-27.png\",\n                    \"mimeType\": \"image/png\",\n                    \"filesize\": 206269,\n                    \"width\": 768,\n                    \"height\": 768,\n                    \"sizes\": {\n                        \"thumbnail\": {\n                            \"width\": 400,\n                            \"height\": 300,\n                            \"mimeType\": \"image/png\",\n                            \"filesize\": 83019,\n                            \"filename\": \"media2-27-400x300.png\",\n                            \"url\": \"http://localhost:3000/media/media2-27-400x300.png\"\n                        },\n                        \"card\": {\n                            \"width\": 768,\n                            \"height\": 1024,\n                            \"mimeType\": \"image/png\",\n                            \"filesize\": 356218,\n                            \"filename\": \"media2-27-768x1024.png\",\n                            \"url\": \"http://localhost:3000/media/media2-27-768x1024.png\"\n                        },\n                        \"tablet\": {\n                            \"url\": null,\n                            \"width\": null,\n                            \"height\": null,\n                            \"mimeType\": null,\n                            \"filesize\": null,\n                            \"filename\": null\n                        }\n                    },\n                    \"createdAt\": \"2023-08-05T16:56:46.678Z\",\n                    \"updatedAt\": \"2023-08-05T16:56:46.678Z\",\n                    \"url\": \"http://localhost:3000/media/media2-27.png\"\n                },\n                \"info\": [\n                    {\n                        \"type\": \"paragraph\",\n                        \"children\": [\n                            {\n                                \"text\": \"Get access to all courses and exclusive content with our Premium Plan Subscription.\"\n                            }\n                        ]\n                    },\n                    {\n                        \"type\": \"list\",\n                        \"children\": [\n                            {\n                                \"type\": \"list-item\",\n                                \"children\": [\n                                    {\n                                        \"text\": \"Access to all courses related to programming and web development\"\n                                    }\n                                ]\n                            },\n                            {\n                                \"type\": \"list-item\",\n                                \"children\": [\n                                    {\n                                        \"text\": \"Exclusive content only available to Premium Plan subscribers\"\n                                    }\n                                ]\n                            },\n                            {\n                                \"type\": \"list-item\",\n                                \"children\": [\n                                    {\n                                        \"text\": \"Priority support from our team of experts\"\n                                    }\n                                ]\n                            }\n                        ]\n                    }\n                ],\n                \"slug\": \"premium-plan-subscription\",\n                \"createdAt\": \"2023-08-05T16:56:46.966Z\",\n                \"updatedAt\": \"2023-08-05T16:56:46.966Z\"\n            }\n        ],\n        \"referenceNumber\": \"{{randomNumber}}\",\n        \"createdAt\": \"2023-08-05T18:30:58.198Z\",\n        \"updatedAt\": \"2023-08-05T18:30:58.198Z\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "User Creation Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c8374b02-465d-4c06-a6ee-ede85f27a185",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ce2253b6-027c-4090-af8a-ce45536c7393",
+						"exec": [
+							"const body = JSON.parse(pm.request.body.raw)\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"\r",
+							"pm.test(\"Body is correct\", function () {\r",
+							"    pm.response.to.have.body();\r",
+							"});\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"response should be okay to process\", function () {\r",
+							"    pm.response.to.not.be.error;\r",
+							"    pm.response.to.not.have.jsonBody(\"error\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"response message should have the User successfully created.\", function () {\r",
+							"    pm.expect(responseJson.message).to.eql(\"User successfully created.\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Email is in a valid format\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData.doc.email).to.match(/^[\\w-]+(\\.[\\w-]+)*@([\\w-]+\\.)+[a-zA-Z]{2,7}$/);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.collectionVariables.set(\"userEmail\", body.email);\r",
+							"pm.collectionVariables.set(\"userPassword\", body.password);\r",
+							"pm.collectionVariables.set(\"userId\", responseJson.doc.id);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "948d3512-3b19-433c-a0df-18d93e243ecc",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\":\"{{$randomLastName}}\",\r\n    \"email\":\"{{$randomEmail}}\",\r\n    \"password\":\"{{$randomPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/users",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"id": "ea6255af-206e-47ff-8806-b57161c33988",
+					"name": "User Creation",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\":\"{{$randomLastName}}\",\r\n    \"email\":\"{{$randomEmail}}\",\r\n    \"password\":\"{{$randomPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/users",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "X-RateLimit-Limit",
+							"value": "500"
+						},
+						{
+							"key": "X-RateLimit-Remaining",
+							"value": "498"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 01 Mar 2023 02:42:08 GMT"
+						},
+						{
+							"key": "X-RateLimit-Reset",
+							"value": "1677638561"
+						},
+						{
+							"key": "Content-Language",
+							"value": "en"
+						},
+						{
+							"key": "Vary",
+							"value": "X-HTTP-Method-Override, Accept-Encoding"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "PUT, PATCH, POST, GET, DELETE, OPTIONS"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Content-Encoding, x-apollo-tracing"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "247"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"f7-GS9EUuKxL+QakNIFzgVFl17Ppio\""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"User successfully created.\",\n    \"doc\": {\n        \"id\": \"63febb814bcf6baf2d54c18a\",\n        \"firstName\": \"Mariela\",\n        \"lastName\": \"Russel\",\n        \"roles\": [\n            \"user\"\n        ],\n        \"email\": \"yazmin0@hotmail.com\",\n        \"createdAt\": \"2023-03-01T02:42:09.221Z\",\n        \"updatedAt\": \"2023-03-01T02:42:09.221Z\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "User Login Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ea2b93c7-0d36-4811-af79-d97351101553",
+						"exec": [
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"console.log(responseJson)\r",
+							"\r",
+							"pm.test(\"Body is correct\", function () {\r",
+							"    pm.response.to.have.body();\r",
+							"});\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"response should be okay to process\", function () {\r",
+							"    pm.response.to.not.be.error;\r",
+							"    pm.response.to.not.have.jsonBody(\"error\");\r",
+							"});\r",
+							"pm.test(\"response message should have the Auth Passed message\", function () {\r",
+							"    pm.expect(responseJson.message).to.eql(\"Auth Passed\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Cookie payload-token is present\", () => {\r",
+							"  pm.expect(pm.cookies.has('payload-token')).to.be.true;\r",
+							"});\r",
+							"\r",
+							"const schema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": { \"type\": \"string\", \"const\": \"Auth Passed\" },\r",
+							"    \"user\": {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"id\": { \"type\": \"string\" },\r",
+							"        \"firstName\": { \"type\": \"string\" },\r",
+							"        \"lastName\": { \"type\": \"string\" },\r",
+							"        \"roles\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\r",
+							"        \"slug\": { \"type\": \"string\" },\r",
+							"        \"email\": { \"type\": \"string\", \"format\": \"email\" },\r",
+							"        \"createdAt\": { \"type\": \"string\", \"format\": \"date-time\" },\r",
+							"        \"updatedAt\": { \"type\": \"string\", \"format\": \"date-time\" }\r",
+							"      },\r",
+							"      \"required\": [\"id\", \"firstName\", \"lastName\", \"roles\", \"slug\", \"email\", \"createdAt\", \"updatedAt\"]\r",
+							"    },\r",
+							"    \"token\": { \"type\": \"string\" },\r",
+							"    \"exp\": { \"type\": \"number\" }\r",
+							"  },\r",
+							"  \"required\": [\"message\", \"user\", \"token\", \"exp\"]\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Response matches schema\", function () {\r",
+							"    \r",
+							"    var response = pm.response.json();\r",
+							"    pm.expect(tv4.validate(response, schema)).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "fdaa0567-3314-4c9e-acce-9a3a8e7cbe2c",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"{{userEmail}}\",\r\n    \"password\":\"{{userPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/users/login",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"id": "adfa2ccb-b5f6-48ba-9ff5-8d99de768ed7",
+					"name": "User Admin",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"guillomarindavila@gmail.com\",\r\n    \"password\":\"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/users/login",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "X-RateLimit-Limit",
+							"value": "500"
+						},
+						{
+							"key": "X-RateLimit-Remaining",
+							"value": "498"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 26 Feb 2023 20:02:24 GMT"
+						},
+						{
+							"key": "X-RateLimit-Reset",
+							"value": "1677441772"
+						},
+						{
+							"key": "Content-Language",
+							"value": "en"
+						},
+						{
+							"key": "Vary",
+							"value": "X-HTTP-Method-Override, Accept-Encoding"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "PUT, PATCH, POST, GET, DELETE, OPTIONS"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Content-Encoding, x-apollo-tracing"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "payload-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhheXR3YXluZS4xNkBnbWFpbC5jb20iLCJpZCI6IjYzZTAxNWFjMWIxZGJjNGYxM2FjNTFlMiIsImNvbGxlY3Rpb24iOiJ1c2VycyIsInJvbGVzIjpbImFkbWluIl0sImlhdCI6MTY3NzQ0MTc0NSwiZXhwIjoxNjc3NDQ4OTQ1fQ.whPk543tYKd0DNnWKUzk5UCJv2NgrBDNfepitE1IMDk; Path=/; Expires=Sun, 26 Feb 2023 22:02:25 GMT; HttpOnly; SameSite=Lax"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "608"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"260-s6RoOCQCauMEDs9T7oLSwwLA83Q\""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Auth Passed\",\n    \"user\": {\n        \"id\": \"63e015ac1b1dbc4f13ac51e2\",\n        \"firstName\": \"Hayt\",\n        \"lastName\": \"Wayne\",\n        \"phone\": \"4145857846\",\n        \"address\": \"MI casa\",\n        \"birthDate\": \"1999-01-01T00:00:00.000Z\",\n        \"roles\": [\n            \"admin\"\n        ],\n        \"email\": \"haytwayne.16@gmail.com\",\n        \"createdAt\": \"2023-02-05T20:46:37.042Z\",\n        \"updatedAt\": \"2023-02-26T18:28:00.054Z\"\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhheXR3YXluZS4xNkBnbWFpbC5jb20iLCJpZCI6IjYzZTAxNWFjMWIxZGJjNGYxM2FjNTFlMiIsImNvbGxlY3Rpb24iOiJ1c2VycyIsInJvbGVzIjpbImFkbWluIl0sImlhdCI6MTY3NzQ0MTc0NSwiZXhwIjoxNjc3NDQ4OTQ1fQ.whPk543tYKd0DNnWKUzk5UCJv2NgrBDNfepitE1IMDk\",\n    \"exp\": 1677448945\n}"
+				},
+				{
+					"id": "f1ce2fc5-7fd4-446b-b97f-eb547e3d97db",
+					"name": "User Editor",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"arepayquezo@gmail.com\",\r\n    \"password\":\"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api}}/users/login",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "X-RateLimit-Limit",
+							"value": "500"
+						},
+						{
+							"key": "X-RateLimit-Remaining",
+							"value": "498"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 26 Feb 2023 20:02:24 GMT"
+						},
+						{
+							"key": "X-RateLimit-Reset",
+							"value": "1677441772"
+						},
+						{
+							"key": "Content-Language",
+							"value": "en"
+						},
+						{
+							"key": "Vary",
+							"value": "X-HTTP-Method-Override, Accept-Encoding"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "PUT, PATCH, POST, GET, DELETE, OPTIONS"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Content-Encoding, x-apollo-tracing"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "payload-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhheXR3YXluZS4xNkBnbWFpbC5jb20iLCJpZCI6IjYzZTAxNWFjMWIxZGJjNGYxM2FjNTFlMiIsImNvbGxlY3Rpb24iOiJ1c2VycyIsInJvbGVzIjpbImFkbWluIl0sImlhdCI6MTY3NzQ0MTc0NSwiZXhwIjoxNjc3NDQ4OTQ1fQ.whPk543tYKd0DNnWKUzk5UCJv2NgrBDNfepitE1IMDk; Path=/; Expires=Sun, 26 Feb 2023 22:02:25 GMT; HttpOnly; SameSite=Lax"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "608"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"260-s6RoOCQCauMEDs9T7oLSwwLA83Q\""
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Auth Passed\",\n    \"user\": {\n        \"id\": \"63e015ac1b1dbc4f13ac51e2\",\n        \"firstName\": \"Hayt\",\n        \"lastName\": \"Wayne\",\n        \"phone\": \"4145857846\",\n        \"address\": \"MI casa\",\n        \"birthDate\": \"1999-01-01T00:00:00.000Z\",\n        \"roles\": [\n            \"admin\"\n        ],\n        \"email\": \"haytwayne.16@gmail.com\",\n        \"createdAt\": \"2023-02-05T20:46:37.042Z\",\n        \"updatedAt\": \"2023-02-26T18:28:00.054Z\"\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhheXR3YXluZS4xNkBnbWFpbC5jb20iLCJpZCI6IjYzZTAxNWFjMWIxZGJjNGYxM2FjNTFlMiIsImNvbGxlY3Rpb24iOiJ1c2VycyIsInJvbGVzIjpbImFkbWluIl0sImlhdCI6MTY3NzQ0MTc0NSwiZXhwIjoxNjc3NDQ4OTQ1fQ.whPk543tYKd0DNnWKUzk5UCJv2NgrBDNfepitE1IMDk\",\n    \"exp\": 1677448945\n}"
+				}
+			]
+		},
+		{
+			"name": "Order Plan Creation Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5b73bdb3-b879-4628-b45d-b3ed99ee5e4c",
+						"exec": [
+							"pm.collectionVariables.set('product', Math.floor(Math.random() * 1000));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "42e59153-f055-4629-b252-54c4bbebfd00",
+						"exec": [
+							"\r",
+							"pm.test(\"Validate the message field is not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData.message).to.exist.and.to.not.be.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Amount is a non-negative integer\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.order.amount).to.be.a('number');\r",
+							"    pm.expect(responseData.order.amount).to.be.at.least(0, \"Amount should be non-negative\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Verify that the 'products' array is present and not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.order.products).to.exist.and.to.be.an('array');\r",
+							"    pm.expect(responseData.order.products.length).to.be.at.least(1, \"Array should contain at least one element\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "ff26278b-6124-423c-bdd0-357587c6341e",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentMethodType\": \"zelle\",\r\n    \"paymentMethod\": {\r\n        \"zelleEmail\": \"{{$randomEmail}}\",\r\n        \"zelleName\": \"{{$randomFullName}}\"\r\n    },\r\n    \"product\": {{productPlanObj}},\r\n    \"referenceNumber\": \"{{randomNumber}}\",\r\n    \"amount\": {{$randomPrice}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/orders/new-user-order",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"orders",
+						"new-user-order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order Course Creation Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "46f8e2e2-c3d5-4ef1-8c5d-488ca918faf4",
+						"exec": [
+							"pm.collectionVariables.set('product', Math.floor(Math.random() * 1000));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ce66cd3b-f77a-4c7a-9a44-a3cea0b5f5a6",
+						"exec": [
+							"\r",
+							"pm.test(\"Validate the message field is not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData.message).to.exist.and.to.not.be.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Amount is a non-negative integer\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.order.amount).to.be.a('number');\r",
+							"    pm.expect(responseData.order.amount).to.be.at.least(0, \"Amount should be non-negative\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Verify that the 'products' array is present and not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.order.products).to.exist.and.to.be.an('array');\r",
+							"    pm.expect(responseData.order.products.length).to.be.at.least(1, \"Array should contain at least one element\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "a2438877-c5b3-493b-ad10-17b70d512075",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentMethodType\": \"zelle\",\r\n    \"paymentMethod\": {\r\n        \"zelleEmail\": \"{{$randomEmail}}\",\r\n        \"zelleName\": \"{{$randomFullName}}\"\r\n    },\r\n    \"product\": {{producCourseObj}},\r\n    \"referenceNumber\": \"{{randomNumber}}\",\r\n    \"amount\": {{$randomPrice}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/orders/new-user-order",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"orders",
+						"new-user-order"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "2f04dd30-8ade-4f35-a7c8-08aa90d83faa",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "c502e8bd-d43c-44d9-8dd5-d6e048d0cb3f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "49d52012-244e-44bb-b435-586194029d77",
+			"key": "productPlanId",
+			"value": ""
+		},
+		{
+			"id": "f0a33c66-2e46-4698-85cc-520b3f10bdb7",
+			"key": "productPlanObj",
+			"value": ""
+		},
+		{
+			"id": "70564a50-a5a2-4641-b171-f7cf20701388",
+			"key": "producCourseId",
+			"value": ""
+		},
+		{
+			"id": "cac79de0-2ee4-4f31-b877-bc20110398a3",
+			"key": "producCourseObj",
+			"value": ""
+		},
+		{
+			"id": "a8db1d68-e924-480f-943c-a54db869da2a",
+			"key": "userEmail",
+			"value": ""
+		},
+		{
+			"id": "0b2d976e-eb12-40d0-a941-c2ea17a60822",
+			"key": "userPassword",
+			"value": ""
+		},
+		{
+			"id": "5fa97ff0-4952-45b5-9f57-e46867de9338",
+			"key": "userId",
+			"value": ""
+		},
+		{
+			"id": "66857c25-52c6-4d03-90a3-d0ac8b63f6ff",
+			"key": "product",
+			"value": ""
+		}
+	]
+}
