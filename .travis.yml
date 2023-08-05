@@ -45,7 +45,7 @@ jobs:
           --verbose
         - >
           docker-compose run postman
-          newman  run Enrollement-Process.postman_collection.json
+          newman  run tests/Enrollement-Process.postman_collection.json
           -e tests/LMS-ENV-LOCAL.postman_environment.json
           -r cli,json
           --reporter-json-export tests/report.json
