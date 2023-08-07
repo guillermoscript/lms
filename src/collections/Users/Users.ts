@@ -195,6 +195,13 @@ const Users: CollectionConfig = {
 				read: isAdminFieldLevel,
 			},
 		},
+		{
+			name: 'score',
+			label: 'Score',
+			type: 'number',
+			defaultValue: 0,
+			// required: true,
+		},
 		slugField('email'),
 	],
 	hooks: {
