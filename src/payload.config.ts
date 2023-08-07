@@ -22,6 +22,7 @@ import { runInactivateSubscriptionAndCreateRenewalOrder } from './lib/cron';
 import { StatusCodes } from 'http-status-codes';
 import { ExamnsSubmissionsAccess, ExamnsSubmissionsFields, ExamnsSubmissionsHooks } from './collections/ExamnsSubmissions';
 import GoogleButton from './components/Google/GoogleButton';
+import Notifications from './collections/Notifications';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
@@ -47,6 +48,7 @@ export default buildConfig({
     Enrollments,
     Evaluations,
     Media,
+    Notifications,
     Lessons,
     PaymentMethods,
     Plans,
