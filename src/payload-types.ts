@@ -15,6 +15,7 @@ export interface Config {
     enrollments: Enrollment;
     evaluations: Evaluation;
     medias: Media;
+    notifications: Notification;
     lessons: Lesson;
     'payment-methods': PaymentMethod;
     plans: Plan;
@@ -494,6 +495,30 @@ export interface Enrollment {
   course?: string | Course;
   status?: 'active' | 'inactive';
   order?: string | Order;
+  updatedAt: string;
+  createdAt: string;
+}
+export interface Notification {
+  id: string;
+  recipient?: string | User;
+  message: string;
+  status: 'active' | 'inactive';
+  type:
+    | 'comment'
+    | 'like'
+    | 'share'
+    | 'follow'
+    | 'mention'
+    | 'message'
+    | 'order'
+    | 'payment'
+    | 'evaluation'
+    | 'request'
+    | 'notification'
+    | 'other';
+  read: boolean;
+  lastModifiedBy?: string | User;
+  createdBy?: string | User;
   updatedAt: string;
   createdAt: string;
 }

@@ -1,6 +1,5 @@
 import { CollectionConfig } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
-import { isRole } from '../access/isRole';
 import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { slugField } from '../fields/slug';
@@ -10,7 +9,6 @@ import { anyone } from '../access/anyone';
 import { createdByField } from '../fields/createdBy';
 import { lastModifiedBy } from '../fields/lastModifiedBy ';
 import { adminEmail, noReplyEmail } from '../utilities/consts';
-import course from '../seed/course';
 
 const Notifications: CollectionConfig = {
     slug: 'notifications',
@@ -124,18 +122,10 @@ const Notifications: CollectionConfig = {
         },
         {
             name: 'read',
-            type: 'radio',
+            type: 'checkbox',
+            required: true,
             defaultValue: false,
-            options: [
-                {
-                    label: 'Leido',
-                    value: 'true',
-                },
-                {
-                    label: 'No leido',
-                    value: 'false',
-                },
-            ],
+            label: 'Leido',
         },
         lastModifiedBy(),
         createdByField(),
