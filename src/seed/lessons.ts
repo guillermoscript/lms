@@ -32,6 +32,7 @@ const lessonsData = [
                 },
             ],
             isPublic: true,
+            score: 8,
             slug: 'introduction-to-javascript',
         },
     },
@@ -66,6 +67,7 @@ const lessonsData = [
                 },
             ],
             isPublic: true,
+            score: 15,
             slug: 'introduction-to-python',
         },
     }

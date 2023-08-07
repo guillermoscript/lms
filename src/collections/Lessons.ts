@@ -12,12 +12,9 @@ import { populateTeacher } from '../hooks/poupulateTeacherField';
 import { slugField } from '../fields/slug';
 import { User } from '../payload-types';
 import { checkRole } from './Users/checkRole';
-import tryCatch from '../utilities/tryCatch';
 import completedBy from '../services/completedBy';
+import addScoreToUser from '../services/addScoreToUser';
 
-
-
-// Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Lessons: CollectionConfig = {
     slug: 'lessons',
     admin: {
@@ -192,6 +189,35 @@ const Lessons: CollectionConfig = {
             relationTo: 'users',
             label: 'Completado por',
             hasMany: true,
+            hooks: {
+                afterChange: [
+                    async ({ req, operation, originalDoc }) => {
+                        if (operation === 'update') {
+                            
+                            const { payload, user } = req
+
+                            if (!user) {
+                                return
+                            }
+                            
+                            const score = originalDoc.score 
+                            try {
+                                const [updatedUser] = await addScoreToUser(score, user, payload)
+                                console.log(updatedUser)
+                                return
+                            } catch (error) {
+                                console.log(error)
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            name: 'score',
+            type: 'number',
+            label: 'Puntaje',
+            defaultValue: 10,
         },
             // {
             //     name: 'course',
