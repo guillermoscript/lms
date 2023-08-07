@@ -114,6 +114,7 @@ export interface User {
   googleId?: string;
   googleProfilePicture?: string;
   googleAccessToken?: string;
+  score?: number;
   slug?: string;
   updatedAt: string;
   createdAt: string;
@@ -143,6 +144,7 @@ export interface Lesson {
     id?: string;
   }[];
   completedBy?: string[] | User[];
+  score?: number;
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   isPublic?: boolean;
