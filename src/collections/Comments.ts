@@ -6,6 +6,7 @@ import { populateCreatedBy } from '../hooks/populateCreatedBy';
 import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { slugField } from '../fields/slug';
 import { anyone } from '../access/anyone';
+import addScoreToUser from '../services/addScoreToUser';
 
 
 const Comments: CollectionConfig = {
@@ -16,7 +17,6 @@ const Comments: CollectionConfig = {
     },
     access: {
         create: anyone,
-        // TODO: Only active subscriptions can access this
         read: anyone,
         update: isAdminOrCreatedBy,
         delete: isAdminOrCreatedBy
@@ -57,6 +57,28 @@ const Comments: CollectionConfig = {
         beforeChange: [
             populateCreatedBy,
             populateLastModifiedBy,
+        ],
+        afterChange: [
+            async ({ req, operation }) => {
+                if (operation === 'create') {
+                    
+                    const { payload, user } = req
+
+                    if (!user) {
+                        return
+                    }
+                    
+                    // for now a static score
+                    const score = 4 
+                    try {
+                        const [updatedUser] = await addScoreToUser(score, user, payload)
+                        console.log(updatedUser)
+                        return
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }
+            }
         ]
     }
 };
