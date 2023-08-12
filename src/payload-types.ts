@@ -344,6 +344,7 @@ export interface Evaluation {
   course?: string | Course;
   endDate: string;
   maxScore: number;
+  score: number;
   evaluationType: 'exam' | 'homework';
   homework?: {
     content: {
