@@ -93,6 +93,12 @@ const Evaluations: CollectionConfig = {
             // }
         },
         {
+            name: 'score',
+            type: 'number',
+            required: true,
+            label: 'Puntaje de experiencia',
+        },
+        {
             name: 'evaluationType',
             type: 'radio',
             required: true,

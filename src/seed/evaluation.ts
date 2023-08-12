@@ -8,6 +8,7 @@ const evaluationData: Seeder = [
             description: 'A test to evaluate your JavaScript skills',
             endDate: '2025-12-31',
             maxScore: 100,
+            score: 10,
             evaluationType: 'exam',
         },
     },
@@ -18,6 +19,7 @@ const evaluationData: Seeder = [
             description: 'A test to evaluate your Python skills',
             endDate: '2025-12-31',
             maxScore: 100,
+            score: 14,
             evaluationType: 'exam',
         },
     }
