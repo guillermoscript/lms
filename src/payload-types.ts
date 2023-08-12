@@ -145,6 +145,7 @@ export interface Lesson {
   }[];
   completedBy?: string[] | User[];
   score?: number;
+  order?: number;
   createdBy?: string | User;
   lastModifiedBy?: string | User;
   isPublic?: boolean;

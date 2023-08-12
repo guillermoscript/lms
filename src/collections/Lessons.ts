@@ -177,12 +177,6 @@ const Lessons: CollectionConfig = {
                 },
             ],
         },
-        // {
-        //     name: 'comments',
-        //     type: 'relationship',
-        //     relationTo: 'comments',
-        //     hasMany: true,
-        // },
         {
             name: 'completedBy',
             type: 'relationship',
@@ -219,12 +213,11 @@ const Lessons: CollectionConfig = {
             label: 'Puntaje',
             defaultValue: 10,
         },
-            // {
-            //     name: 'course',
-            //     type: 'relationship',
-            //     relationTo: 'courses',
-            //     hasMany: false,
-            // },
+        {
+            name: 'order',
+            type: 'number',
+            label: 'Orden numérico de la lección',
+        },
         createdByField(),
         lastModifiedBy(),
         isPublicField(),
