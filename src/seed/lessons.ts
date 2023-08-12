@@ -1,5 +1,6 @@
+import { Seeder } from ".";
 
-const lessonsData = [
+const lessonsData: Seeder = [
     {
         collection: 'lessons',
         data: {
@@ -33,6 +34,7 @@ const lessonsData = [
             ],
             isPublic: true,
             score: 8,
+            order: 1,
             slug: 'introduction-to-javascript',
         },
     },
@@ -68,6 +70,7 @@ const lessonsData = [
             ],
             isPublic: true,
             score: 15,
+            order: 2,
             slug: 'introduction-to-python',
         },
     }
