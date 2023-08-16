@@ -1,4 +1,4 @@
-import { CollectionConfig } from 'payload/types';
+import { Access, CollectionConfig } from 'payload/types';
 import { isAdmin } from '../access/isAdmin';
 import { isAdminOrCreatedBy } from '../access/isAdminOrCreatedBy';
 import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
@@ -15,6 +15,56 @@ import { checkRole } from './Users/checkRole';
 import completedBy from '../services/completedBy';
 import addScoreToUser from '../services/addScoreToUser';
 
+const hasAccessOrIsEnrolled: Access = ({ req: { user, payload }, id }) => {
+
+    if (!user) {
+        return false
+    }
+
+    if (checkRole(['admin', 'teacher'], user as unknown as User)) {
+        return true
+    }  
+
+    async function findIfUserIsEnrolled() {
+        try {
+            const enrollment = await payload.find({
+                collection: 'enrollments',
+                where: {
+                    and: [
+                        {
+                            student: {
+                                equals: user?.id,
+                            },
+                        },
+                        {
+                            status: {
+                                equals: 'active',
+                            },
+                        },
+                        {
+                            'course.lessons': {
+                                in: [id]
+                            }
+                        }
+                    ],
+                }
+            })
+
+            if (!enrollment || enrollment.docs.length === 0) {
+                return false
+            }
+
+            return true
+            
+        } catch (error) {
+            console.log(error)
+            return false
+        }
+    }
+
+    return findIfUserIsEnrolled()
+}
+
 const Lessons: CollectionConfig = {
     slug: 'lessons',
     admin: {
@@ -28,88 +78,7 @@ const Lessons: CollectionConfig = {
     access: {
         create: isAdminOrTeacher,
         // TODO: Only active subscriptions can access this
-        read: ({ req: { user, payload }, id  }) => {
-            
-            console.log('id', id)
-            
-            if (!user) {
-                return false
-            }
-
-            if (checkRole(['admin', 'teacher'], user as unknown as User)) {
-                return true
-            }  
-
-
-            // TODO QA THIS NEW FUNCTION
-            async function findIfUserIsEnrolled() {
-                try {
-                    const enrollment = await payload.find({
-                        collection: 'enrollments',
-                        where: {
-                            and: [
-                                {
-                                    student: {
-                                        equals: user?.id,
-                                    },
-                                },
-                                {
-                                    status: {
-                                        equals: 'active',
-                                    },
-                                },
-                            ],
-                        }
-                    })
-        
-                    console.log(enrollment, "enrollment")
-        
-                     // return enrollment ? true : false
-                    if (!enrollment || enrollment.docs.length === 0) {
-                        return false
-                    }
-        
-                    console.log(enrollment.docs, "enrollment.docs")
-                    const userCourses = enrollment.docs.map((enrollment) => enrollment.course).flat()
-
-                    console.log(userCourses, "userCourses")
-                    
-                    for (let i = 0; i < userCourses.length; i++) {
-                        const course = userCourses[i];
-                        // check if course has lesson]
-                        console.log(course, "course")
-                        
-                        if (course.lessons) {
-                            // check if lesson has id
-                            console.log(course.lessons, "course.lessons")
-
-                            const isLessonInCourse = course.lessons.find((lesson: any) => lesson.id === id)
-
-                            console.log(isLessonInCourse, "isLessonInCourse")
-
-                            if (isLessonInCourse) {
-                                return {
-                                    id: {
-                                        equals: id
-                                    }
-                                }
-                            }
-                        } else {
-                            continue
-                        }
-                    }
-
-                    return false
-
-                } catch (error) {
-                    console.log(error)
-                    return false
-                }
-            }
-
-            return findIfUserIsEnrolled()
-        
-        },
+        read: hasAccessOrIsEnrolled,
         update: isAdminOrCreatedBy,
         delete: isAdmin
     },
