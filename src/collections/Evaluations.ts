@@ -169,6 +169,12 @@ const Evaluations: CollectionConfig = {
             // }
         },
         {
+            name: 'order',
+            type: 'number',
+            required: true,
+            label: 'Orden',
+        },
+        {
             name: 'completedBy',
             type: 'relationship',
             relationTo: 'users',
