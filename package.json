@@ -24,6 +24,7 @@
     "http-status-codes": "^2.2.0",
     "jwt-simple": "^0.5.6",
     "node-cron": "^3.0.2",
+    "openai": "^3.3.0",
     "passport": "^0.6.0",
     "passport-google-oauth2": "^0.2.0",
     "payload": "^1.13.4",

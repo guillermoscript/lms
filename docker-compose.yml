@@ -28,6 +28,7 @@ services:
       CLIENT_SECRET: ${CLIENT_SECRET}
       OAUTH_SERVER: ${OAUTH_SERVER}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      OPEN_AI_KEY: ${OPEN_AI_KEY}
 
     networks:
       - app-network
