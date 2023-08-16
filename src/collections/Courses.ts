@@ -1,5 +1,4 @@
-import type { BeforeChangeHook } from 'payload/dist/collections/config/types'
-import { CollectionConfig } from 'payload/types';
+import { CollectionConfig, FieldAccess } from 'payload/types';
 import { isAdmin } from '../access/isAdmin';
 import { isAdminOrCreatedBy, isAdminOrCreatedByFieldLevel } from '../access/isAdminOrCreatedBy';
 import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
@@ -14,12 +13,61 @@ import { slugField } from '../fields/slug';
 import { anyone } from '../access/anyone';
 import { checkRole } from './Users/checkRole';
 import payload from 'payload';
-import tryCatch from '../utilities/tryCatch';
 import completedBy from '../services/completedBy';
 import { adminEmail, noReplyEmail } from '../utilities/consts';
-import { Course } from '../payload-types';
+import { Course, User } from '../payload-types';
 import { StatusCodes } from 'http-status-codes';
 
+const findIfUserHasAccessToCourse: FieldAccess<{ id: string }, unknown, User> = ({ req, id }) => {
+
+    const user = req.user as User
+
+    if (!user) {
+        return false
+    }
+
+    if (checkRole(['admin', 'teacher'], user)) {
+        return true
+    }
+
+    async function findIfUserIsEnrolled() {
+        try {
+            const enrollment = await payload.find({
+                collection: 'enrollments',
+                where: {
+                    and: [
+                        {
+                            student: {
+                                equals: user?.id,
+                            },
+                        },
+                        {
+                            status: {
+                                equals: 'active',
+                            },
+                        },
+                        {
+                            course: {
+                                equals: id,
+                            },
+                        }
+                    ],
+                }
+            })
+
+            if (!enrollment || enrollment.docs.length === 0) {
+                return false
+            }
+
+            return true
+        } catch (error) {
+            console.log(error)
+            return false
+        }
+    }
+
+    return findIfUserIsEnrolled()
+}
 
 // Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Courses: CollectionConfig = {
@@ -65,7 +113,7 @@ const Courses: CollectionConfig = {
                     return true
                 },
                 update: isAdminOrCreatedByFieldLevel
-                
+
             },
             filterOptions: ({ relationTo, siblingData, user }) => {
                 return {
@@ -81,56 +129,17 @@ const Courses: CollectionConfig = {
             relationTo: 'lessons',
             hasMany: true,
             access: {
-                read: ({ req }) => {
-                    
-                    const user = req.user
-
-                    if (!user) {
-                        return false
-                    }
-
-                    if (checkRole([ 'admin','teacher'], req.user)) {
-                        return true
-                    }
-
-                    async function findIfUserIsEnrolled() {
-                        try {
-                            const enrollment = await payload.find({
-                                collection: 'enrollments',
-                                where: {
-                                    and: [
-                                        {
-                                            student: {
-                                                equals: user?.id,
-                                            },
-                                        },
-                                        {
-                                            status: {
-                                                equals: 'active',
-                                            },
-                                        },
-                                        {
-                                            course: {
-                                                equals: req.params.id,
-                                            },
-                                        }
-                                    ],
-                                }
-                            })
-                            // return enrollment ? true : false
-                            if (!enrollment || enrollment.docs.length === 0) {
-                                return false
-                            }
-
-                            return true
-                        } catch (error) {
-                            console.log(error)
-                            return false
-                        }
-                    }
-
-                    return findIfUserIsEnrolled()
-                },
+                read: findIfUserHasAccessToCourse,
+                update: isAdminOrCreatedByFieldLevel
+            },
+        },
+        {
+            name: 'evaluations',
+            type: 'relationship',
+            relationTo: 'evaluations',
+            hasMany: true,
+            access: {
+                read: findIfUserHasAccessToCourse,
                 update: isAdminOrCreatedByFieldLevel
             },
         },
@@ -162,9 +171,9 @@ const Courses: CollectionConfig = {
     },
     endpoints: [
         {
-			path: '/:id/completed-by',
-			method: 'post',
-			handler: async (req, res, next) => {
+            path: '/:id/completed-by',
+            method: 'post',
+            handler: async (req, res, next) => {
                 const [courseUpdated, error] = await completedBy({
                     collection: 'courses',
                     id: req.params.id,
@@ -188,7 +197,7 @@ const Courses: CollectionConfig = {
                     subject: 'Curso completado',
                     html: `<h1>Felicidades</h1><p>Has completado el curso ${course.name}</p>`
                 })
-                
+
                 req.payload.sendEmail({
                     from: noReplyEmail,
                     to: adminEmail!,
