@@ -1,3 +1,4 @@
+import { Configuration, OpenAIApi } from 'openai';
 import { Access, Field, PayloadRequest } from "payload/types";
 import { createdByField } from "../fields/createdBy";
 import { lastModifiedBy } from "../fields/lastModifiedBy ";
@@ -10,6 +11,7 @@ import { BeforeOperationHook, BeforeValidateHook, BeforeChangeHook, AfterChangeH
 import { isLoggedIn } from "../access/isLoggedIn";
 import { checkRole } from "./Users/checkRole";
 import { isAdmin } from "../access/isAdmin";
+import { historyTeacherPrompt, openAiService } from "../services/openAi";
 
 export const ExamnsSubmissionsFields: Field[] = [
 
@@ -27,6 +29,11 @@ export const ExamnsSubmissionsFields: Field[] = [
     {
         name: 'teacherComments',
         type: 'richText',
+        required: false,
+    },
+    {
+        name: 'gptResponse',
+        type: 'json',
         required: false,
     },
     {
@@ -195,6 +202,88 @@ export const ExamnsSubmissionsHooks: {
                 html,
                 from: noReplyEmail,
             })
+        },
+        async ({
+            doc, // full document data
+            req, // full express request
+            previousDoc, // document data before updating the collection
+            operation, // name of the operation ie. 'create', 'update'
+        }) => {
+            if (operation === 'update') {
+                return doc
+            }
+
+            const questionsData: Array<{
+                name: string;
+                label: string;
+                id: string;
+            }> = doc.form.fields
+            const answersData: Array<{
+                field: string;
+                value: string;
+                id: string;
+            }> = doc.submissionData
+
+            let prompt = ``
+
+            for (let index = 0; index < questionsData.length; index++) {
+                const element = questionsData[index];
+
+                const question = element.label
+                const answer = answersData[index].value
+
+                const final = `
+                    question: ${question}
+                    answer: ${answer}
+                `
+                prompt += final
+            }
+
+            const configuration = new Configuration({
+                apiKey: process.env.OPENAI_API_KEY,
+            });
+
+            const openai = new OpenAIApi(configuration);
+
+            const [completion, err] = await tryCatch(openai.createChatCompletion({
+                model: "gpt-3.5-turbo-16k",
+                messages: [{
+                    "role": "system",
+                    "content": historyTeacherPrompt
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }],
+                temperature: 0.11,
+                max_tokens: 10324,
+                top_p: 1,
+                frequency_penalty: 0.34,
+                presence_penalty: 0.25,
+            }));
+
+            if (err) {
+                console.log(err)
+                return doc
+            }
+
+            const response = completion.data.choices[0].message?.content
+            const { payload } = req
+            const [updatedEvaluation, error] = await tryCatch(payload.update({
+                collection: 'examns-submissions',
+                id: doc.id,
+                data: {
+                    gptResponse: response,
+                },
+                depth: 1,
+            }))
+
+            if (error) {
+                console.log(error, 'erearaerearare')
+                return doc
+            }
+
+            return doc
         }
     ],
 }
