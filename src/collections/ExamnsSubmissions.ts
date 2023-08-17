@@ -267,7 +267,7 @@ export const ExamnsSubmissionsHooks: {
                 return doc
             }
 
-            const response = completion.data.choices[0].message?.content
+            const response = completion?.data.choices[0].message?.content
             const { payload } = req
             const [updatedEvaluation, error] = await tryCatch(payload.update({
                 collection: 'examns-submissions',
