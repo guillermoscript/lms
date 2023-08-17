@@ -69,7 +69,6 @@ const findIfUserHasAccessToCourse: FieldAccess<{ id: string }, unknown, User> = 
     return findIfUserIsEnrolled()
 }
 
-// Example Collection - For reference only, this must be added to payload.config.ts to be used.
 const Courses: CollectionConfig = {
     slug: 'courses',
     admin: {
