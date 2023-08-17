@@ -1,10 +1,8 @@
 import { CollectionConfig, PayloadRequest } from 'payload/types';
 import { isAdminOrEditor } from '../access/isAdminOrEditor';
-import { isEnrolledOrHasAccess } from '../access/isEnrolledOrHasAccess';
 import periodicity from '../fields/periodicity';
 import orderRelation from '../fields/orderRelation';
 import { checkRole } from './Users/checkRole';
-import { slugField } from '../fields/slug';
 import tryCatch from '../utilities/tryCatch';
 import { Subscription } from '../payload-types';
 import { PaginatedDocs } from 'payload/dist/mongoose/types';
@@ -70,10 +68,26 @@ const Subscriptions: CollectionConfig = {
             if (checkRole(['admin', 'editor', 'teacher'], user)) {
                 return true
             }
-            // TODO: let a user type student enroll in a course
+            // TODO: let a user type student enroll in a course, this will be needed for the checkout process with automatic enrollment
+            
             return false
         },
-        read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
+        read: ({ req: { user } }) => {
+
+            if (!user) {
+                return false
+            }
+
+            if (checkRole(['admin', 'editor', 'teacher'], user)) {
+                return true
+            }
+
+            return {
+                'user': {
+                    equals: user.id
+                }
+            }
+        },
         update: isAdminOrEditor,
         delete: isAdminOrEditor
     },
