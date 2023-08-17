@@ -80,9 +80,9 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     if (err4 || !lessonsSeeded) return
 
-    const [exams, err5] = await seeder(payload, programmingExam)
+    // const [exams, err5] = await seeder(payload, programmingExam)
 
-    if (err5 || !exams) return
+    // if (err5 || !exams) return
 
     const evaluations = evaluationData.map((evaluation, index) => {
         return {
