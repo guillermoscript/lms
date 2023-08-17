@@ -1,4 +1,4 @@
-import { Access, CollectionConfig } from 'payload/types';
+import { CollectionConfig } from 'payload/types';
 import { isAdmin } from '../access/isAdmin';
 import { isAdminOrCreatedBy } from '../access/isAdminOrCreatedBy';
 import { isAdminOrTeacher } from '../access/isAdminOrTeacher';
@@ -14,56 +14,7 @@ import { User } from '../payload-types';
 import { checkRole } from './Users/checkRole';
 import completedBy from '../services/completedBy';
 import addScoreToUser from '../services/addScoreToUser';
-
-const hasAccessOrIsEnrolled: Access = ({ req: { user, payload }, id }) => {
-
-    if (!user) {
-        return false
-    }
-
-    if (checkRole(['admin', 'teacher'], user as unknown as User)) {
-        return true
-    }  
-
-    async function findIfUserIsEnrolled() {
-        try {
-            const enrollment = await payload.find({
-                collection: 'enrollments',
-                where: {
-                    and: [
-                        {
-                            student: {
-                                equals: user?.id,
-                            },
-                        },
-                        {
-                            status: {
-                                equals: 'active',
-                            },
-                        },
-                        {
-                            'course.lessons': {
-                                in: [id]
-                            }
-                        }
-                    ],
-                }
-            })
-
-            if (!enrollment || enrollment.docs.length === 0) {
-                return false
-            }
-
-            return true
-            
-        } catch (error) {
-            console.log(error)
-            return false
-        }
-    }
-
-    return findIfUserIsEnrolled()
-}
+import hasAccessOrIsEnrolled from '../access/hasAccessOrIsEnrolled';
 
 const Lessons: CollectionConfig = {
     slug: 'lessons',
@@ -77,8 +28,7 @@ const Lessons: CollectionConfig = {
     },
     access: {
         create: isAdminOrTeacher,
-        // TODO: Only active subscriptions can access this
-        read: hasAccessOrIsEnrolled,
+        read: ({ req: { user, payload }, id }) => hasAccessOrIsEnrolled({ req: { user, payload }, id }, 'lessons'),
         update: isAdminOrCreatedBy,
         delete: isAdmin
     },
