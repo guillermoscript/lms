@@ -18,11 +18,11 @@ import { adminEmail, noReplyEmail } from '../utilities/consts';
 import { Course, User } from '../payload-types';
 import { StatusCodes } from 'http-status-codes';
 
-const findIfUserHasAccessToCourse: FieldAccess<{ id: string }, unknown, User> = ({ req, id }) => {
+const findIfUserHasAccessToCourse: FieldAccess<{ id: string }, unknown, User> = async ({ req, id }) => {
 
     const user = req.user as User
 
-    if (!user) {
+    if (!user || !id) {
         return false
     }
 
@@ -30,43 +30,39 @@ const findIfUserHasAccessToCourse: FieldAccess<{ id: string }, unknown, User> = 
         return true
     }
 
-    async function findIfUserIsEnrolled() {
-        try {
-            const enrollment = await payload.find({
-                collection: 'enrollments',
-                where: {
-                    and: [
-                        {
-                            student: {
-                                equals: user?.id,
-                            },
+    try {
+        const enrollment = await payload.find({
+            collection: 'enrollments',
+            where: {
+                and: [
+                    {
+                        student: {
+                            equals: user?.id,
                         },
-                        {
-                            status: {
-                                equals: 'active',
-                            },
+                    },
+                    {
+                        status: {
+                            equals: 'active',
                         },
-                        {
-                            course: {
-                                equals: id,
-                            },
-                        }
-                    ],
-                }
-            })
-
-            if (!enrollment || enrollment.docs.length === 0) {
-                return false
+                    },
+                    {
+                        course: {
+                            equals: id,
+                        },
+                    }
+                ],
             }
+        })
 
-            return true
-        } catch (error) {
-            console.log(error)
+        if (!enrollment || enrollment.docs.length === 0) {
             return false
         }
-    }
 
-    return findIfUserIsEnrolled()
+        return true
+    } catch (error) {
+        console.log(error)
+        return false
+    }
 }
 
 const Courses: CollectionConfig = {
