@@ -131,8 +131,6 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     if (err7 || !courseSeeded) return
 
-    console.log(courseSeeded, ' < === courseSeeded')
-
 
     const plans = plansSeed.map((plan, index) => {
         return {
@@ -150,8 +148,6 @@ export const seed = async (payload: Payload): Promise<void> => {
     const [plansSeeded, err8] = await seeder(payload, plans)
 
     if (err8 || !plansSeeded) return
-
-    console.log(plansSeeded, ' < === plansSeeded')
 
     const products = productsSeed.map((product, index) => {
         return {
@@ -179,8 +175,6 @@ export const seed = async (payload: Payload): Promise<void> => {
     const [productsSeeded, err9] = await seeder(payload, products)
 
     if (err9 || !productsSeeded) return
-
-    console.log(productsSeeded, ' < === productsSeeded')
 
     payload.logger.info('Seeding complete')
 
