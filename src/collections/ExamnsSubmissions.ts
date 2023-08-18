@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from 'openai';
+// import { Configuration, OpenAIApi } from 'openai';
 import { Access, Field, PayloadRequest } from "payload/types";
 import { createdByField } from "../fields/createdBy";
 import { lastModifiedBy } from "../fields/lastModifiedBy ";
@@ -203,88 +203,88 @@ export const ExamnsSubmissionsHooks: {
                 from: noReplyEmail,
             })
         },
-        async ({
-            doc, // full document data
-            req, // full express request
-            previousDoc, // document data before updating the collection
-            operation, // name of the operation ie. 'create', 'update'
-        }) => {
-            if (operation === 'update') {
-                return doc
-            }
+        // async ({
+        //     doc, // full document data
+        //     req, // full express request
+        //     previousDoc, // document data before updating the collection
+        //     operation, // name of the operation ie. 'create', 'update'
+        // }) => {
+        //     if (operation === 'update') {
+        //         return doc
+        //     }
 
-            const questionsData: Array<{
-                name: string;
-                label: string;
-                id: string;
-            }> = doc.form.fields
-            const answersData: Array<{
-                field: string;
-                value: string;
-                id: string;
-            }> = doc.submissionData
+        //     const questionsData: Array<{
+        //         name: string;
+        //         label: string;
+        //         id: string;
+        //     }> = doc.form.fields
+        //     const answersData: Array<{
+        //         field: string;
+        //         value: string;
+        //         id: string;
+        //     }> = doc.submissionData
 
-            let prompt = ``
+        //     let prompt = ``
 
-            for (let index = 0; index < questionsData.length; index++) {
-                const element = questionsData[index];
+        //     for (let index = 0; index < questionsData.length; index++) {
+        //         const element = questionsData[index];
 
-                const question = element.label
-                const answer = answersData[index].value
+        //         const question = element.label
+        //         const answer = answersData[index].value
 
-                const final = `
-                    question: ${question}
-                    answer: ${answer}
-                `
-                prompt += final
-            }
+        //         const final = `
+        //             question: ${question}
+        //             answer: ${answer}
+        //         `
+        //         prompt += final
+        //     }
 
-            const configuration = new Configuration({
-                apiKey: process.env.OPENAI_API_KEY,
-            });
+        //     const configuration = new Configuration({
+        //         apiKey: process.env.OPENAI_API_KEY,
+        //     });
 
-            const openai = new OpenAIApi(configuration);
+        //     const openai = new OpenAIApi(configuration);
 
-            const [completion, err] = await tryCatch(openai.createChatCompletion({
-                model: "gpt-3.5-turbo-16k",
-                messages: [{
-                    "role": "system",
-                    "content": historyTeacherPrompt
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }],
-                temperature: 0.11,
-                max_tokens: 10324,
-                top_p: 1,
-                frequency_penalty: 0.34,
-                presence_penalty: 0.25,
-            }));
+        //     const [completion, err] = await tryCatch(openai.createChatCompletion({
+        //         model: "gpt-3.5-turbo-16k",
+        //         messages: [{
+        //             "role": "system",
+        //             "content": historyTeacherPrompt
+        //         },
+        //         {
+        //             "role": "user",
+        //             "content": prompt
+        //         }],
+        //         temperature: 0.11,
+        //         max_tokens: 10324,
+        //         top_p: 1,
+        //         frequency_penalty: 0.34,
+        //         presence_penalty: 0.25,
+        //     }));
 
-            if (err) {
-                console.log(err)
-                return doc
-            }
+        //     if (err) {
+        //         console.log(err)
+        //         return doc
+        //     }
 
-            const response = completion?.data.choices[0].message?.content
-            const { payload } = req
-            const [updatedEvaluation, error] = await tryCatch(payload.update({
-                collection: 'examns-submissions',
-                id: doc.id,
-                data: {
-                    gptResponse: response,
-                },
-                depth: 1,
-            }))
+        //     const response = completion?.data.choices[0].message?.content
+        //     const { payload } = req
+        //     const [updatedEvaluation, error] = await tryCatch(payload.update({
+        //         collection: 'examns-submissions',
+        //         id: doc.id,
+        //         data: {
+        //             gptResponse: response,
+        //         },
+        //         depth: 1,
+        //     }))
 
-            if (error) {
-                console.log(error, 'erearaerearare')
-                return doc
-            }
+        //     if (error) {
+        //         console.log(error, 'erearaerearare')
+        //         return doc
+        //     }
 
-            return doc
-        }
+        //     return doc
+        // }
     ],
 }
 
