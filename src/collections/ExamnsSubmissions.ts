@@ -11,7 +11,7 @@ import { BeforeOperationHook, BeforeValidateHook, BeforeChangeHook, AfterChangeH
 import { isLoggedIn } from "../access/isLoggedIn";
 import { checkRole } from "./Users/checkRole";
 import { isAdmin } from "../access/isAdmin";
-import { historyTeacherPrompt, openAiService } from "../services/openAi";
+// import { historyTeacherPrompt, openAiService } from "../services/openAi";
 
 export const ExamnsSubmissionsFields: Field[] = [
 
