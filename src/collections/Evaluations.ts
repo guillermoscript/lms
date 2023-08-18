@@ -29,7 +29,7 @@ const Evaluations: CollectionConfig = {
     access: {
         create: isAdminOrTeacher,
         // TODO 
-        read: ({ req: { user, payload }, id }) => hasAccessOrIsEnrolled({ req: { user, payload }, id }, 'evaluations'),
+        read: async ({ req: { user, payload }, id }) =>  await hasAccessOrIsEnrolled({ req: { user, payload }, id }, 'evaluations'),
         update: isLoggedIn,
         delete: isAdmin
     },

@@ -28,7 +28,7 @@ const Lessons: CollectionConfig = {
     },
     access: {
         create: isAdminOrTeacher,
-        read: ({ req: { user, payload }, id }) => hasAccessOrIsEnrolled({ req: { user, payload }, id }, 'lessons'),
+        read: async ({ req: { user, payload }, id }) =>  await hasAccessOrIsEnrolled({ req: { user, payload }, id }, 'lessons'),
         update: isAdminOrCreatedBy,
         delete: isAdmin
     },
