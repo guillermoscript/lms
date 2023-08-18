@@ -84,7 +84,6 @@ const Enrollments: CollectionConfig = {
             }
 
         },
-        // read: ({ req: { user } }) => isEnrolledOrHasAccess(['admin', 'editor', 'teacher'], user),
         update: isAdminOrEditor,
         delete: isAdminOrEditor
     },
