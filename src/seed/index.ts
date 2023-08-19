@@ -11,6 +11,7 @@ import evaluationData from './evaluation';
 import courseSeed from './course';
 import plansSeed from './plans';
 import productsSeed from './product';
+import promptSeed from './prompts';
 
 export type Seeder = Array<{
     collection: string,
@@ -80,6 +81,21 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     if (err4 || !lessonsSeeded) return
 
+    const promptData = promptSeed.map((prompt, index) => {
+        return {
+            ...prompt,
+            data: {
+                ...prompt.data,
+                // @ts-ignore
+                category: categoriesSeeded[index].id,
+            }
+        }
+    })
+
+    const [promptSeeded, errseed] = await seeder(payload, promptData)
+
+    if (errseed || !promptSeeded) return
+
     // const [exams, err5] = await seeder(payload, programmingExam)
 
     // if (err5 || !exams) return
@@ -89,6 +105,8 @@ export const seed = async (payload: Payload): Promise<void> => {
             ...evaluation,
             data: {
                 ...evaluation.data,
+                // @ts-ignore
+                prompt: promptSeeded[index].id,
                 exam: {
                     content: [
                         {
