@@ -20,6 +20,7 @@ export interface Config {
     'payment-methods': PaymentMethod;
     plans: Plan;
     products: Product;
+    prompts: Prompt;
     reviews: Review;
     subscriptions: Subscription;
     orders: Order;
@@ -185,6 +186,7 @@ export interface Evaluation {
   completedBy?: string[] | User[];
   approvedBy?: string[] | User[];
   reprovedBy?: string[] | User[];
+  prompt?: string | Prompt;
   lastModifiedBy?: string | User;
   createdBy?: string | User;
   slug?: string;
@@ -306,6 +308,17 @@ export interface Examn {
     }[];
     id?: string;
   }[];
+  updatedAt: string;
+  createdAt: string;
+}
+export interface Prompt {
+  id: string;
+  name: string;
+  prompt: string;
+  category: string[] | Category[];
+  createdBy?: string | User;
+  lastModifiedBy?: string | User;
+  slug?: string;
   updatedAt: string;
   createdAt: string;
 }
