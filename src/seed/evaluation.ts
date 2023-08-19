@@ -9,6 +9,7 @@ const evaluationData: Seeder = [
             endDate: '2025-12-31',
             maxScore: 100,
             score: 10,
+            order: 1,
             evaluationType: 'exam',
         },
     },
@@ -20,6 +21,7 @@ const evaluationData: Seeder = [
             endDate: '2025-12-31',
             maxScore: 100,
             score: 14,
+            order: 2,
             evaluationType: 'exam',
         },
     }

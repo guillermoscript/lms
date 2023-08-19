@@ -1,15 +1,17 @@
+import { Configuration, OpenAIApi } from 'openai';
 import { Access, Field, PayloadRequest } from "payload/types";
 import { createdByField } from "../fields/createdBy";
 import { lastModifiedBy } from "../fields/lastModifiedBy ";
 import { populateLastModifiedBy } from "../hooks/populateLastModifiedBy";
 import { populateCreatedBy } from "../hooks/populateCreatedBy";
-import { Evaluation, ExamnsSubmission, User } from "../payload-types";
+import { Evaluation, ExamnsSubmission, Prompt, User } from "../payload-types";
 import { noReplyEmail } from "../utilities/consts";
 import tryCatch from "../utilities/tryCatch";
 import { BeforeOperationHook, BeforeValidateHook, BeforeChangeHook, AfterChangeHook, BeforeReadHook, AfterReadHook, BeforeDeleteHook, AfterDeleteHook, AfterErrorHook, BeforeLoginHook, AfterLoginHook, AfterLogoutHook, AfterMeHook, AfterRefreshHook, AfterForgotPasswordHook } from "payload/dist/collections/config/types";
 import { isLoggedIn } from "../access/isLoggedIn";
 import { checkRole } from "./Users/checkRole";
 import { isAdmin } from "../access/isAdmin";
+import { historyTeacherPrompt, openAiService } from "../services/openAi";
 
 export const ExamnsSubmissionsFields: Field[] = [
 
@@ -27,6 +29,11 @@ export const ExamnsSubmissionsFields: Field[] = [
     {
         name: 'teacherComments',
         type: 'richText',
+        required: false,
+    },
+    {
+        name: 'gptResponse',
+        type: 'json',
         required: false,
     },
     {
@@ -195,6 +202,106 @@ export const ExamnsSubmissionsHooks: {
                 html,
                 from: noReplyEmail,
             })
+        },
+        async ({
+            doc, // full document data
+            req, // full express request
+            previousDoc, // document data before updating the collection
+            operation, // name of the operation ie. 'create', 'update'
+        }) => {
+            if (operation === 'update') {
+                return doc
+            }
+
+            const questionsData: Array<{
+                name: string;
+                label: string;
+                id: string;
+            }> = doc.form.fields
+            const answersData: Array<{
+                field: string;
+                value: string;
+                id: string;
+            }> = doc.submissionData
+
+            console.log(doc)
+            const evaluation = doc.evaluation as Evaluation
+
+            const promptId: string = evaluation?.prompt as string
+
+            const [initialPrompt, promptError] = await tryCatch(req.payload.findByID({
+                collection: 'prompts',
+                id: promptId,
+            }))
+
+            if (promptError) {
+                console.log(promptError)
+                return doc
+            }
+
+            let prompt = ``
+
+            for (let index = 0; index < questionsData.length; index++) {
+                const element = questionsData[index];
+
+                const question = element.label
+                const answer = answersData[index].value
+
+                const final = `
+                    question: ${question}
+                    answer: ${answer}
+                `
+                prompt += final
+            }
+
+            
+            const configuration = new Configuration({
+                apiKey: process.env.OPENAI_API_KEY,
+            });
+
+            const openai = new OpenAIApi(configuration);
+
+            const [completion, err] = await tryCatch(openai.createChatCompletion({
+                model: "gpt-3.5-turbo-16k",
+                messages: [{
+                    "role": "system",
+                    "content": initialPrompt.prompt
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }],
+                temperature: 0.11,
+                max_tokens: 10324,
+                top_p: 1,
+                frequency_penalty: 0.34,
+                presence_penalty: 0.25,
+            }));
+
+            if (err) {
+                console.log(err)
+                return doc
+            }
+
+            console.log(process.env.OPENAI_API_KEY, 'process.env.OPENAI_API_KEY')
+
+            const response = completion?.data.choices[0].message?.content
+            const { payload } = req
+            const [updatedEvaluation, error] = await tryCatch(payload.update({
+                collection: 'examns-submissions',
+                id: doc.id,
+                data: {
+                    gptResponse: response,
+                },
+                depth: 1,
+            }))
+
+            if (error) {
+                console.log(error, 'erearaerearare')
+                return doc
+            }
+
+            return doc
         }
     ],
 }

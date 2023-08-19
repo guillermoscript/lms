@@ -11,6 +11,7 @@ import evaluationData from './evaluation';
 import courseSeed from './course';
 import plansSeed from './plans';
 import productsSeed from './product';
+import promptSeed from './prompts';
 
 export type Seeder = Array<{
     collection: string,
@@ -80,15 +81,32 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     if (err4 || !lessonsSeeded) return
 
-    const [exams, err5] = await seeder(payload, programmingExam)
+    const promptData = promptSeed.map((prompt, index) => {
+        return {
+            ...prompt,
+            data: {
+                ...prompt.data,
+                // @ts-ignore
+                category: categoriesSeeded[index].id,
+            }
+        }
+    })
 
-    if (err5 || !exams) return
+    const [promptSeeded, errseed] = await seeder(payload, promptData)
+
+    if (errseed || !promptSeeded) return
+
+    // const [exams, err5] = await seeder(payload, programmingExam)
+
+    // if (err5 || !exams) return
 
     const evaluations = evaluationData.map((evaluation, index) => {
         return {
             ...evaluation,
             data: {
                 ...evaluation.data,
+                // @ts-ignore
+                prompt: promptSeeded[index].id,
                 exam: {
                     content: [
                         {
@@ -131,8 +149,6 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     if (err7 || !courseSeeded) return
 
-    console.log(courseSeeded, ' < === courseSeeded')
-
 
     const plans = plansSeed.map((plan, index) => {
         return {
@@ -150,8 +166,6 @@ export const seed = async (payload: Payload): Promise<void> => {
     const [plansSeeded, err8] = await seeder(payload, plans)
 
     if (err8 || !plansSeeded) return
-
-    console.log(plansSeeded, ' < === plansSeeded')
 
     const products = productsSeed.map((product, index) => {
         return {
@@ -179,8 +193,6 @@ export const seed = async (payload: Payload): Promise<void> => {
     const [productsSeeded, err9] = await seeder(payload, products)
 
     if (err9 || !productsSeeded) return
-
-    console.log(productsSeeded, ' < === productsSeeded')
 
     payload.logger.info('Seeding complete')
 

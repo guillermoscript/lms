@@ -23,6 +23,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ExamnsSubmissionsAccess, ExamnsSubmissionsFields, ExamnsSubmissionsHooks } from './collections/ExamnsSubmissions';
 import GoogleButton from './components/Google/GoogleButton';
 import Notifications from './collections/Notifications';
+import Prompts from './collections/Prompt';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
@@ -53,6 +54,7 @@ export default buildConfig({
     PaymentMethods,
     Plans,
     Products,
+    Prompts,
     Reviews,
     Subscriptions,
     Orders,
