@@ -4,7 +4,7 @@ import { createdByField } from "../fields/createdBy";
 import { lastModifiedBy } from "../fields/lastModifiedBy ";
 import { populateLastModifiedBy } from "../hooks/populateLastModifiedBy";
 import { populateCreatedBy } from "../hooks/populateCreatedBy";
-import { Evaluation, ExamnsSubmission, User } from "../payload-types";
+import { Evaluation, ExamnsSubmission, Prompt, User } from "../payload-types";
 import { noReplyEmail } from "../utilities/consts";
 import tryCatch from "../utilities/tryCatch";
 import { BeforeOperationHook, BeforeValidateHook, BeforeChangeHook, AfterChangeHook, BeforeReadHook, AfterReadHook, BeforeDeleteHook, AfterDeleteHook, AfterErrorHook, BeforeLoginHook, AfterLoginHook, AfterLogoutHook, AfterMeHook, AfterRefreshHook, AfterForgotPasswordHook } from "payload/dist/collections/config/types";
@@ -224,6 +224,21 @@ export const ExamnsSubmissionsHooks: {
                 id: string;
             }> = doc.submissionData
 
+            console.log(doc)
+            const evaluation = doc.evaluation as Evaluation
+
+            const promptId: string = evaluation?.prompt as string
+
+            const [initialPrompt, promptError] = await tryCatch(req.payload.findByID({
+                collection: 'prompts',
+                id: promptId,
+            }))
+
+            if (promptError) {
+                console.log(promptError)
+                return doc
+            }
+
             let prompt = ``
 
             for (let index = 0; index < questionsData.length; index++) {
@@ -250,7 +265,7 @@ export const ExamnsSubmissionsHooks: {
                 model: "gpt-3.5-turbo-16k",
                 messages: [{
                     "role": "system",
-                    "content": historyTeacherPrompt
+                    "content": initialPrompt.prompt
                 },
                 {
                     "role": "user",
@@ -281,10 +296,10 @@ export const ExamnsSubmissionsHooks: {
                 depth: 1,
             }))
 
-            // if (error) {
-            //     console.log(error, 'erearaerearare')
-            //     return doc
-            // }
+            if (error) {
+                console.log(error, 'erearaerearare')
+                return doc
+            }
 
             return doc
         }
