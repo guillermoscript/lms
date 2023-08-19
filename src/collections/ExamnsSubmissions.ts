@@ -11,7 +11,7 @@ import { BeforeOperationHook, BeforeValidateHook, BeforeChangeHook, AfterChangeH
 import { isLoggedIn } from "../access/isLoggedIn";
 import { checkRole } from "./Users/checkRole";
 import { isAdmin } from "../access/isAdmin";
-import { historyTeacherPrompt, openAiService } from "../services/openAi";
+// import { historyTeacherPrompt, openAiService } from "../services/openAi";
 
 export const ExamnsSubmissionsFields: Field[] = [
 
@@ -282,8 +282,6 @@ export const ExamnsSubmissionsHooks: {
                 console.log(err)
                 return doc
             }
-
-            console.log(process.env.OPENAI_API_KEY, 'process.env.OPENAI_API_KEY')
 
             const response = completion?.data.choices[0].message?.content
             const { payload } = req
