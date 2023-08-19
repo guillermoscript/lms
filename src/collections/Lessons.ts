@@ -137,6 +137,13 @@ const Lessons: CollectionConfig = {
             type: 'number',
             label: 'Orden numérico de la lección',
         },
+
+        {
+            name: 'prompt',
+            type: 'relationship',
+            relationTo: 'prompts',
+            label: 'Prompts de OpenAI a usar para ayudar al estudiante a completar la lección',
+        },
         createdByField(),
         lastModifiedBy(),
         isPublicField(),
