@@ -154,6 +154,12 @@ const Evaluations: CollectionConfig = {
             relationTo: 'users',
             hasMany: true,
         },
+        {
+            name: 'prompt',
+            type: 'relationship',
+            relationTo: 'prompts',
+            label: 'Prompts de OpenAI a usar para evaluar con profebot',
+        },
         lastModifiedBy(),
         createdByField(),
         slugField('name'),
