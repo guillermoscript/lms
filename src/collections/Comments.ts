@@ -7,6 +7,7 @@ import { populateLastModifiedBy } from '../hooks/populateLastModifiedBy';
 import { slugField } from '../fields/slug';
 import { anyone } from '../access/anyone';
 import addScoreToUser from '../services/addScoreToUser';
+import { Comment } from '../payload-types';
 
 
 const Comments: CollectionConfig = {
@@ -78,6 +79,54 @@ const Comments: CollectionConfig = {
                         console.log(error)
                     }
                 }
+            },
+
+            async ({ req, operation, doc }) => {
+                if (operation !== 'create') {
+                    return
+                }
+                const comment = doc as Comment
+                const { user, payload } = req
+
+                const relationTo = comment?.commentable?.relationTo
+                const id = comment?.commentable?.value?.id as string
+
+                if (!relationTo || !id) {
+                    return
+                }
+
+                if (relationTo === 'products' || relationTo === 'courses') {
+                    return
+                }
+
+
+                const [commentable, commentableError] = await payload.findByID({
+                    collection: relationTo,
+                    id: id,
+                })
+
+                if (commentableError) {
+                    console.log(commentableError, "commentableError")
+                    return
+                }
+
+                const [notification, notificationError] = await payload.create({
+                    collection: 'notifications',
+                    data: {
+                        recipient: commentable?.createdBy,
+                        type: 'comment',
+                        status: 'active',
+                        message: `${user?.firstName} ${user?.lastName} ha comentado en tu ${relationTo}`,
+                        read: false,
+                    }
+                })
+
+                if (notificationError) {
+                    console.log(notificationError)
+                    return
+                }
+
+                return doc
             }
         ]
     }
