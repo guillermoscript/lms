@@ -24,6 +24,9 @@ import { ExamnsSubmissionsAccess, ExamnsSubmissionsFields, ExamnsSubmissionsHook
 import GoogleButton from './components/Google/GoogleButton';
 import Notifications from './collections/Notifications';
 import Prompts from './collections/Prompt';
+import UserDocuments from './collections/UserDocuments';
+import Chats from './collections/Chats';
+import UserMessages from './collections/UserMessages';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
@@ -42,6 +45,7 @@ export default buildConfig({
   },
   cors: ['http://localhost:3000', 'http://localhost:3001'],
   collections: [
+    Chats,
     Courses,
     Currencies,
     Categories,
@@ -49,6 +53,7 @@ export default buildConfig({
     Enrollments,
     Evaluations,
     Media,
+    UserMessages,
     Notifications,
     Lessons,
     PaymentMethods,
@@ -59,6 +64,7 @@ export default buildConfig({
     Subscriptions,
     Orders,
     Users,
+    UserDocuments
   ],
   globals: [
     pagoMovil,

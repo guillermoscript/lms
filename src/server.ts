@@ -1,4 +1,5 @@
-import express from 'express';
+import path from 'path';
+import express, { Response } from 'express';
 import payload from 'payload';
 import { noReplyEmail } from './utilities/consts';
 import session from 'express-session';
@@ -8,6 +9,15 @@ import getCookieExpiration from 'payload/dist/utilities/getCookieExpiration'
 import jwt from 'jwt-simple'
 import tryCatch from './utilities/tryCatch';
 import { seed } from './seed';
+import { Configuration, OpenAIApi } from 'openai'
+import fs from 'fs';
+import { Readable } from 'stream';
+import { PayloadRequest } from 'payload/types';
+
+const  bufferToStream  = (buffer: Buffer) => {
+  return  Readable.from(buffer);
+}
+
 
 
 type GoogleUserInfo = {
@@ -31,6 +41,10 @@ type GoogleUserInfo = {
 
 require('dotenv').config();
 const app = express();
+const configuration = new Configuration({
+  apiKey: process.env.OPEN_AI_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 // Redirect root to Admin panel
 app.get('/', (_, res) => {
@@ -183,7 +197,7 @@ async function start() {
       res.redirect('http://localhost:3001/dashboard/account')
     }
   );
-
+    
   if (process.env.PAYLOAD_SEED === 'true') {
     payload.logger.info('Seeding Payload...')
     await seed(payload)
@@ -201,4 +215,23 @@ start().catch(error => {
   process.exit(1)
 })
 
+async function createChatCompletition(transcription: string, systemPrompt: string) {
 
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo-16k",
+    messages: [{
+        "role": "system",
+        "content": systemPrompt
+    },
+    {
+        "role": "user",
+        "content": transcription
+    }],
+    temperature: 0,
+    max_tokens: 10324,
+    // frequency_penalty: 0.14,
+    // presence_penalty: 0.15,
+  });
+
+  return response?.data.choices[0].message?.content
+}
